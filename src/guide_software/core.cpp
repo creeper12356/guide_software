@@ -3,17 +3,6 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 #include "dependencyinstaller.h"
-void Core::configure()
-{
-    QFile reader("./config.json");
-    reader.open(QIODevice::ReadOnly);
-    if(!reader.isOpen()){
-        qDebug() << "Exception: file not open";
-    }
-    config = new QJsonObject(QJsonDocument::fromJson(reader.readAll()).object());
-    reader.close();
-    qDebug() << "config = " << *config;
-}
 
 Core::Core(QApplication* a):
     QObject(nullptr),
@@ -26,6 +15,7 @@ Core::Core(QApplication* a):
     connect(mainPage->getUi()->check_button,&QPushButton::clicked,
             installer,&DependencyInstaller::checkDependencies);
     configure();
+    installer->show();
 //    if(!config->value("isDependencyInstalled").toBool()){
 //        //dependency not fully installed
 //        installer->exec();
@@ -39,4 +29,15 @@ Core::~Core()
     delete config;
     delete installer;
     delete mainPage;
+}
+void Core::configure()
+{
+    QFile reader("./config.json");
+    reader.open(QIODevice::ReadOnly);
+    if(!reader.isOpen()){
+        qDebug() << "Exception: file not open";
+    }
+    config = new QJsonObject(QJsonDocument::fromJson(reader.readAll()).object());
+    reader.close();
+    qDebug() << "config = " << *config;
 }

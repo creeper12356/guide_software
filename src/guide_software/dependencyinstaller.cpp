@@ -9,6 +9,11 @@ DependencyInstaller::DependencyInstaller(Core *c, QWidget *parent) :
     ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
+    proc = new QProcess(this);
+    proc->setProgram("bash");
+    proc->setArguments(QStringList() << "-c" << "xargs apt list < ./requirements.txt");
+
+    connect(proc,SIGNAL(finished(int)),this,SLOT(processDependencies()));
 }
 
 DependencyInstaller::~DependencyInstaller()
@@ -17,14 +22,18 @@ DependencyInstaller::~DependencyInstaller()
 }
 void DependencyInstaller::checkDependencies()
 {
-    static int count = 0;
-    qDebug() << count;
-    QProcess* proc = new QProcess(this);
-    proc->setProgram("bash");
-    proc->setArguments(QStringList() << "-c" << "apt list");
+    ui->textBrowser->clear();
+    if(proc->state() != QProcess::NotRunning){
+        qDebug() << "running";
+        return ;
+    }
     proc->start();
-    proc->waitForFinished(10000);
-    qDebug() << "result == " << proc->readAll();
-    proc->close();
-    ++count;
+    qDebug() << "started.";
+}
+
+void DependencyInstaller::processDependencies()
+{
+    qDebug() << "finished.";
+    QString res = QString(proc->readAllStandardOutput());
+    ui->textBrowser->setText(res);
 }

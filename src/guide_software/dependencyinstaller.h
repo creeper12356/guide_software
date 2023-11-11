@@ -12,6 +12,7 @@ class DependencyInstaller : public QDialog
     Q_OBJECT
 private:
     Core* core = nullptr;
+    QProcess* proc = nullptr;
 public:
     explicit DependencyInstaller(Core* core,QWidget *parent = nullptr);
     ~DependencyInstaller();
@@ -21,6 +22,8 @@ public:
      * an empty stringlist returned means all dependencies have been installed
      */
     void checkDependencies();
+private slots:
+    void processDependencies();
 private:
     Ui::DependencyInstaller *ui;
 };

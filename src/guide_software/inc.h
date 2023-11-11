@@ -18,4 +18,5 @@
 #include <QDir>
 
 #include <QDebug>
+#define SECOND 1000
 #endif // INC_H
