@@ -15,20 +15,16 @@ DependencyInstaller::~DependencyInstaller()
 {
     delete ui;
 }
-
-QStringList DependencyInstaller::checkDependencies()
+void DependencyInstaller::checkDependencies()
 {
-    this->show();
+    static int count = 0;
+    qDebug() << count;
     QProcess* proc = new QProcess(this);
-    proc->start("firefox",QStringList());
-//    if(!proc->waitForStarted()){
-//        qDebug() << "cannot start process.";
-//        return QStringList();
-//    }
-//    if(!proc->waitForFinished(3000)){
-//        qDebug() << "timeout";
-//        return QStringList();
-//    }
-//    qDebug() << proc->readAllStandardOutput();
-//    proc->close();
+    proc->setProgram("bash");
+    proc->setArguments(QStringList() << "-c" << "apt list");
+    proc->start();
+    proc->waitForFinished(10000);
+    qDebug() << "result == " << proc->readAll();
+    proc->close();
+    ++count;
 }

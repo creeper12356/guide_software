@@ -25,7 +25,7 @@ Core::Core(QApplication* a):
     installer = new DependencyInstaller(this);
     connect(mainPage->getUi()->check_button,&QPushButton::clicked,
             installer,&DependencyInstaller::checkDependencies);
-//    configure();
+    configure();
 //    if(!config->value("isDependencyInstalled").toBool()){
 //        //dependency not fully installed
 //        installer->exec();

@@ -20,7 +20,7 @@ public:
      * return a stringlist of absent dependencies.
      * an empty stringlist returned means all dependencies have been installed
      */
-    QStringList checkDependencies();
+    void checkDependencies();
 private:
     Ui::DependencyInstaller *ui;
 };
