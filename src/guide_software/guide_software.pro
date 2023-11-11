@@ -17,14 +17,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     core.cpp \
+    dependencyinstaller.cpp \
     main.cpp \
     mainpage.cpp
 
 HEADERS += \
     core.h \
+    dependencyinstaller.h \
+    inc.h \
     mainpage.h
 
 FORMS += \
+    dependencyinstaller.ui \
     mainpage.ui
 
 TRANSLATIONS += \
