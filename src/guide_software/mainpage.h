@@ -13,7 +13,7 @@ class MainPage : public QMainWindow
 private:
     Core* core = nullptr;
 public:
-    explicit MainPage(Core* core,QWidget *parent = nullptr);
+    MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();
 public:
     //getters

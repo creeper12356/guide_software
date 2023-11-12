@@ -21,8 +21,8 @@ private:
     DependencyInstaller* installer = nullptr;
 private:
     /*
-     * configure software before booting ,
-     * according to ./config.json
+     * read from ./config.json
+     * and configure before starting widgets
      */
     void configure();
 public:

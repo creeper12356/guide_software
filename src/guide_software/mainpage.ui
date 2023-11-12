@@ -66,19 +66,6 @@
      <string>仿真</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="check_button">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>380</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>检查</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

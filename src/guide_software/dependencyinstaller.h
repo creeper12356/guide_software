@@ -13,19 +13,34 @@ class DependencyInstaller : public QDialog
 private:
     Core* core = nullptr;
     QProcess* proc = nullptr;
+    /* list of packages that are to be installed */
+    QStringList pkgList;
 public:
-    explicit DependencyInstaller(Core* core,QWidget *parent = nullptr);
+    DependencyInstaller(Core* core,QWidget *parent = nullptr);
     ~DependencyInstaller();
-    /*TODO:
-     * check dependencies required,
-     * return a stringlist of absent dependencies.
-     * an empty stringlist returned means all dependencies have been installed
+    Ui::DependencyInstaller* getUi(){return ui;}
+    /*
+     * return if all dependencies required are installed,
+     * if not , the function will update pkgList as well as GUI
      */
-    void checkDependencies();
+    bool checkDependencies();
 private slots:
-    void processDependencies();
+    /*
+     * the slot will be called when user clicked yes(accepted)
+     */
+    void on_button_box_accepted();
+private:
+    /*
+     * install dependencies with password provided
+     */
+    void installDependencies(const QString &pwd);
 private:
     Ui::DependencyInstaller *ui;
+signals:
+    /*
+     * emitted when all dependencies are installed
+     */
+    void allInstalled();
 };
 
 #endif // DEPENDENCYINSTALLER_H

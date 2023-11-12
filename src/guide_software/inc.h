@@ -9,6 +9,7 @@
 #include <QProcess>
 
 #include <QDialog>
+#include <QInputDialog>
 #include <QMainWindow>
 
 #include <QJsonDocument>
