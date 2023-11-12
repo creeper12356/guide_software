@@ -68,13 +68,23 @@ void DependencyInstaller::installDependencies(const QString& pwd)
     QString installCmd =
             "echo " + pwd +
             " | sudo -S apt install -y ";
+    int pkgCount = pkgList.count();
+    int installCount = 0;
     for(auto pkgName:pkgList){
-        installCmd += pkgName + " ";
+        proc->setArguments(QStringList() << "-c" << installCmd + pkgName);
+        proc->start();
+        proc->waitForStarted(-1);
+        proc->waitForFinished(-1);
+        ++installCount;
+        qDebug() << pkgName + " installed! ";
     }
-    proc->setArguments(QStringList() << "-c" << installCmd);
-    proc->start();
-    proc->waitForStarted();
-    proc->waitForFinished();
+//    for(auto pkgName:pkgList){
+//        installCmd += pkgName + " ";
+//    }
+//    proc->setArguments(QStringList() << "-c" << installCmd);
+//    proc->start();
+//    proc->waitForStarted();
+//    proc->waitForFinished();
     qDebug() << "successfully installed " << pkgList;
     this->close();
     pkgList.clear();
