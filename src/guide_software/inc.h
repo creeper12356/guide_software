@@ -18,6 +18,8 @@
 #include <QFile>
 #include <QDir>
 
+#include <QKeyEvent>
+
 #include <QDebug>
 #define SECOND 1000
 #endif // INC_H

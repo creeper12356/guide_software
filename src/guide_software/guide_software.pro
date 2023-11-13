@@ -31,9 +31,6 @@ FORMS += \
     dependencyinstaller.ui \
     mainpage.ui
 
-TRANSLATIONS += \
-    guide_software_zh_CN.ts
-
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

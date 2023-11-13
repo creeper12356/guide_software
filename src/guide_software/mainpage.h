@@ -21,6 +21,7 @@ public:
 private slots:
     void on_exit_button_clicked();
 protected:
+    void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent *event) override;
 private:
     Ui::MainPage *ui;

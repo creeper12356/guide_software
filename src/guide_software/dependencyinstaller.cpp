@@ -8,8 +8,18 @@ DependencyInstaller::DependencyInstaller(Core *c, QWidget *parent) :
     ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
+    //by default show check GUI
+    this->switchCheckGUI();
+
     proc = new QProcess(this);
     proc->setProgram("bash");
+
+    pwdDialog = new QInputDialog(this);
+    pwdDialog->setLabelText("我们需要您提供用户的密码：");
+    pwdDialog->setTextEchoMode(QLineEdit::Password);
+    pwdDialog->setModal(true);
+
+    ui->progress_bar->hide();
 }
 
 DependencyInstaller::~DependencyInstaller()
@@ -57,9 +67,30 @@ bool DependencyInstaller::checkDependencies()
     return false;
 }
 
+void DependencyInstaller::switchCheckGUI()
+{
+    ui->hint_label->setText("检测到您的电脑上没有安装下列前置软件包:");
+    ui->pkg_list->show();
+    ui->q_label->show();
+    ui->button_box->show();
+    ui->progress_bar->hide();
+}
+
+void DependencyInstaller::switchInstallGUI()
+{
+    ui->hint_label->setText("正在安装中，这可能需要一点时间...");
+    ui->pkg_list->hide();
+    ui->q_label->hide();
+    ui->button_box->hide();
+    ui->progress_bar->setValue(0);
+    ui->progress_bar->show();
+}
+
 void DependencyInstaller::installDependencies(const QString& pwd)
 {
-    //TODO: if user enters wrong password?
+    pwdDialog->close();
+    //TODO: little strange here: cannot switch GUI inside this function?
+    //TODO: what if user enters wrong password?
     qDebug() << "start installing...";
     /*
      * this command allows sudo apt install without
@@ -76,17 +107,12 @@ void DependencyInstaller::installDependencies(const QString& pwd)
         proc->waitForStarted(-1);
         proc->waitForFinished(-1);
         ++installCount;
+        ui->progress_bar->setValue(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
     }
-//    for(auto pkgName:pkgList){
-//        installCmd += pkgName + " ";
-//    }
-//    proc->setArguments(QStringList() << "-c" << installCmd);
-//    proc->start();
-//    proc->waitForStarted();
-//    proc->waitForFinished();
     qDebug() << "successfully installed " << pkgList;
     this->close();
+    proc->close();
     pkgList.clear();
     ui->pkg_list->clear();
     emit allInstalled();
@@ -94,13 +120,9 @@ void DependencyInstaller::installDependencies(const QString& pwd)
 
 void DependencyInstaller::on_button_box_accepted()
 {
-    QInputDialog pwdDialog(this);
-    pwdDialog.setLabelText("我们需要您提供用户的密码：");
-    pwdDialog.setTextEchoMode(QLineEdit::Password);
-    connect(&pwdDialog,&QInputDialog::textValueSelected,[&pwdDialog,this](const QString& pwd){
-        qDebug() << "your pwd is " << pwd;
-        pwdDialog.close();
-        installDependencies(pwd);
-    });
-    pwdDialog.exec();
+    this->switchInstallGUI();
+    //if rejected , go back to check GUI.
+    connect(pwdDialog,&QInputDialog::rejected,this,&DependencyInstaller::switchCheckGUI);
+    connect(pwdDialog,&QInputDialog::textValueSelected,this,&DependencyInstaller::installDependencies);
+    pwdDialog->open();
 }

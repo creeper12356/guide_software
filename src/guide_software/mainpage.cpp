@@ -22,6 +22,13 @@ void MainPage::on_exit_button_clicked()
     this->close();
 }
 
+void MainPage::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Escape){
+        this->close();
+    }
+}
+
 void MainPage::closeEvent(QCloseEvent *event)
 {
     emit closed();

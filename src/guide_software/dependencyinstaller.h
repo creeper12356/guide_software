@@ -13,6 +13,8 @@ class DependencyInstaller : public QDialog
 private:
     Core* core = nullptr;
     QProcess* proc = nullptr;
+    /* subdialog popping up when asking for password */
+    QInputDialog* pwdDialog = nullptr;
     /* list of packages that are to be installed */
     QStringList pkgList;
 public:
@@ -25,11 +27,14 @@ public:
      */
     bool checkDependencies();
 private slots:
+    /* GUI functions */
+    void switchCheckGUI();
+    void switchInstallGUI();
     /*
      * the slot will be called when user clicked yes(accepted)
      */
     void on_button_box_accepted();
-private:
+
     /*
      * install dependencies with password provided
      */
