@@ -91,14 +91,29 @@
         comm installed.txt requirements.txt -13
         ```
         -13选项表示省略1，3列，只输出第2列，刚好是requirements.txt有，而installed.txt没有的，对应的就是没有安装的软件包
-    
+
+2023.11.15
+* 解决使用apt list重定向至文件时产生的警告:```WARNING: apt does not have a stable CLI interface. Use with caution in scripts.``` 
+    产生该警告的根本原因是，apt 是apt-get的前端，它很好的支持命令行交互，但是无法提供稳定的脚本输出。然而，程序中需要使用apt list来列出已经安装软件的列表，如果将所有std error output都重定向消除：
+    ```bash
+    apt list $dependency > result.log 2> /dev/null
+    ```
+    其中，>表示重定向标准输出，2>表示重定向标准错误输出，而重定向目的地/dev/null表示丢弃所有标准错误输出。
+* 处理两种最常见的错误：
+    如前所述，DependencyInstaller将丢弃安装过程中所有的错误。然而，为了提高软件的易用性，软件将在安装之前处理最常见的两种错误：
+        * 密码错误
+        * 网络未连接
+    如果以上两种错误出现，将终止安装，并在界面上显示出错误。
+        * 密码错误
+        * 网络未连接
+
+
 ## Bug Report
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。
 * 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动,同时，requirements.txt必须为有序文件。
 * (**Solved**)MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
 * 下载软件包过程中，出现GUI冻结导致程序无响应
 * execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
-* dpkg-preconfigure warning.
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:
