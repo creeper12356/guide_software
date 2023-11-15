@@ -66,8 +66,8 @@
     ```bash
     tail filename -n +6 #输出从第6行到末尾
     ```
-    * **cut**\
-    cut命令接收文件或标准输入，对表格中的列进行处理。\
+    * **cut**
+    cut命令接收文件或标准输入，对表格中的列进行处理。
         * 使用-c选项按字符截取表格中的列:
         ```bash
         cut tabname -c 1-3 #截取表格中的1-3字符的列
@@ -94,9 +94,11 @@
     
 ## Bug Report
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。
-* 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动。
-* MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
-
+* 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动,同时，requirements.txt必须为有序文件。
+* (**Solved**)MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
+* 下载软件包过程中，出现GUI冻结导致程序无响应
+* execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
+* dpkg-preconfigure warning.
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:

@@ -10,35 +10,35 @@ class Core;
 class DependencyInstaller : public QDialog
 {
     Q_OBJECT
-private:
+protected:
     Core* core = nullptr;
     QProcess* proc = nullptr;
-    /* subdialog popping up when asking for password */
+    /* subdialog that pops up when asking for password */
     QInputDialog* pwdDialog = nullptr;
     /* list of packages that are to be installed */
     QStringList pkgList;
 public:
     DependencyInstaller(Core* core,QWidget *parent = nullptr);
-    ~DependencyInstaller();
+    virtual ~DependencyInstaller();
     Ui::DependencyInstaller* getUi(){return ui;}
     /*
      * return if all dependencies required are installed,
      * if not , the function will update pkgList as well as GUI
      */
-    bool checkDependencies();
+    virtual bool checkDependencies();
 private slots:
     /* GUI functions */
-    void switchCheckGUI();
-    void switchInstallGUI();
+    virtual void switchCheckGUI();
+    virtual void switchInstallGUI();
     /*
      * the slot will be called when user clicked yes(accepted)
      */
-    void on_button_box_accepted();
+    virtual void on_button_box_accepted();
 
     /*
      * install dependencies with password provided
      */
-    void installDependencies(const QString &pwd);
+    virtual void installDependencies(const QString &pwd);
 private:
     Ui::DependencyInstaller *ui;
 signals:
@@ -46,6 +46,12 @@ signals:
      * emitted when all dependencies are installed
      */
     void allInstalled();
+    /*
+     * this signal will be send to core
+     * core will pop up a critical dialog(showing errMsg)
+     * then quit application
+     */
+    void error(QString errMsg);
 };
 
 #endif // DEPENDENCYINSTALLER_H

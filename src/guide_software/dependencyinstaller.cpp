@@ -88,10 +88,21 @@ void DependencyInstaller::switchInstallGUI()
 
 void DependencyInstaller::installDependencies(const QString& pwd)
 {
+    /*
+     * first part : sudo apt install
+     */
+    /*
+     *	TODO: check if password is right
+     */
     pwdDialog->close();
-    //TODO: little strange here: cannot switch GUI inside this function?
     //TODO: what if user enters wrong password?
     qDebug() << "start installing...";
+    /* need sudo apt update */
+//    proc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
+//    proc->start();
+//    proc->waitForStarted(-1);
+//    proc->waitForFinished(-1);
+//    qDebug() << "update finished.";
     /*
      * this command allows sudo apt install without
      * manually input password in terminal
@@ -101,11 +112,19 @@ void DependencyInstaller::installDependencies(const QString& pwd)
             " | sudo -S apt install -y ";
     int pkgCount = pkgList.count();
     int installCount = 0;
+    QString stdErrOutput;
     for(auto pkgName:pkgList){
         proc->setArguments(QStringList() << "-c" << installCmd + pkgName);
+        qDebug() << "proc.arg" << proc->arguments();
         proc->start();
         proc->waitForStarted(-1);
         proc->waitForFinished(-1);
+        stdErrOutput = proc->readAllStandardError();
+        qDebug() << "stdErr" << stdErrOutput;
+//        if(!stdErrOutput.isEmpty()){
+            //an error occurs
+//            emit error(stdErrOutput);
+//        }
         ++installCount;
         ui->progress_bar->setValue(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
@@ -115,6 +134,9 @@ void DependencyInstaller::installDependencies(const QString& pwd)
     proc->close();
     pkgList.clear();
     ui->pkg_list->clear();
+    /*
+     * second part: pip3 install
+     */
     emit allInstalled();
 }
 

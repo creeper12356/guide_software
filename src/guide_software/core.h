@@ -4,6 +4,7 @@
 #include "inc.h"
 class MainPage;
 class DependencyInstaller;
+class PyLibInstaller;
 class Core:public QObject
 {
     Q_OBJECT
@@ -19,6 +20,7 @@ private:
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
+    PyLibInstaller* py_installer = nullptr;
 private:
     /*
      * read from ./config.json
@@ -29,6 +31,7 @@ public:
     Core(QApplication* app);
     ~Core();
 private slots:
+    void reportError(QString errMsg);
 };
 
 #endif // CORE_H

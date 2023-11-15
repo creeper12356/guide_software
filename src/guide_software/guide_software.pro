@@ -19,13 +19,15 @@ SOURCES += \
     core.cpp \
     dependencyinstaller.cpp \
     main.cpp \
-    mainpage.cpp
+    mainpage.cpp \
+    pylibinstaller.cpp
 
 HEADERS += \
     core.h \
     dependencyinstaller.h \
     inc.h \
-    mainpage.h
+    mainpage.h \
+    pylibinstaller.h
 
 FORMS += \
     dependencyinstaller.ui \

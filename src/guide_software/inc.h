@@ -11,6 +11,7 @@
 #include <QDialog>
 #include <QInputDialog>
 #include <QMainWindow>
+#include <QMessageBox>
 
 #include <QJsonDocument>
 #include <QJsonObject>
