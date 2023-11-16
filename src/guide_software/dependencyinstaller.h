@@ -21,24 +21,11 @@ public:
     DependencyInstaller(Core* core,QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
     Ui::DependencyInstaller* getUi(){return ui;}
-    /*
-     * return if all dependencies required are installed,
-     * if not , the function will update pkgList as well as GUI
-     */
-    virtual bool checkDependencies();
-private slots:
+public slots:
     /* GUI functions */
     virtual void switchCheckGUI();
     virtual void switchInstallGUI();
-    /*
-     * the slot will be called when user clicked yes(accepted)
-     */
-    virtual void on_button_box_accepted();
-
-    /*
-     * install dependencies with password provided
-     */
-    virtual void installDependencies(const QString &pwd);
+    void showUnmetDependencies(const QStringList& list);
 private:
     Ui::DependencyInstaller *ui;
 signals:

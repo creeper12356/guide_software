@@ -20,7 +20,13 @@ private:
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
-    PyLibInstaller* py_installer = nullptr;
+//    PyLibInstaller* py_installer = nullptr;
+    QInputDialog* pwdDialog = nullptr;
+
+    //processes behind widgets
+    QProcess* installerProc = nullptr;
+    //list of names of unmet dependencies
+    QStringList pkgList;
 private:
     /*
      * read from ./config.json
@@ -30,8 +36,25 @@ private:
 public:
     Core(QApplication* app);
     ~Core();
+private:
+    bool checkDependencies();
+    void installDependencies(const QString& pwd);
 private slots:
     void reportError(QString errMsg);
+    void askForPwd();
+signals:
+    /*
+     * send to dependency installer
+     * to show unmet dependencies
+     * in GUI
+     */
+    void unmetDependencies(const QStringList& list);
+    /*
+     * send to dependency installer
+     * to show installing process
+     * process is between 0 and 100
+     */
+    void installProcess(int process);
 };
 
 #endif // CORE_H
