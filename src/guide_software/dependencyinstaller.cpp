@@ -13,11 +13,11 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
     //by default show check GUI
     this->switchCheckGUI();
     //init process
-    installerProc = new QProcess(this);
-    installerProc->setProgram("bash");
+    proc = new QProcess(this);
+    proc->setProgram("bash");
 
     //use event loop to avoid freezing GUIs
-    connect(installerProc,SIGNAL(finished(int)),
+    connect(proc,SIGNAL(finished(int)),
             eventLoop,SLOT(quit()));
     connect(this,&DependencyInstaller::installProcess,
             ui->progress_bar,&QProgressBar::setValue);
@@ -30,7 +30,7 @@ DependencyInstaller::~DependencyInstaller()
 }
 bool DependencyInstaller::checkDependencies()
 {
-    if(installerProc->state() != QProcess::NotRunning){
+    if(proc->state() != QProcess::NotRunning){
         qDebug() << "The process is busy now.";
         return true;
     }
@@ -46,13 +46,13 @@ bool DependencyInstaller::checkDependencies()
             "comm installed.txt requirements.txt -13"
             "&& "
             "rm installed.txt ";
-    installerProc->setArguments(QStringList() << "-c" << getNotinstalledCmd);
-    installerProc->start();
+    proc->setArguments(QStringList() << "-c" << getNotinstalledCmd);
+    proc->start();
     eventLoop->exec();
     pkgList.clear();
 
     //use QTextStream to read lines from QIODevice
-    QTextStream stream(installerProc);
+    QTextStream stream(proc);
     while(!stream.atEnd()){
         pkgList.append(stream.readLine());
     }
@@ -61,12 +61,12 @@ bool DependencyInstaller::checkDependencies()
         //find unmetDependencies
         showUnmetDependencies(pkgList);
     }
-    installerProc->close();
+    proc->close();
     return pkgList.empty();
 }
 void DependencyInstaller::installDependencies(const QString& pwd)
 {
-    if(installerProc->state() != QProcess::NotRunning){
+    if(proc->state() != QProcess::NotRunning){
         qDebug() << "The process is busy now.";
         return ;
     }
@@ -79,11 +79,10 @@ void DependencyInstaller::installDependencies(const QString& pwd)
     /*
      * TODO: check if network is ok
      */
-    //TODO: what if user enters wrong password?
     qDebug() << "start installing...";
     /* need sudo apt update */
-    installerProc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
-    installerProc->start();
+    proc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
+    proc->start();
     eventLoop->exec();
     qDebug() << "update finished.";
     /*
@@ -98,39 +97,36 @@ void DependencyInstaller::installDependencies(const QString& pwd)
     int pkgCount = pkgList.count();
     int installCount = 0;
     for(auto pkgName:pkgList){
-        installerProc->setArguments(QStringList() << "-c" << installCmd.arg(pkgName));
-        installerProc->start();
+        proc->setArguments(QStringList() << "-c" << installCmd.arg(pkgName));
+        proc->start();
         eventLoop->exec();
         ++installCount;
-    //show intallation progress in real time
+    //GUI display intallation progress in real time
         emit installProcess(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
     }
     qDebug() << "successfully installed " << pkgList;
-    installerProc->close();
+    proc->close();
     pkgList.clear();
-    /*
-     * second part: pip3 install
-     */
 }
 
 bool DependencyInstaller::checkAndInstall()
 {
-    isAccepted = false;
     if(checkDependencies()){
+        //dependencies all installed
         return true;
     }
+    //pre-set
+    isAccepted = false;
     this->show();
-    //when the user accepts or rejects the widget
+    //after user clicks the button box
     //the eventLoop quits
     connect(ui->button_box,&QDialogButtonBox::clicked,
            eventLoop,&QEventLoop::quit);
     connect(ui->button_box,&QDialogButtonBox::accepted,
             this,&DependencyInstaller::setAccepted);
     eventLoop->exec();
-    qDebug() << "result == " << this->result();
     if(!isAccepted){
-        //the user refuses to install
         /*TODO : improve it.
          */
         return false;

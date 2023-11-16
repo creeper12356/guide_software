@@ -11,17 +11,15 @@ Core::Core(QApplication* a):
     app(a)
 {
     eventLoop = new QEventLoop(this);
-    //TODO: check if eventLoop is deleted properly
 
-    //config by reading from local file
+    //configure with local file
     configure();
+    //init widget pages
     mainPage = new MainPage(this);
     installer = new DependencyInstaller(this,eventLoop,pwdDialog);
     initPwdDialog();
 
-    //connecting signals and slots
     initConnections();
-
 
     //check if all requirements are met.
     if(installer->checkAndInstall()){
@@ -29,7 +27,8 @@ Core::Core(QApplication* a):
     }
     else{
         qDebug() << "about to quit.";
-        installer->reject();
+        app->quit();
+        app->quit();
     }
 }
 
@@ -43,16 +42,13 @@ Core::~Core()
 }
 void Core::initConnections()
 {
-    //app backend will quit iff the mainpage is closed
+    //app backend quits iff the mainpage is closed
     connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
     //if user do not want to install right now , then quit program
     //use QueuedConnection to assert thread safety
     connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
-        //if user cancels inputing password, installer GUI should switch back.
-//    connect(pwdDialog,&QInputDialog::rejected,
-//            installer,&DependencyInstaller::switchCheckGUI);
-        //report installer error
+    //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
 }
@@ -73,16 +69,6 @@ void Core::reportError(QString errMsg)
      */
     app->quit();
 }
-
-//void Core::processInstallFinished()
-//{
-//    qDebug() << "after installation.";
-//    installer->switchCheckGUI();
-//    if(checkDependencies()){
-//        installer->close();
-//        mainPage->show();
-//    }
-//}
 
 void Core::configure()
 {

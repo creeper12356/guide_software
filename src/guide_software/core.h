@@ -38,10 +38,10 @@ public:
     ~Core();
 private:
     //init functions
+    /* init GUI of password dialog */
     inline void initPwdDialog();
+    /* init signals and slots connection */
     inline void initConnections();
-private:
-
 private slots:
     void reportError(QString errMsg);
 };

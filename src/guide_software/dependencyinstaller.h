@@ -14,7 +14,8 @@ protected:
     Core* core = nullptr;
     /*
      * pointer to core's member eventLoop
-     * used to get rid of GUI freezing
+     * used to process GUI events
+     * used to wait for user to react
      */
     QEventLoop*& eventLoop;
     /*
@@ -23,14 +24,12 @@ protected:
      */
     QInputDialog*& pwdDialog;
 
-    //processes behind widgets
-    QProcess* installerProc = nullptr;
-    //list of names of unmet dependencies
+    /* the process runnning bash */
+    QProcess* proc = nullptr;
+    /* list of names of unmet dependencies */
     QStringList pkgList;
 
-    /*
-     * updated after user accpets or rejects it
-     */
+     /* updated after user accpets or rejects it */
     bool isAccepted = false;
 public:
     DependencyInstaller(Core* core,QEventLoop*& eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
@@ -39,16 +38,18 @@ public:
     Ui::DependencyInstaller* getUi(){return ui;}
 protected:
     /*
-     * check if dependencies in requirements.txt
-     * are all met
+     * return if all dependencies in requirements.txt are met
      */
     bool checkDependencies();
+    /*
+     * install dependencies using password
+     */
     void installDependencies(const QString& pwd);
 public:
     /*
      * check and install dependencies
      * called by other classes(for example , Core)
-     * return if dependencies are successfully installed
+     * return if dependencies are finally installed
      */
     bool checkAndInstall();
 public slots:
@@ -69,9 +70,9 @@ signals:
     void error(QString errMsg);
     /*
      * emitted to front end to show install process
+     * value is in range [1,100]
      */
     void installProcess(int value);
-
 };
 
 #endif // DEPENDENCYINSTALLER_H
