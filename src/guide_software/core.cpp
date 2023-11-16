@@ -16,15 +16,20 @@ Core::Core(QApplication* a):
     //config by reading from local file
     configure();
     mainPage = new MainPage(this);
-    installer = new DependencyInstaller(this);
-    initProcesses();
+    installer = new DependencyInstaller(this,eventLoop,pwdDialog);
     initPwdDialog();
 
     //connecting signals and slots
     initConnections();
+
+
     //check if all requirements are met.
-    if(this->checkDependencies()){
+    if(installer->checkAndInstall()){
         mainPage->show();
+    }
+    else{
+        qDebug() << "about to quit.";
+        installer->reject();
     }
 }
 
@@ -35,43 +40,21 @@ Core::~Core()
     delete installer;
     delete mainPage;
     delete pwdDialog;
-
-    delete installerProc;
 }
-
-void Core::initProcesses()
-{
-    installerProc = new QProcess(this);
-    installerProc->setProgram("bash");
-}
-
 void Core::initConnections()
 {
-    //use event loop to avoid freezing GUIs
-    connect(installerProc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     //app backend will quit iff the mainpage is closed
     connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
-    connect(this,&Core::unmetDependencies,
-            installer,&DependencyInstaller::showUnmetDependencies);
-    //if user want to install right now , then ask for password
-    connect(installer->getUi()->button_box,&QDialogButtonBox::accepted,
-            this,&Core::askForPwd);
     //if user do not want to install right now , then quit program
+    //use QueuedConnection to assert thread safety
     connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
-    //after the user inputs password , installation process begins.
-    connect(pwdDialog,&QInputDialog::textValueSelected,
-            this,&Core::installDependencies);
-    //if user cancels inputing password, installer GUI should switch back.
-    connect(pwdDialog,&QInputDialog::rejected,
-            installer,&DependencyInstaller::switchCheckGUI);
-    //show intallation progress in real time
-    connect(this,&Core::installProcess,
-            installer->getUi()->progress_bar,&QProgressBar::setValue);
-    connect(this,&Core::installFinished,this,&Core::processInstallFinished);
-    //report installer error
-    connect(installer,&DependencyInstaller::error,
-            this,&Core::reportError);
+        //if user cancels inputing password, installer GUI should switch back.
+//    connect(pwdDialog,&QInputDialog::rejected,
+//            installer,&DependencyInstaller::switchCheckGUI);
+        //report installer error
+//    connect(installer,&DependencyInstaller::error,
+//            this,&Core::reportError);
 }
 
 void Core::initPwdDialog()
@@ -82,93 +65,6 @@ void Core::initPwdDialog()
     pwdDialog->setModal(true);
 }
 
-bool Core::checkDependencies()
-{
-    if(installerProc->state() != QProcess::NotRunning){
-        qDebug() << "The process is busy now.";
-        return true;
-    }
-
-    //this command standard outputs a list of packages not installed
-    QString getNotinstalledCmd =
-            "xargs apt list --installed < requirements.txt "
-            "| tail -n +2 "
-            "| cut -f 1 -d / "
-            "| sort "
-            "> installed.txt "
-            "&& "
-            "comm installed.txt requirements.txt -13"
-            "&& "
-            "rm installed.txt ";
-    installerProc->setArguments(QStringList() << "-c" << getNotinstalledCmd);
-    installerProc->start();
-    eventLoop->exec();
-    pkgList.clear();
-
-    //use QTextStream to read lines from QIODevice
-    QTextStream stream(installerProc);
-    while(!stream.atEnd()){
-        pkgList.append(stream.readLine());
-    }
-
-    if(!pkgList.empty()){
-        emit unmetDependencies(pkgList);
-    }
-    installerProc->close();
-    return pkgList.empty();
-}
-void Core::installDependencies(const QString& pwd)
-{
-    pwdDialog->close();
-    if(installerProc->state() != QProcess::NotRunning){
-        qDebug() << "The process is busy now.";
-        return ;
-    }
-    /*
-     * first part : sudo apt install
-     */
-    /*
-     *	TODO: check if password is right
-     */
-    /*
-     * TODO: check if network is ok
-     */
-    //TODO: what if user enters wrong password?
-    qDebug() << "start installing...";
-    /* need sudo apt update */
-    installerProc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
-    installerProc->start();
-    eventLoop->exec();
-    qDebug() << "update finished.";
-    /*
-     * this command allows sudo apt install without
-     * manually input password in terminal
-     */
-    //TODO: redirect error output to /dev/null
-    QString installCmd =
-            "echo " + pwd +
-            " | sudo -S apt install %1 -y "
-            "2>> error.log";
-    int pkgCount = pkgList.count();
-    int installCount = 0;
-    for(auto pkgName:pkgList){
-        app->processEvents();
-        installerProc->setArguments(QStringList() << "-c" << installCmd.arg(pkgName));
-        installerProc->start();
-        eventLoop->exec();
-        ++installCount;
-        emit installProcess(100.0 * installCount / pkgCount);
-        qDebug() << pkgName + " installed! ";
-    }
-    qDebug() << "successfully installed " << pkgList;
-    installerProc->close();
-    pkgList.clear();
-    /*
-     * second part: pip3 install
-     */
-    emit installFinished();
-    return ;
-    }
 void Core::reportError(QString errMsg)
 {
     QMessageBox::critical(nullptr,"error",errMsg);
@@ -178,22 +74,15 @@ void Core::reportError(QString errMsg)
     app->quit();
 }
 
-void Core::askForPwd()
-{
-    qDebug() << "accepted";
-    installer->switchInstallGUI();
-    pwdDialog->show();
-}
-
-void Core::processInstallFinished()
-{
-    qDebug() << "after installation.";
-    installer->switchCheckGUI();
-    if(checkDependencies()){
-        installer->close();
-        mainPage->show();
-    }
-}
+//void Core::processInstallFinished()
+//{
+//    qDebug() << "after installation.";
+//    installer->switchCheckGUI();
+//    if(checkDependencies()){
+//        installer->close();
+//        mainPage->show();
+//    }
+//}
 
 void Core::configure()
 {

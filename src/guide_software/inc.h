@@ -12,6 +12,7 @@
 #include <QInputDialog>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include <QJsonDocument>
 #include <QJsonObject>
