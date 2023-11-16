@@ -107,6 +107,13 @@
         * 密码错误
         * 网络未连接
 
+2023.11.16
+* 解决安装过程中GUI冻结的问题
+安装过程中GUI冻结的原因在于程序阻塞在了waitForFinished函数，无法相应GUI事件，这将带来极差的用户体验。参考了https://doc.qt.io/archives/qq/qq27-responsive-guis.html 之后，找到了几种可行的解决方案。
+    * 使用一个工作线程，将需要长时间阻塞的安装工作移动到与主线程分离的新线程，重新实现QThread类或调用QObject::moveToThread()函数。
+    * 使用一个局部的事件循环。waitForFinished函数之所以会造成GUI阻塞，是因为在等待进程执行完毕时，并没有使用一个新的事件循环来相应GUI事件，因此可以构造一个局部的QEventLoop对象，连接信号和槽，在进程开始时调用QEventLoop::exec()等待进程结束。本方法可以简单解决GUI冻结问题。
+    * 并行编程。继承QRunnable并覆写run()方法，同时使用QFutureWatcher观察进度。
+
 
 ## Bug Report
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。

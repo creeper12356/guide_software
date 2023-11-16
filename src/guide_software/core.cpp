@@ -10,46 +10,22 @@ Core::Core(QApplication* a):
     QObject(nullptr),
     app(a)
 {
+    eventLoop = new QEventLoop(this);
+    //TODO: check if eventLoop is deleted properly
+
+    //config by reading from local file
     configure();
     mainPage = new MainPage(this);
-    //app backend quit iff the mainpage is closed
-    connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
     installer = new DependencyInstaller(this);
-    //init processes
-    installerProc = new QProcess(this);
-    installerProc->setProgram("bash");
-
-    pwdDialog = new QInputDialog();
-    pwdDialog->setLabelText("我们需要您提供用户的密码：");
-    pwdDialog->setTextEchoMode(QLineEdit::Password);
-//    pwdDialog->setModal(true);
-
+    initProcesses();
+    initPwdDialog();
 
     //connecting signals and slots
-    //test
-    connect(this,&Core::unmetDependencies,installer,&DependencyInstaller::showUnmetDependencies);
-    connect(installer->getUi()->button_box,&QDialogButtonBox::accepted,
-            this,&Core::askForPwd);
-    connect(pwdDialog,&QInputDialog::textValueSelected,this,&Core::installDependencies);
-    connect(this,&Core::installProcess,
-            installer->getUi()->progress_bar,&QProgressBar::setValue);
-    //test
-    connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
-            app,&QApplication::quit,Qt::QueuedConnection);
-    connect(installer,&DependencyInstaller::allInstalled,
-                mainPage,&MainPage::show);
-    connect(installer,&DependencyInstaller::error,
-            this,&Core::reportError);
-
+    initConnections();
     //check if all requirements are met.
     if(this->checkDependencies()){
         mainPage->show();
     }
-//    if(!installer->checkDependencies()){
-//        installer->show();
-//    else{
-//        mainPage->show();
-//    }
 }
 
 Core::~Core()
@@ -61,6 +37,49 @@ Core::~Core()
     delete pwdDialog;
 
     delete installerProc;
+}
+
+void Core::initProcesses()
+{
+    installerProc = new QProcess(this);
+    installerProc->setProgram("bash");
+}
+
+void Core::initConnections()
+{
+    //use event loop to avoid freezing GUIs
+    connect(installerProc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
+    //app backend will quit iff the mainpage is closed
+    connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
+    connect(this,&Core::unmetDependencies,
+            installer,&DependencyInstaller::showUnmetDependencies);
+    //if user want to install right now , then ask for password
+    connect(installer->getUi()->button_box,&QDialogButtonBox::accepted,
+            this,&Core::askForPwd);
+    //if user do not want to install right now , then quit program
+    connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
+            app,&QApplication::quit,Qt::QueuedConnection);
+    //after the user inputs password , installation process begins.
+    connect(pwdDialog,&QInputDialog::textValueSelected,
+            this,&Core::installDependencies);
+    //if user cancels inputing password, installer GUI should switch back.
+    connect(pwdDialog,&QInputDialog::rejected,
+            installer,&DependencyInstaller::switchCheckGUI);
+    //show intallation progress in real time
+    connect(this,&Core::installProcess,
+            installer->getUi()->progress_bar,&QProgressBar::setValue);
+    connect(this,&Core::installFinished,this,&Core::processInstallFinished);
+    //report installer error
+    connect(installer,&DependencyInstaller::error,
+            this,&Core::reportError);
+}
+
+void Core::initPwdDialog()
+{
+    pwdDialog = new QInputDialog();
+    pwdDialog->setLabelText("我们需要您提供用户的密码：");
+    pwdDialog->setTextEchoMode(QLineEdit::Password);
+    pwdDialog->setModal(true);
 }
 
 bool Core::checkDependencies()
@@ -83,11 +102,9 @@ bool Core::checkDependencies()
             "rm installed.txt ";
     installerProc->setArguments(QStringList() << "-c" << getNotinstalledCmd);
     installerProc->start();
-    //this two wait will not timeout
-    installerProc->waitForStarted(-1);
-    installerProc->waitForFinished(-1);
-    //run script finished
+    eventLoop->exec();
     pkgList.clear();
+
     //use QTextStream to read lines from QIODevice
     QTextStream stream(installerProc);
     while(!stream.atEnd()){
@@ -121,8 +138,7 @@ void Core::installDependencies(const QString& pwd)
     /* need sudo apt update */
     installerProc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
     installerProc->start();
-    installerProc->waitForStarted(-1);
-    installerProc->waitForFinished(-1);
+    eventLoop->exec();
     qDebug() << "update finished.";
     /*
      * this command allows sudo apt install without
@@ -139,8 +155,7 @@ void Core::installDependencies(const QString& pwd)
         app->processEvents();
         installerProc->setArguments(QStringList() << "-c" << installCmd.arg(pkgName));
         installerProc->start();
-        installerProc->waitForStarted(-1);
-        installerProc->waitForFinished(-1);
+        eventLoop->exec();
         ++installCount;
         emit installProcess(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
@@ -151,19 +166,9 @@ void Core::installDependencies(const QString& pwd)
     /*
      * second part: pip3 install
      */
-    /*
-     * TODO: check if all dependency installed again
-     */
-    if(checkDependencies()){
-        qDebug() << "all installed";
-        installer->close();
-        mainPage->show();
+    emit installFinished();
+    return ;
     }
-    else{
-        qDebug() << "not successful";
-        installer->switchCheckGUI();
-    }
-}
 void Core::reportError(QString errMsg)
 {
     QMessageBox::critical(nullptr,"error",errMsg);
@@ -179,6 +184,17 @@ void Core::askForPwd()
     installer->switchInstallGUI();
     pwdDialog->show();
 }
+
+void Core::processInstallFinished()
+{
+    qDebug() << "after installation.";
+    installer->switchCheckGUI();
+    if(checkDependencies()){
+        installer->close();
+        mainPage->show();
+    }
+}
+
 void Core::configure()
 {
     QFile reader("./config.json");

@@ -17,6 +17,7 @@ private:
      * pointing at currently running application
      */
     QApplication* app = nullptr;
+    QEventLoop* eventLoop = nullptr;
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
@@ -37,11 +38,17 @@ public:
     Core(QApplication* app);
     ~Core();
 private:
+    //init functions
+    inline void initPwdDialog();
+    inline void initProcesses();
+    inline void initConnections();
+private:
     bool checkDependencies();
     void installDependencies(const QString& pwd);
 private slots:
     void reportError(QString errMsg);
     void askForPwd();
+    void processInstallFinished();
 signals:
     /*
      * send to dependency installer
@@ -55,6 +62,10 @@ signals:
      * process is between 0 and 100
      */
     void installProcess(int process);
+    /*
+     * emitted when function installDependencies finishes
+     */
+    void installFinished();
 };
 
 #endif // CORE_H

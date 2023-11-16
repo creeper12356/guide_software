@@ -12,11 +12,6 @@ class DependencyInstaller : public QDialog
     Q_OBJECT
 protected:
     Core* core = nullptr;
-    QProcess* proc = nullptr;
-    /* subdialog that pops up when asking for password */
-    QInputDialog* pwdDialog = nullptr;
-    /* list of packages that are to be installed */
-    QStringList pkgList;
 public:
     DependencyInstaller(Core* core,QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
@@ -29,10 +24,6 @@ public slots:
 private:
     Ui::DependencyInstaller *ui;
 signals:
-    /*
-     * emitted when all dependencies are installed
-     */
-    void allInstalled();
     /*
      * this signal will be send to core
      * core will pop up a critical dialog(showing errMsg)

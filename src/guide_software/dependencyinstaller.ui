@@ -90,8 +90,8 @@
   <widget class="QSlider" name="horizontalSlider">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>150</y>
+     <x>140</x>
+     <y>80</y>
      <width>160</width>
      <height>16</height>
     </rect>

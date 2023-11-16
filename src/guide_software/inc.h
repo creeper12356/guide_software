@@ -20,6 +20,7 @@
 #include <QDir>
 
 #include <QKeyEvent>
+#include <QEventLoop>
 
 #include <QDebug>
 #define SECOND 1000
