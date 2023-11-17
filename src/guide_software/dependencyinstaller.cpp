@@ -116,20 +116,24 @@ bool DependencyInstaller::checkAndInstall()
         //dependencies all installed
         return true;
     }
-    //pre-set
-    isAccepted = false;
-    this->show();
     //after user clicks the button box
     //the eventLoop quits
     connect(ui->button_box,&QDialogButtonBox::clicked,
            eventLoop,&QEventLoop::quit);
     connect(ui->button_box,&QDialogButtonBox::accepted,
             this,&DependencyInstaller::setAccepted);
-    eventLoop->exec();
-    if(!isAccepted){
+
+    while(true){
+        //pre-set
+        isAccepted = false;
+        this->show();
+        eventLoop->exec();
+        if(!isAccepted){
         /*TODO : improve it.
          */
         return false;
+    }
+
     }
     //the user accepts to install
 
