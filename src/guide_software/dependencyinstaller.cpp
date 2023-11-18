@@ -2,8 +2,8 @@
 #include "dependencyinstaller.h"
 #include "ui_dependencyinstaller.h"
 #include "core.h"
-DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialog *&pd, QWidget *parent) :
-    QDialog(parent),
+DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialog *&pd, QWidget *parent)
+   :QDialog(parent),
     core(c),
     eventLoop(loop),
     pwdDialog(pd),
@@ -22,6 +22,16 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
     connect(this,&DependencyInstaller::installProcess,
             ui->progress_bar,&QProgressBar::setValue);
 
+    //after user clicks the button box
+    //the eventLoop quits
+    connect(ui->button_box,&QDialogButtonBox::clicked,
+           eventLoop,&QEventLoop::quit);
+    connect(ui->button_box,&QDialogButtonBox::accepted,
+            this,&DependencyInstaller::setAccepted);
+    //when the user select or cancel the password dialog
+    //the eventLoop quits
+    connect(pwdDialog,&QInputDialog::finished,
+            eventLoop,&QEventLoop::quit);
 }
 
 DependencyInstaller::~DependencyInstaller()
@@ -112,51 +122,42 @@ void DependencyInstaller::installDependencies(const QString& pwd)
 
 bool DependencyInstaller::checkAndInstall()
 {
+    //check dependencies first,
+    //if all installed , return true
     if(checkDependencies()){
-        //dependencies all installed
         return true;
     }
-    //after user clicks the button box
-    //the eventLoop quits
-    connect(ui->button_box,&QDialogButtonBox::clicked,
-           eventLoop,&QEventLoop::quit);
-    connect(ui->button_box,&QDialogButtonBox::accepted,
-            this,&DependencyInstaller::setAccepted);
-
+    //if not all installed
     while(true){
-        //pre-set
+        //pre-set flags
         isAccepted = false;
+
+        //wait for the user to accept or reject
         this->show();
         eventLoop->exec();
         if(!isAccepted){
-        /*TODO : improve it.
-         */
-        return false;
+            return false;
+        }
+        //the user accepts to install
+
+        if(isPasswdNeeded){
+            //wait for the user to input password or cancel
+            pwdDialog->show();
+            eventLoop->exec();
+            if(pwdDialog->result() == QDialog::Rejected){
+                continue;
+            }
+        }
+        //the user inputs password
+        this->switchInstallGUI();
+        installDependencies(pwdDialog->textValue());
+
+        //check if installation succeeds
+        if(checkDependencies()){
+            this->close();
+            return true;
+        }
     }
-
-    }
-    //the user accepts to install
-
-    //after the user inputs password ,
-    //the event loop quits,
-    //and installation process begins.
-
-    pwdDialog->show();
-    //when the user select or cancel the password dialog
-    //the eventLoop quits
-    connect(pwdDialog,&QInputDialog::finished,
-            eventLoop,&QEventLoop::quit);
-    eventLoop->exec();
-    if(pwdDialog->result() == QDialog::Rejected){
-        qDebug() << "password canceled out . ";
-        return false;
-    }
-    //the user selects the password
-    this->switchInstallGUI();
-    installDependencies(pwdDialog->textValue());
-
-    this->close();
-    return checkDependencies();
 }
 void DependencyInstaller::switchCheckGUI()
 {
@@ -183,7 +184,6 @@ void DependencyInstaller::showUnmetDependencies(const QStringList& list)
     this->switchCheckGUI();
     ui->pkg_list->clear();
     ui->pkg_list->addItems(list);
-    this->show();
 }
 
 void DependencyInstaller::setAccepted()

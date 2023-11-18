@@ -31,6 +31,8 @@ protected:
 
      /* updated after user accpets or rejects it */
     bool isAccepted = false;
+
+    bool isPasswdNeeded = true;
 public:
     DependencyInstaller(Core* core,QEventLoop*& eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
@@ -40,16 +42,16 @@ protected:
     /*
      * return if all dependencies in requirements.txt are met
      */
-    bool checkDependencies();
+    virtual bool checkDependencies();
     /*
-     * install dependencies using password
+     * install dependencies using password pwd
      */
-    void installDependencies(const QString& pwd);
+    virtual void installDependencies(const QString& pwd);
 public:
     /*
      * check and install dependencies
-     * called by other classes(for example , Core)
-     * return if dependencies are finally installed
+     * called by outer classes(for example , Core)
+     * return if dependencies are eventually installed
      */
     bool checkAndInstall();
 public slots:

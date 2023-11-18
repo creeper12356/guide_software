@@ -15,19 +15,20 @@ Core::Core(QApplication* a):
     //configure with local file
     configure();
     //init widget pages
+    initPwdDialog();
     mainPage = new MainPage(this);
     installer = new DependencyInstaller(this,eventLoop,pwdDialog);
-    initPwdDialog();
+    py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
 
     initConnections();
 
     //check if all requirements are met.
-    if(installer->checkAndInstall()){
+    if(installer->checkAndInstall() && py_installer->checkAndInstall()){
         mainPage->show();
     }
     else{
+        //TODO: improve logical parts
         qDebug() << "about to quit.";
-        app->quit();
         app->quit();
     }
 }
@@ -37,6 +38,7 @@ Core::~Core()
     qDebug() << "~Core()";
     delete config;
     delete installer;
+    delete py_installer;
     delete mainPage;
     delete pwdDialog;
 }
@@ -51,6 +53,12 @@ void Core::initConnections()
     //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
+
+    //when the user select or cancel the password dialog
+    //the eventLoop quits
+    connect(pwdDialog,&QInputDialog::finished,
+            eventLoop,&QEventLoop::quit);
+
 }
 
 void Core::initPwdDialog()

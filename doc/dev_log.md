@@ -113,8 +113,9 @@
     * 使用一个工作线程，将需要长时间阻塞的安装工作移动到与主线程分离的新线程，重新实现QThread类或调用QObject::moveToThread()函数。
     * 使用一个局部的事件循环。waitForFinished函数之所以会造成GUI阻塞，是因为在等待进程执行完毕时，并没有使用一个新的事件循环来相应GUI事件，因此可以构造一个局部的QEventLoop对象，连接信号和槽，在进程开始时调用QEventLoop::exec()等待进程结束。本方法可以简单解决GUI冻结问题。
     * 并行编程。继承QRunnable并覆写run()方法，同时使用QFutureWatcher观察进度。
-
-
+最终确定使用第二种方法，为Core类增加QEventLoop* 类成员eventLoop，使用该eventLoop来相应长时间阻塞线程时的GUI事件。
+* 重构代码
+原本计划的前后端分离架构，会造成大量的信号槽连接，大大降低代码可读性。因此，仍然将软件模块化，每个模块是前后端集成的整体（除了Core只有后端），同时，每个窗体模块共享Core中的事件循环，用于处理其长时间操作时的GUI事件。
 ## Bug Report
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。
 * 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动,同时，requirements.txt必须为有序文件。
