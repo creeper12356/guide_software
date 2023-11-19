@@ -11,6 +11,11 @@ class DependencyInstaller : public QDialog
 {
     Q_OBJECT
 protected:
+    QString updateCmd;
+    QString getNotInstalledCmd;
+    QString installCmd;
+    bool isPasswdNeeded = true;
+private:
     Core* core = nullptr;
     /*
      * pointer to core's member eventLoop
@@ -32,21 +37,25 @@ protected:
      /* updated after user accpets or rejects it */
     bool isAccepted = false;
 
-    bool isPasswdNeeded = true;
 public:
     DependencyInstaller(Core* core,QEventLoop*& eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
     //getters
     Ui::DependencyInstaller* getUi(){return ui;}
-protected:
+private:
+    /*
+     * init check and install commands
+     */
+    void initCmds();
     /*
      * return if all dependencies in requirements.txt are met
      */
-    virtual bool checkDependencies();
+private:
+    bool checkDependencies();
     /*
      * install dependencies using password pwd
      */
-    virtual void installDependencies(const QString& pwd);
+    void installDependencies(QString pwd);
 public:
     /*
      * check and install dependencies

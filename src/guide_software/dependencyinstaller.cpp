@@ -10,6 +10,7 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
     ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
+    initCmds();
     //by default show check GUI
     this->switchCheckGUI();
     //init process
@@ -28,15 +29,37 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
            eventLoop,&QEventLoop::quit);
     connect(ui->button_box,&QDialogButtonBox::accepted,
             this,&DependencyInstaller::setAccepted);
-    //when the user select or cancel the password dialog
-    //the eventLoop quits
-    connect(pwdDialog,&QInputDialog::finished,
-            eventLoop,&QEventLoop::quit);
 }
 
 DependencyInstaller::~DependencyInstaller()
 {
     delete ui;
+}
+
+void DependencyInstaller::initCmds()
+{
+    //specially used as sudo apt update
+    updateCmd =
+            "echo %1 | sudo -S apt update";
+    //this command standard outputs a list of packages not installed
+    getNotInstalledCmd =
+            "xargs apt list --installed < requirements.txt "
+            "| tail -n +2 "
+            "| cut -f 1 -d / "
+            "| sort "
+            "> installed.txt "
+            "&& "
+            "comm installed.txt requirements.txt -13 "
+            "&& "
+            "rm installed.txt ";
+    /*
+     * this command allows sudo apt install without
+     * manually input password in terminal
+     */
+   installCmd =
+            "echo %1"
+            " | sudo -S apt install %2 -y "
+            "2> /dev/null";
 }
 bool DependencyInstaller::checkDependencies()
 {
@@ -45,18 +68,7 @@ bool DependencyInstaller::checkDependencies()
         return true;
     }
 
-    //this command standard outputs a list of packages not installed
-    QString getNotinstalledCmd =
-            "xargs apt list --installed < requirements.txt "
-            "| tail -n +2 "
-            "| cut -f 1 -d / "
-            "| sort "
-            "> installed.txt "
-            "&& "
-            "comm installed.txt requirements.txt -13"
-            "&& "
-            "rm installed.txt ";
-    proc->setArguments(QStringList() << "-c" << getNotinstalledCmd);
+    proc->setArguments(QStringList() << "-c" << getNotInstalledCmd);
     proc->start();
     eventLoop->exec();
     pkgList.clear();
@@ -74,40 +86,27 @@ bool DependencyInstaller::checkDependencies()
     proc->close();
     return pkgList.empty();
 }
-void DependencyInstaller::installDependencies(const QString& pwd)
+void DependencyInstaller::installDependencies(QString pwd)
 {
+    if(!isPasswdNeeded){
+        pwd = "";
+    }
     if(proc->state() != QProcess::NotRunning){
         qDebug() << "The process is busy now.";
         return ;
     }
-    /*
-     * first part : sudo apt install
-     */
-    /*
-     *	TODO: check if password is right
-     */
-    /*
-     * TODO: check if network is ok
-     */
     qDebug() << "start installing...";
-    /* need sudo apt update */
-    proc->setArguments(QStringList() << "-c" << "echo " + pwd + " | sudo -S apt update");
-    proc->start();
-    eventLoop->exec();
-    qDebug() << "update finished.";
-    /*
-     * this command allows sudo apt install without
-     * manually input password in terminal
-     */
-    //TODO: redirect error output to /dev/null
-    QString installCmd =
-            "echo " + pwd +
-            " | sudo -S apt install %1 -y "
-            "2>> error.log";
+    //update
+    if(!updateCmd.isEmpty()){
+        proc->setArguments(QStringList() << "-c" << updateCmd.arg(pwd));
+        proc->start();
+        eventLoop->exec();
+        qDebug() << "update finished.";
+    }
     int pkgCount = pkgList.count();
     int installCount = 0;
     for(auto pkgName:pkgList){
-        proc->setArguments(QStringList() << "-c" << installCmd.arg(pkgName));
+        proc->setArguments(QStringList() << "-c" << installCmd.arg(pwd,pkgName));
         proc->start();
         eventLoop->exec();
         ++installCount;

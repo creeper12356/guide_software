@@ -1,4 +1,6 @@
 # 开发日志
+## 未完成目标
+* 安装失败时，界面上报错。
 ## 开发记录
 2023.11.10
 * 初步设计MainPage,DependencyInstaller的GUI界面。
@@ -122,6 +124,10 @@
 * (**Solved**)MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
 * 下载软件包过程中，出现GUI冻结导致程序无响应
 * execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
+
+2023.11.19
+* 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
+* 注：requirements.txt和py_requirements.txt必须有序，否则会出现前置软件检测问题。
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:

@@ -10,8 +10,7 @@ public:
                    QInputDialog*& pwdDialog,
                    QWidget *parent = nullptr);
 protected:
-    bool checkDependencies() override;
-    void installDependencies(const QString& pwd) override;
+    void initCmds();
 };
 
 #endif // PYLIBINSTALLER_H

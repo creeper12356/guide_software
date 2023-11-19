@@ -50,6 +50,10 @@ void Core::initConnections()
     //use QueuedConnection to assert thread safety
     connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
+    //the same for py_installer
+    connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
+            app,&QApplication::quit,Qt::QueuedConnection);
+
     //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
@@ -58,7 +62,6 @@ void Core::initConnections()
     //the eventLoop quits
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
-
 }
 
 void Core::initPwdDialog()
