@@ -1,10 +1,11 @@
-#include "inc.h"
 #include "core.h"
 #include "mainpage.h"
 #include "ui_mainpage.h"
 #include "dependencyinstaller.h"
 #include "ui_dependencyinstaller.h"
 #include "pylibinstaller.h"
+#include "choiceguide.h"
+#include "ui_choiceguide.h"
 
 Core::Core(QApplication* a):
     QObject(nullptr),
@@ -19,6 +20,7 @@ Core::Core(QApplication* a):
     mainPage = new MainPage(this);
     installer = new DependencyInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
+    guide = new ChoiceGuide(nullptr);
 
     initConnections();
 
@@ -41,6 +43,7 @@ Core::~Core()
     delete py_installer;
     delete mainPage;
     delete pwdDialog;
+    delete guide;
 }
 void Core::initConnections()
 {
@@ -62,6 +65,9 @@ void Core::initConnections()
     //the eventLoop quits
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
+
+    connect(mainPage->getUi()->conf_button,&QPushButton::clicked,
+            guide,&ChoiceGuide::show);
 }
 
 void Core::initPwdDialog()

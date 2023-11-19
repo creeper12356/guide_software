@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    choiceguide.cpp \
     core.cpp \
     dependencyinstaller.cpp \
     main.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
     pylibinstaller.cpp
 
 HEADERS += \
+    choiceguide.h \
     core.h \
     dependencyinstaller.h \
     inc.h \
@@ -30,6 +32,7 @@ HEADERS += \
     pylibinstaller.h
 
 FORMS += \
+    choiceguide.ui \
     dependencyinstaller.ui \
     mainpage.ui
 

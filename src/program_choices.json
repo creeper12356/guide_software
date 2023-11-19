@@ -1,0 +1,12 @@
+{
+	"Arm":false,
+	"Mips":false,
+	"Alpha":false,
+	"X86":
+	{
+		"SPEC 2017":
+		[1,2,3],
+		"PARSEC":
+		[2,4,5]
+	}
+}

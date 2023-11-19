@@ -5,6 +5,7 @@
 class MainPage;
 class DependencyInstaller;
 class PyLibInstaller;
+class ChoiceGuide;
 class Core:public QObject
 {
     Q_OBJECT
@@ -22,6 +23,7 @@ private:
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
     PyLibInstaller* py_installer = nullptr;
+    ChoiceGuide* guide = nullptr;
     /*
      * shared by widgets which may ask for password,
      * for example DependencyInstaller
