@@ -128,6 +128,9 @@
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
 * 注：requirements.txt和py_requirements.txt必须有序，否则会出现前置软件检测问题。
+2023.11.20
+* 使用JSON文件格式存储选择分支的信息，具有可拓展性。
+* 初步搭建ChoiceGuide 前端界面，完成部分页面切换逻辑。
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:
