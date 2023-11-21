@@ -3,7 +3,6 @@
 #include "ui_mainpage.h"
 #include "dependencyinstaller.h"
 #include "ui_dependencyinstaller.h"
-#include "pylibinstaller.h"
 #include "choiceguide.h"
 #include "ui_choiceguide.h"
 
@@ -18,7 +17,7 @@ Core::Core(QApplication* a):
     //init widget pages
     initPwdDialog();
     mainPage = new MainPage(this);
-    installer = new DependencyInstaller(this,eventLoop,pwdDialog);
+    installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
     guide = new ChoiceGuide(nullptr);
 

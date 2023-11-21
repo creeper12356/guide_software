@@ -7,6 +7,7 @@ namespace Ui {
 class DependencyInstaller;
 }
 class Core;
+//abstract base class for dependency install dialog
 class DependencyInstaller : public QDialog
 {
     Q_OBJECT
@@ -42,15 +43,15 @@ public:
     virtual ~DependencyInstaller();
     //getters
     Ui::DependencyInstaller* getUi(){return ui;}
-private:
+protected:
     /*
      * init check and install commands
      */
-    void initCmds();
+    virtual void initCmds() = 0;
+private:
     /*
      * return if all dependencies in requirements.txt are met
      */
-private:
     bool checkDependencies();
     /*
      * install dependencies using password pwd
@@ -85,5 +86,26 @@ signals:
      */
     void installProcess(int value);
 };
+
+class AptInstaller: public DependencyInstaller
+{
+public:
+    AptInstaller(Core* core,
+                 QEventLoop*& eventLoop,
+                 QInputDialog*& pwdDialog,
+                 QWidget* parent = nullptr);
+protected:
+    void initCmds() override;
+};
+class PyLibInstaller: public DependencyInstaller{
+public:
+    PyLibInstaller(Core* core,
+                   QEventLoop*& eventLoop,
+                   QInputDialog*& pwdDialog,
+                   QWidget *parent = nullptr);
+protected:
+    void initCmds() override;
+};
+
 
 #endif // DEPENDENCYINSTALLER_H

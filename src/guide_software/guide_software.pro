@@ -20,8 +20,7 @@ SOURCES += \
     core.cpp \
     dependencyinstaller.cpp \
     main.cpp \
-    mainpage.cpp \
-    pylibinstaller.cpp
+    mainpage.cpp
 
 HEADERS += \
     choiceguide.h \
@@ -29,7 +28,6 @@ HEADERS += \
     dependencyinstaller.h \
     inc.h \
     mainpage.h \
-    pylibinstaller.h
 
 FORMS += \
     choiceguide.ui \

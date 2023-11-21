@@ -10,7 +10,6 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
     ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
-    initCmds();
     //by default show check GUI
     this->switchCheckGUI();
     //init process
@@ -38,29 +37,7 @@ DependencyInstaller::~DependencyInstaller()
 
 void DependencyInstaller::initCmds()
 {
-    //specially used as sudo apt update
-    updateCmd =
-            "echo %1 | sudo -S apt update";
-    //this command standard outputs a list of packages not installed
-    getNotInstalledCmd =
-            "xargs apt list --installed < requirements.txt "
-            "| tail -n +2 "
-            "| cut -f 1 -d / "
-            "| sort "
-            "> installed.txt "
-            "&& "
-            "comm installed.txt requirements.txt -13 "
-            "&& "
-            "rm installed.txt ";
-    /*
-     * this command allows sudo apt install without
-     * manually input password in terminal
-     */
-   installCmd =
-            "echo %1"
-            " | sudo -S apt install %2 -y "
-            "2> /dev/null";
-}
+    }
 bool DependencyInstaller::checkDependencies()
 {
     if(proc->state() != QProcess::NotRunning){
@@ -188,4 +165,60 @@ void DependencyInstaller::showUnmetDependencies(const QStringList& list)
 void DependencyInstaller::setAccepted()
 {
     isAccepted = true;
+}
+AptInstaller::AptInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
+    :DependencyInstaller(core,eventLoop,pwdDialog,parent)
+{
+    initCmds();
+    isPasswdNeeded = true;
+}
+
+void AptInstaller::initCmds()
+{
+    //specially used as sudo apt update
+    updateCmd =
+            "echo %1 | sudo -S apt update";
+    //this command standard outputs a list of packages not installed
+    getNotInstalledCmd =
+            "xargs apt list --installed < requirements.txt "
+            "| tail -n +2 "
+            "| cut -f 1 -d / "
+            "| sort "
+            "> installed.txt "
+            "&& "
+            "comm installed.txt requirements.txt -13 "
+            "&& "
+            "rm installed.txt ";
+    /*
+     * this command allows sudo apt install without
+     * manually input password in terminal
+     */
+   installCmd =
+            "echo %1"
+            " | sudo -S apt install %2 -y "
+            "2> /dev/null";
+}
+
+PyLibInstaller::PyLibInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
+    :DependencyInstaller(core,eventLoop,pwdDialog,parent)
+{
+    initCmds();
+    isPasswdNeeded = false;
+    this->getUi()->hint_label->setText(
+               "检测到您的电脑上没有安装下列Python库:");
+}
+
+void PyLibInstaller::initCmds()
+{
+    updateCmd = "";
+    //this command standard outputs a list of packages not installed
+    getNotInstalledCmd =
+            "pip3 list | tail -n +3 | cut -f 1 -d ' ' | sort > py_installed.txt "
+            "&& "
+            "comm py_installed.txt py_requirements.txt -13 "
+            "&& "
+            "rm py_installed.txt ";
+    installCmd =
+            "%1pip3 install %2 "
+            "2> /dev/null";
 }
