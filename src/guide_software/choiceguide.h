@@ -3,6 +3,12 @@
 #define CHOICEGUIDE_H
 #include "inc.h"
 
+struct ProgramChoice{
+    QString architecture = "";
+    QString set = "";
+    QStringList programs;
+};
+
 namespace Ui {
 class ChoiceGuide;
 }
@@ -15,7 +21,8 @@ private:
      * loaded from file ./program_choices.json
      * stores info of program choice branches
      */
-    QJsonObject* programInfo = nullptr;
+    QJsonObject programInfo;
+    ProgramChoice programChoice;
 public:
     explicit ChoiceGuide(QWidget *parent = nullptr);
     ~ChoiceGuide();
@@ -33,7 +40,9 @@ private slots:
     /* update states of buttons ans page index changes */
     void on_stacked_widget_currentChanged(int index);
 
-    void ChoiceButtonClickSlot();
+    void architectChosenSlot(QString name);
+    void setChosenSlot(QString name);
+    void programChosenSlot(QString name);
 
 private:
     Ui::ChoiceGuide *ui;

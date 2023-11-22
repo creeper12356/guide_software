@@ -8,33 +8,38 @@ ChoiceGuide::ChoiceGuide(QWidget *parent) :
     ui->setupUi(this);
     loadProgramChoices();
     int count = 0;
-    for(auto key:programInfo->keys()){
+    for(auto key:programInfo.keys()){
         QPushButton* newButton = new QPushButton(key,this);
         ui->arch_grid->addWidget(newButton,0,count);
         ++count;
-        connect(newButton,&QPushButton::clicked,this,&ChoiceGuide::ChoiceButtonClickSlot);
+        connect(newButton,&QPushButton::clicked,this,[newButton,this](){
+            this->architectChosenSlot(newButton->text());
+            qDebug() << newButton->text();
+        });
     }
 }
 
 ChoiceGuide::~ChoiceGuide()
 {
     delete ui;
-    delete programInfo;
 }
 
 void ChoiceGuide::showEvent(QShowEvent *event)
 {
     ui->stacked_widget->setCurrentIndex(0);
     ui->prev_button->setEnabled(false);
-    ui->next_button->setEnabled(false);
+    ui->next_button->setEnabled(true);
     ui->finish_button->setEnabled(false);
+    programChoice.architecture = "";
+    programChoice.set = "";
+    programChoice.programs.clear();
 }
 
 void ChoiceGuide::loadProgramChoices()
 {
     QFile reader("./program_choices.json");
     reader.open(QIODevice::ReadOnly);
-    programInfo = new QJsonObject(QJsonDocument::fromJson(reader.readAll()).object());
+    programInfo = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();
 }
 
@@ -48,31 +53,72 @@ void ChoiceGuide::on_stacked_widget_currentChanged(int index)
     qDebug() << "index: " << index;
     ui->prev_button->setEnabled(index != 0);
     ui->next_button->setEnabled(index != ui->stacked_widget->count() - 1);
-    ui->finish_button->setEnabled(index == ui->stacked_widget->count() - 1);
+    if(index == ui->stacked_widget->count() - 1){
+        //reaches last page
+        if(!programChoice.architecture.isEmpty()
+                && !programChoice.set.isEmpty()
+                && !programChoice.programs.isEmpty()){
+            ui->finish_button->setEnabled(true);
+        }
+    }
+    else{
+        ui->finish_button->setDisabled(true);
+    }
 }
 
-void ChoiceGuide::ChoiceButtonClickSlot()
+
+void ChoiceGuide::architectChosenSlot(QString name)
 {
-    qDebug() << "choice button clicked.";
-    QPushButton* button = reinterpret_cast<QPushButton* > (sender());
-    qDebug() << button->text();
-    ui->next_button->setEnabled(true);
-    int count = 0;
-    if(!programInfo->contains(button->text())){
-        qDebug() << "key not existed";
+    //backend
+    programChoice.architecture = name;
+    programChoice.set = "";
+    programChoice.programs.clear();
+
+    //frontend
+    while(ui->set_grid->count()){
+        delete ui->set_grid->takeAt(0)->widget();
+    }
+    ui->prog_list->clear();
+
+    if(programInfo[name].isBool()){
+        //not implemented
         return ;
     }
-    QJsonValue arch = programInfo->operator [](button->text());
-    if(!arch.isObject()){
-        qDebug() << "not implemented yet.";
+    auto sets = programInfo[name].toObject();
+    for(auto key:sets.keys()){
+        QPushButton *newButton = new QPushButton(key,this);
+        ui->set_grid->addWidget(newButton);
+        connect(newButton,&QPushButton::clicked,this,[this,newButton](){
+           this->setChosenSlot(newButton->text());
+        });
+    }
+}
+
+void ChoiceGuide::setChosenSlot(QString name)
+{
+    //backend
+    programChoice.set = name;
+    programChoice.programs.clear();
+    //frontend
+    ui->prog_list->clear();
+    if(programInfo[programChoice.architecture].toObject()[name].isBool()){
+        //not implemented
         return ;
     }
-    for(auto key:arch.toObject().keys()){
-        QPushButton* newButton = new QPushButton(key,this);
-        ui->set_grid->addWidget(newButton,0,count);
-        ++count;
-        connect(newButton,&QPushButton::clicked,this,&ChoiceGuide::ChoiceButtonClickSlot);
+    auto programs = programInfo[programChoice.architecture].toObject()[name].toArray();
+
+    for(auto program:programs){
+        ui->prog_list->addItem(program.toString());
     }
+}
+
+void ChoiceGuide::programChosenSlot(QString name)
+{
+    //backend
+    if(programChoice.programs.contains(name)){
+        return ;
+    }
+    programChoice.programs.push_back(name);
 }
 
 void ChoiceGuide::on_prev_button_clicked()

@@ -5,8 +5,26 @@
 	"X86":
 	{
 		"SPEC 2017":
-		[1,2,3],
+		[
+			"hello",
+			"world",
+			"kkk"
+		],
 		"PARSEC":
-		[2,4,5]
+		[
+			"blackscholes",
+			"bodytrack",
+			"canneal",
+			"dedup",
+			"facesim",
+			"ferret",
+			"fluidanimate",
+			"freqmine",
+			"raytrace",
+			"streamcluster",
+			"swaptions",
+			"vips",
+			"x264"
+		]
 	}
 }

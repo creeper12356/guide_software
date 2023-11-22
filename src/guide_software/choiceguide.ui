@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="arch_page">
      <widget class="QWidget" name="gridLayoutWidget">
@@ -92,11 +92,21 @@
        <string>选择程序</string>
       </property>
      </widget>
+     <widget class="QListWidget" name="prog_list">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>130</y>
+        <width>431</width>
+        <height>281</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QPushButton" name="next_button">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
