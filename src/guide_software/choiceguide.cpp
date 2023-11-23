@@ -20,10 +20,8 @@ ChoiceGuide::ChoiceGuide(QWidget *parent) :
     for(auto key:testInfo.keys()){
         ui->test_list->addItem(key);
     }
-    connect(ui->prog_list,&QListWidget::itemClicked,this,[this](QListWidgetItem* item){
-        qDebug() << item->text();
-        this->programChosenSlot(item->text());
-    });
+    connect(ui->prog_list,&QListWidget::itemSelectionChanged,this,&ChoiceGuide::programChosenSlot);
+    connect(ui->select_all,&QCheckBox::stateChanged,this,&ChoiceGuide::selectAllPrograms);
     connect(ui->test_list,&QListWidget::itemClicked,this,[this](QListWidgetItem* item){
         qDebug() << item->text();
         this->testChosenSlot(item->text());
@@ -55,6 +53,8 @@ void ChoiceGuide::showEvent(QShowEvent *)
         delete ui->set_grid->takeAt(0)->widget();
     }
     ui->prog_list->clear();
+    ui->select_all->setChecked(false);
+    ui->test_list->setCurrentRow(-1);
     ui->thread_num_box->setValue(0);
 }
 
@@ -131,17 +131,22 @@ void ChoiceGuide::setChosenSlot(QString name)
     refreshFinishState();
 }
 
-void ChoiceGuide::programChosenSlot(QString name)
+void ChoiceGuide::programChosenSlot()
 {
     //backend
-    if(userChoice.programs.contains(name)){
-        qDebug() << "remove " << name;
-        userChoice.programs.removeOne(name);
+    userChoice.programs.clear();
+    int count = ui->prog_list->count();
+    for(int i = 0;i < count;++i){
+        userChoice.programs.append(ui->prog_list->item(i)->text());
     }
-    else{
-        qDebug() << "add " << name;
-        userChoice.programs.push_back(name);
-    }
+//    if(userChoice.programs.contains(name)){
+//        qDebug() << "remove " << name;
+//        userChoice.programs.removeOne(name);
+//    }
+//    else{
+//        qDebug() << "add " << name;
+//        userChoice.programs.push_back(name);
+//    }
     refreshFinishState();
 }
 
@@ -156,6 +161,15 @@ void ChoiceGuide::threadNumSetSlot(int threadNum)
 {
     userChoice.threadNum = threadNum;
     refreshFinishState();
+}
+
+void ChoiceGuide::selectAllPrograms(bool flag)
+{
+    qDebug() << flag;
+    int count = ui->prog_list->count();
+    for(int i = 0;i < count;++i){
+        ui->prog_list->item(i)->setSelected(flag);
+    }
 }
 
 void ChoiceGuide::refreshFinishState()

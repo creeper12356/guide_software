@@ -63,7 +63,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>仿真</string>
+     <string>性能仿真</string>
     </property>
    </widget>
   </widget>

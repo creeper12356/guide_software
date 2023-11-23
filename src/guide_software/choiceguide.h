@@ -39,6 +39,7 @@ public:
     explicit ChoiceGuide(QWidget *parent = nullptr);
     ~ChoiceGuide();
 protected:
+    //每次打开时的配置
     void showEvent(QShowEvent *event) override;
 private:
     //从json文件中加载选择分支信息
@@ -55,9 +56,11 @@ private slots:
 
     void architectChosenSlot(QString name);
     void setChosenSlot(QString name);
-    void programChosenSlot(QString name);
+    void programChosenSlot();
     void testChosenSlot(QString name);
     void threadNumSetSlot(int threadNum);
+    //全选或全不选
+    void selectAllPrograms(bool flag);
     void refreshFinishState();
 
 public:
