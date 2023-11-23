@@ -10,13 +10,7 @@ class Core:public QObject
 {
     Q_OBJECT
 private:
-    /*
-     * config object
-     */
     QJsonObject* config = nullptr;
-    /*
-     * pointing at currently running application
-     */
     QApplication* app = nullptr;
     QEventLoop* eventLoop = nullptr;
 
@@ -24,27 +18,22 @@ private:
     DependencyInstaller* installer = nullptr;
     PyLibInstaller* py_installer = nullptr;
     ChoiceGuide* guide = nullptr;
-    /*
-     * shared by widgets which may ask for password,
-     * for example DependencyInstaller
-     */
+    //由所有可能询问密码的窗体共享
     QInputDialog* pwdDialog = nullptr;
 
 
 private:
-    /*
-     * read from ./config.json
-     * and configure before starting widgets
-     */
+    //在启动所有窗体前，从config.json文件中读取配置
     void configure();
 public:
     Core(QApplication* app);
     ~Core();
 private:
-    //init functions
-    /* init GUI of password dialog */
+    //初始化函数
+    //初始化密码对话框GUI
     inline void initPwdDialog();
     /* init signals and slots connection */
+    //初始化信号槽连接
     inline void initConnections();
 private slots:
     void reportError(QString errMsg);

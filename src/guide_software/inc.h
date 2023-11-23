@@ -1,9 +1,7 @@
 #pragma once
 #ifndef INC_H
 #define INC_H
-/*
- * This file is used to include all Qt libs used in this project
- */
+//包含该项目所有Qt标准库，宏定义，类声明，枚举声明，命名空间
 #include <QObject>
 #include <QApplication>
 #include <QProcess>

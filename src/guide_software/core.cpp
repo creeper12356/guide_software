@@ -12,9 +12,9 @@ Core::Core(QApplication* a):
 {
     eventLoop = new QEventLoop(this);
 
-    //configure with local file
+    //使用文件配置
     configure();
-    //init widget pages
+    //初始化窗体
     initPwdDialog();
     mainPage = new MainPage(this);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
@@ -23,7 +23,6 @@ Core::Core(QApplication* a):
 
     initConnections();
 
-    //check if all requirements are met.
     if(installer->checkAndInstall() && py_installer->checkAndInstall()){
         mainPage->show();
     }
@@ -46,13 +45,11 @@ Core::~Core()
 }
 void Core::initConnections()
 {
-    //app backend quits iff the mainpage is closed
+    //主页面关闭时，软件关闭
     connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
-    //if user do not want to install right now , then quit program
-    //use QueuedConnection to assert thread safety
+    //用户拒绝安装前置软件包，退出软件
     connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
-    //the same for py_installer
     connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
 
@@ -60,8 +57,6 @@ void Core::initConnections()
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
 
-    //when the user select or cancel the password dialog
-    //the eventLoop quits
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
 

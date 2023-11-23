@@ -17,89 +17,101 @@
    <widget class="QStackedWidget" name="stacked_widget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>791</width>
-      <height>511</height>
+      <x>40</x>
+      <y>50</y>
+      <width>691</width>
+      <height>411</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="arch_page">
      <widget class="QWidget" name="gridLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>70</y>
-        <width>311</width>
+        <x>40</x>
+        <y>30</y>
+        <width>591</width>
         <height>281</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="arch_grid"/>
      </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>30</y>
-        <width>81</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>选择架构：</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="set_page">
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>80</y>
-        <width>81</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>选择程序集</string>
-      </property>
-     </widget>
      <widget class="QWidget" name="gridLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>120</y>
-        <width>361</width>
-        <height>251</height>
+        <x>70</x>
+        <y>40</y>
+        <width>561</width>
+        <height>261</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="set_grid"/>
      </widget>
     </widget>
     <widget class="QWidget" name="prog_page">
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>90</y>
-        <width>67</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>选择程序</string>
-      </property>
-     </widget>
      <widget class="QListWidget" name="prog_list">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>130</y>
-        <width>431</width>
-        <height>281</height>
+        <x>40</x>
+        <y>10</y>
+        <width>591</width>
+        <height>381</height>
        </rect>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="test_page">
+     <widget class="QListWidget" name="test_list">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>531</width>
+        <height>311</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="thread_num_box">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>70</y>
+        <width>48</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>30</y>
+        <width>51</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>线程数</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>0</y>
+        <width>81</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>测试集</string>
       </property>
      </widget>
     </widget>
@@ -117,7 +129,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Next</string>
+     <string>下一步</string>
     </property>
    </widget>
    <widget class="QPushButton" name="prev_button">
@@ -133,7 +145,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Previous</string>
+     <string>上一步</string>
     </property>
    </widget>
    <widget class="QPushButton" name="finish_button">
@@ -149,7 +161,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Finish</string>
+     <string>完成</string>
     </property>
    </widget>
    <widget class="QPushButton" name="cancel_button">
@@ -162,7 +174,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Cancel</string>
+     <string>取消</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="info_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>10</y>
+      <width>581</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
     </property>
    </widget>
   </widget>

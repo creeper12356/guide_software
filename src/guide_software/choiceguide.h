@@ -3,10 +3,13 @@
 #define CHOICEGUIDE_H
 #include "inc.h"
 
-struct ProgramChoice{
+//用户选择的结构体
+struct Choice{
     QString architecture = "";
     QString set = "";
     QStringList programs;
+    QString test = "";
+    int threadNum = 0;
 };
 
 namespace Ui {
@@ -17,19 +20,29 @@ class ChoiceGuide : public QMainWindow
 {
     Q_OBJECT
 private:
+    const QStringList infos =
+    {
+        "请选择架构",
+        "请选择程序集", "请选择程序", "请选择测试集，并输入线程数"
+    };
+private:
     /*
      * loaded from file ./program_choices.json
      * stores info of program choice branches
      */
+    //使用QJsonObject表示的所有程序选择分支信息
     QJsonObject programInfo;
-    ProgramChoice programChoice;
+    //使用QJsonObject表示的测试集列表，测试集名称为所引
+    QJsonObject testInfo;
+    Choice userChoice;
 public:
     explicit ChoiceGuide(QWidget *parent = nullptr);
     ~ChoiceGuide();
 protected:
     void showEvent(QShowEvent *event) override;
 private:
-    void loadProgramChoices();
+    //从json文件中加载选择分支信息
+    void loadChoices();
 private slots:
     /* jump back and force */
     void on_next_button_clicked();
@@ -43,7 +56,11 @@ private slots:
     void architectChosenSlot(QString name);
     void setChosenSlot(QString name);
     void programChosenSlot(QString name);
+    void testChosenSlot(QString name);
+    void threadNumSetSlot(int threadNum);
+    void refreshFinishState();
 
+public:
 private:
     Ui::ChoiceGuide *ui;
 };

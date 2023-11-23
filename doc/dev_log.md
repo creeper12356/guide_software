@@ -1,6 +1,7 @@
 # 开发日志
 ## 未完成目标
 * 安装失败时，界面上报错。
+* 读取json格式失败时，进行异常处理.
 ## 开发记录
 2023.11.10
 * 初步设计MainPage,DependencyInstaller的GUI界面。
@@ -122,8 +123,10 @@
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。
 * 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动,同时，requirements.txt必须为有序文件。
 * (**Solved**)MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
-* 下载软件包过程中，出现GUI冻结导致程序无响应
-* execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
+* (**Solved**)下载软件包过程中，出现GUI冻结导致程序无响应
+* (**Solved**)execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
+* ChoiceGuide选择程序集时，多选会出现问题。
+
 
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
@@ -131,6 +134,9 @@
 2023.11.20
 * 使用JSON文件格式存储选择分支的信息，具有可拓展性。
 * 初步搭建ChoiceGuide 前端界面，完成部分页面切换逻辑。
+2023.11.23
+* 完成ChoiceGuide的页面逻辑和数据存储
+* 从现在开始，代码中的所有注释都为中文
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:

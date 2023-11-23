@@ -10,20 +10,18 @@ DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialo
     ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
-    //by default show check GUI
+    //默认显示检查GUI
     this->switchCheckGUI();
-    //init process
+
     proc = new QProcess(this);
     proc->setProgram("bash");
 
-    //use event loop to avoid freezing GUIs
     connect(proc,SIGNAL(finished(int)),
             eventLoop,SLOT(quit()));
     connect(this,&DependencyInstaller::installProcess,
             ui->progress_bar,&QProgressBar::setValue);
 
-    //after user clicks the button box
-    //the eventLoop quits
+    //用户点击button box后，事件循环终止
     connect(ui->button_box,&QDialogButtonBox::clicked,
            eventLoop,&QEventLoop::quit);
     connect(ui->button_box,&QDialogButtonBox::accepted,
@@ -50,14 +48,13 @@ bool DependencyInstaller::checkDependencies()
     eventLoop->exec();
     pkgList.clear();
 
-    //use QTextStream to read lines from QIODevice
     QTextStream stream(proc);
     while(!stream.atEnd()){
         pkgList.append(stream.readLine());
     }
 
     if(!pkgList.empty()){
-        //find unmetDependencies
+        //存在未满足依赖
         showUnmetDependencies(pkgList);
     }
     proc->close();
@@ -87,7 +84,6 @@ void DependencyInstaller::installDependencies(QString pwd)
         proc->start();
         eventLoop->exec();
         ++installCount;
-    //GUI display intallation progress in real time
         emit installProcess(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
     }
@@ -98,37 +94,32 @@ void DependencyInstaller::installDependencies(QString pwd)
 
 bool DependencyInstaller::checkAndInstall()
 {
-    //check dependencies first,
-    //if all installed , return true
     if(checkDependencies()){
         return true;
     }
-    //if not all installed
     while(true){
         //pre-set flags
         isAccepted = false;
 
-        //wait for the user to accept or reject
         this->show();
         eventLoop->exec();
         if(!isAccepted){
             return false;
         }
-        //the user accepts to install
+        //用户接受安装
 
         if(isPasswdNeeded){
-            //wait for the user to input password or cancel
+            //等待用户输入密码
             pwdDialog->show();
             eventLoop->exec();
             if(pwdDialog->result() == QDialog::Rejected){
                 continue;
             }
         }
-        //the user inputs password
         this->switchInstallGUI();
         installDependencies(pwdDialog->textValue());
 
-        //check if installation succeeds
+        //再次检查依赖是否安装
         if(checkDependencies()){
             this->close();
             return true;
@@ -175,10 +166,8 @@ AptInstaller::AptInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog *&pw
 
 void AptInstaller::initCmds()
 {
-    //specially used as sudo apt update
     updateCmd =
             "echo %1 | sudo -S apt update";
-    //this command standard outputs a list of packages not installed
     getNotInstalledCmd =
             "xargs apt list --installed < requirements.txt "
             "| tail -n +2 "
@@ -189,10 +178,6 @@ void AptInstaller::initCmds()
             "comm installed.txt requirements.txt -13 "
             "&& "
             "rm installed.txt ";
-    /*
-     * this command allows sudo apt install without
-     * manually input password in terminal
-     */
    installCmd =
             "echo %1"
             " | sudo -S apt install %2 -y "
@@ -211,7 +196,6 @@ PyLibInstaller::PyLibInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog 
 void PyLibInstaller::initCmds()
 {
     updateCmd = "";
-    //this command standard outputs a list of packages not installed
     getNotInstalledCmd =
             "pip3 list | tail -n +3 | cut -f 1 -d ' ' | sort > py_installed.txt "
             "&& "
