@@ -11,7 +11,9 @@ Core::Core(QApplication* a):
     app(a)
 {
     eventLoop = new QEventLoop(this);
-
+    proc = new QProcess(this);
+    proc->setProgram("bash");
+    userChoice = new Choice;
     //使用文件配置
     configure();
     //初始化窗体
@@ -36,6 +38,7 @@ Core::Core(QApplication* a):
 Core::~Core()
 {
     qDebug() << "~Core()";
+    delete userChoice;
     delete config;
     delete installer;
     delete py_installer;
@@ -53,6 +56,7 @@ void Core::initConnections()
     connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
 
+    connect(proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
@@ -65,11 +69,12 @@ void Core::initConnections()
 
     connect(mainPage->getUi()->gen_button,&QPushButton::clicked,
             this,&Core::writeScripts);
+    connect(this,&Core::scriptsWriteState,mainPage,&MainPage::displayWritingScript);
 }
 
-void Core::setUserChoice(Choice *choice)
+void Core::copyUserChoice(Choice *choice)
 {
-    this->userChoice = choice;
+    *userChoice = *choice;
 }
 
 void Core::initPwdDialog()
@@ -93,11 +98,24 @@ void Core::writeScripts()
 {
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     if(userChoice->programs.empty()){
-        qDebug() << "Please configure first.";
+        emit scriptsWriteState(false);
+        QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
+        return ;
     }
+    emit scriptsWriteState(true);
+    //暂存路径
+    QDir oldDir = QDir::current();
+    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
+    //清空之前生成的脚本
+    proc->setArguments(QStringList() << "-c" << "rm ./*.rcS");
+    proc->start();
+    eventLoop->exec();
     for(auto program : userChoice->programs){
-        qDebug() << writeScriptCmd.arg(program,QString::number(userChoice->threadNum));
+        proc->setArguments(QStringList() << "-c" << writeScriptCmd.arg(program,QString::number(userChoice->threadNum)));
+        proc->start();
+        eventLoop->exec();
     }
+    QDir::setCurrent(oldDir.path());
 }
 
 void Core::configure()

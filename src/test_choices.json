@@ -1,4 +1,20 @@
 {
-	"Test":2,
-	"Simdev":2
+	"Test":{
+		"description":"Minimal execution time"
+	},
+	"Simdev":{
+		"description":"Best-effort code coverage of real inputs"
+	},
+	"Simsmall":{
+		"description":"Small-scale experiments"
+	},
+	"Simmedium":{
+		"description":"Medium-scale experiments"
+	},
+	"Simlarge":{
+		"description":"Large-scale experiments"
+	},
+	"Native":{
+		"description":"Real-world behavior"
+	}
 }

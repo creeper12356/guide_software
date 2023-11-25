@@ -10,34 +10,12 @@ ChoiceGuide::ChoiceGuide(Core *c, QWidget *parent) :
     ui->setupUi(this);
 
     loadChoices();
-    core->setUserChoice(&userChoice);
-    archGroup = new QButtonGroup(this);
-    setGroup = new QButtonGroup(this);
-    //选择架构按钮只有一个能被选中
-    archGroup->setExclusive(true);
-    setGroup->setExclusive(true);
 
-    int count = 0;
-    for(auto key:programInfo.keys()){
-        QPushButton* newButton = new QPushButton(key,this);
-        archGroup->addButton(newButton);
-        newButton->setCheckable(true);
-        ui->arch_grid->addWidget(newButton,0,count);
-        ++count;
-        connect(newButton,&QPushButton::clicked,this,[newButton,this](){
-            this->architectChosenSlot(newButton->text());
-            qDebug() << newButton->text();
-        });
-    }
-    for(auto key:testInfo.keys()){
-        ui->test_list->addItem(key);
-    }
+    initArchitectButtons();
+    initSetButtons();
+    initTestList();
     connect(ui->prog_list,&QListWidget::itemSelectionChanged,this,&ChoiceGuide::programChosenSlot);
     connect(ui->select_all,&QCheckBox::stateChanged,this,&ChoiceGuide::selectAllPrograms);
-    connect(ui->test_list,&QListWidget::itemClicked,this,[this](QListWidgetItem* item){
-        qDebug() << item->text();
-        this->testChosenSlot(item->text());
-    });
     connect(ui->thread_num_box,SIGNAL(valueChanged(int)),this,SLOT(threadNumSetSlot(int)));
 }
 
@@ -73,6 +51,42 @@ void ChoiceGuide::showEvent(QShowEvent *)
     userChoice.architecture = "";
     userChoice.test = "";
     userChoice.threadNum = 0;
+}
+
+void ChoiceGuide::initArchitectButtons()
+{
+    archGroup = new QButtonGroup(this);
+    archGroup->setExclusive(true);
+    int count = 0;
+    for(auto key:programInfo.keys()){
+        QPushButton* newButton = new QPushButton(key,this);
+        archGroup->addButton(newButton);
+        newButton->setCheckable(true);
+        ui->arch_grid->addWidget(newButton,0,count);
+        ++count;
+        connect(newButton,&QPushButton::clicked,this,[newButton,this](){
+            this->architectChosenSlot(newButton->text());
+            qDebug() << newButton->text();
+        });
+    }
+}
+
+void ChoiceGuide::initSetButtons()
+{
+    setGroup = new QButtonGroup(this);
+    setGroup->setExclusive(true);
+}
+
+void ChoiceGuide::initTestList()
+{
+    for(auto key:testInfo.keys()){
+        ui->test_list->addItem(key);
+    }
+    connect(ui->test_list,&QListWidget::itemClicked,this,[this](QListWidgetItem* item){
+        qDebug() << item->text();
+        this->testChosenSlot(item->text());
+    });
+
 }
 
 void ChoiceGuide::loadChoices()
@@ -164,26 +178,16 @@ void ChoiceGuide::setChosenSlot(QString name)
 
 void ChoiceGuide::programChosenSlot()
 {
-    //backend
     userChoice.programs.clear();
-    int count = ui->prog_list->count();
-    for(int i = 0;i < count;++i){
-        userChoice.programs.append(ui->prog_list->item(i)->text());
+    int selectedCount = ui->prog_list->selectedItems().size();
+    for(auto* item: ui->prog_list->selectedItems()){
+        userChoice.programs.append(item->text());
     }
-//    if(userChoice.programs.contains(name)){
-//        qDebug() << "remove " << name;
-//        userChoice.programs.removeOne(name);
-//    }
-//    else{
-//        qDebug() << "add " << name;
-//        userChoice.programs.push_back(name);
-//    }
     refreshFinishState();
 }
 
 void ChoiceGuide::testChosenSlot(QString name)
 {
-    //backend
     userChoice.test = name;
     refreshFinishState();
 }
@@ -205,7 +209,6 @@ void ChoiceGuide::selectAllPrograms(bool flag)
 
 void ChoiceGuide::refreshFinishState()
 {
-    qDebug() << "refresh..";
     if(!userChoice.architecture.isEmpty()
         && !userChoice.set.isEmpty()
         && !userChoice.programs.isEmpty()
@@ -224,17 +227,15 @@ void ChoiceGuide::on_prev_button_clicked()
 
 void ChoiceGuide::on_cancel_button_clicked()
 {
+    //丢弃所有的更改
     this->close();
 }
 
 void ChoiceGuide::on_finish_button_clicked()
 {
-    //TODO
+    //保存所有的更改
+    core->copyUserChoice(&userChoice);
+    qDebug() << "saved!";
     this->close();
-    qDebug() << userChoice.architecture;
-    qDebug() << userChoice.set;
-    qDebug() << userChoice.programs;
-    qDebug() << userChoice.test;
-    qDebug() << userChoice.threadNum;
 }
 

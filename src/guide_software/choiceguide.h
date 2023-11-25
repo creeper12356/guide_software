@@ -45,12 +45,20 @@ protected:
     //每次打开时的配置
     void showEvent(QShowEvent *event) override;
 private:
+    //初始化函数，在构造函数中调用
+    void initArchitectButtons();
+    void initSetButtons();
+    void initTestList();
+
     //从json文件中加载选择分支信息
     void loadChoices();
     //清除所有程序集选择
     inline void clearSetChoice();
     //清除所有程序选择
     inline void clearProgramChoice();
+    //更新完成按钮的状态
+    void refreshFinishState();
+
 private slots:
     /* jump back and force */
     void on_next_button_clicked();
@@ -68,9 +76,6 @@ private slots:
     void threadNumSetSlot(int threadNum);
     //全选或全不选
     void selectAllPrograms(bool flag);
-    void refreshFinishState();
-
-public:
 private:
     Ui::ChoiceGuide *ui;
 };

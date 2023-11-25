@@ -32,10 +32,6 @@ DependencyInstaller::~DependencyInstaller()
 {
     delete ui;
 }
-
-void DependencyInstaller::initCmds()
-{
-    }
 bool DependencyInstaller::checkDependencies()
 {
     if(proc->state() != QProcess::NotRunning){

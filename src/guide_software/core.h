@@ -14,6 +14,7 @@ private:
     QJsonObject* config = nullptr;
     QApplication* app = nullptr;
     QEventLoop* eventLoop = nullptr;
+    QProcess* proc = nullptr;
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
@@ -21,7 +22,7 @@ private:
     ChoiceGuide* guide = nullptr;
     //由所有可能询问密码的窗体共享
     QInputDialog* pwdDialog = nullptr;
-    //指向ChoiceGuide中的用户选择结构体
+    //指向ChoiceGuide::userChoice的副本
     Choice* userChoice = nullptr;
 
 private:
@@ -38,12 +39,15 @@ private:
     //初始化信号槽连接
     inline void initConnections();
 public:
-    //setters
-    void setUserChoice(Choice* userChoice);
+    //复制用户选择
+    void copyUserChoice(Choice* userChoice);
 private slots:
     void reportError(QString errMsg);
     //根据用户选择，生成脚本
     void writeScripts();
+signals:
+    //发送给前端的信号，true表示生成成功，false表示未生成
+    void scriptsWriteState(bool state);
 };
 
 #endif // CORE_H

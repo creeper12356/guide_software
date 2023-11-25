@@ -20,6 +20,9 @@ public:
     Ui::MainPage* getUi(){return ui;}
 private slots:
     void on_exit_button_clicked();
+public slots:
+    //在界面上显示生成脚本
+    void displayWritingScript(bool state);
 protected:
     void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent *event) override;

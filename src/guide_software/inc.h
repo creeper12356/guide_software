@@ -22,6 +22,7 @@
 
 #include <QKeyEvent>
 #include <QEventLoop>
+#include <QTimer>
 
 #include <QDebug>
 #define SECOND 1000
