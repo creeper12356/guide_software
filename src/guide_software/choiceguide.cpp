@@ -1,15 +1,27 @@
 #include "choiceguide.h"
 #include "ui_choiceguide.h"
+#include "core.h"
 
-ChoiceGuide::ChoiceGuide(QWidget *parent) :
+ChoiceGuide::ChoiceGuide(Core *c, QWidget *parent) :
     QMainWindow(parent),
+    core(c),
     ui(new Ui::ChoiceGuide)
 {
     ui->setupUi(this);
+
     loadChoices();
+    core->setUserChoice(&userChoice);
+    archGroup = new QButtonGroup(this);
+    setGroup = new QButtonGroup(this);
+    //选择架构按钮只有一个能被选中
+    archGroup->setExclusive(true);
+    setGroup->setExclusive(true);
+
     int count = 0;
     for(auto key:programInfo.keys()){
         QPushButton* newButton = new QPushButton(key,this);
+        archGroup->addButton(newButton);
+        newButton->setCheckable(true);
         ui->arch_grid->addWidget(newButton,0,count);
         ++count;
         connect(newButton,&QPushButton::clicked,this,[newButton,this](){
@@ -38,24 +50,29 @@ void ChoiceGuide::showEvent(QShowEvent *)
 {
     ui->stacked_widget->setCurrentIndex(0);
     ui->info_label->setText(infos[0]);
-    //init button state
+    //重置按钮状态
+    //重置所有架构选择按钮为未按下
+    archGroup->setExclusive(false);
+    for(auto* button:archGroup->buttons()){
+        button->setChecked(false);
+    }
+    archGroup->setExclusive(true);
+
+    //重置控制按钮状态
     ui->prev_button->setEnabled(false);
     ui->next_button->setEnabled(true);
     ui->finish_button->setEnabled(false);
-    //init backend state
-    userChoice.architecture = "";
-    userChoice.set = "";
-    userChoice.programs.clear();
-    userChoice.test = "";
-    userChoice.threadNum = 0;
-    //init frontend state
-    while(ui->set_grid->count()){
-        delete ui->set_grid->takeAt(0)->widget();
-    }
-    ui->prog_list->clear();
-    ui->select_all->setChecked(false);
+
+    clearSetChoice();
+    clearProgramChoice();
+
+    //重置控件
     ui->test_list->setCurrentRow(-1);
     ui->thread_num_box->setValue(0);
+
+    userChoice.architecture = "";
+    userChoice.test = "";
+    userChoice.threadNum = 0;
 }
 
 void ChoiceGuide::loadChoices()
@@ -68,6 +85,27 @@ void ChoiceGuide::loadChoices()
     reader.open(QIODevice::ReadOnly);
     testInfo = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();
+}
+
+void ChoiceGuide::clearSetChoice()
+{
+    //清空程序集选择按钮组
+    while(setGroup->buttons().size()){
+        setGroup->removeButton(setGroup->buttons()[0]);
+    }
+    //删除程序集选择按钮
+    while(ui->set_grid->count()){
+        delete ui->set_grid->takeAt(0)->widget();
+    }
+    //后端清除
+    userChoice.set = "";
+}
+
+void ChoiceGuide::clearProgramChoice()
+{
+    ui->prog_list->clear();
+    ui->select_all->setChecked(false);
+    userChoice.programs.clear();
 }
 
 void ChoiceGuide::on_next_button_clicked()
@@ -86,24 +124,20 @@ void ChoiceGuide::on_stacked_widget_currentChanged(int index)
 
 void ChoiceGuide::architectChosenSlot(QString name)
 {
-    //backend
     userChoice.architecture = name;
-    userChoice.set = "";
-    userChoice.programs.clear();
-
-    //frontend
-    while(ui->set_grid->count()){
-        delete ui->set_grid->takeAt(0)->widget();
-    }
-    ui->prog_list->clear();
+    clearSetChoice();
+    clearProgramChoice();
 
     if(programInfo[name].isBool()){
         //not implemented
+        qDebug() << "not implemented yet . return ";
         return ;
     }
     auto sets = programInfo[name].toObject();
     for(auto key:sets.keys()){
         QPushButton *newButton = new QPushButton(key,this);
+        newButton->setCheckable(true);
+        setGroup->addButton(newButton);
         ui->set_grid->addWidget(newButton);
         connect(newButton,&QPushButton::clicked,this,[this,newButton](){
            this->setChosenSlot(newButton->text());
@@ -114,17 +148,14 @@ void ChoiceGuide::architectChosenSlot(QString name)
 
 void ChoiceGuide::setChosenSlot(QString name)
 {
-    //backend
     userChoice.set = name;
-    userChoice.programs.clear();
-    //frontend
-    ui->prog_list->clear();
+    clearProgramChoice();
     if(programInfo[userChoice.architecture].toObject()[name].isBool()){
         //not implemented
         return ;
     }
-    auto programs = programInfo[userChoice.architecture].toObject()[name].toArray();
 
+    auto programs = programInfo[userChoice.architecture].toObject()[name].toArray();
     for(auto program:programs){
         ui->prog_list->addItem(program.toString());
     }
@@ -174,6 +205,7 @@ void ChoiceGuide::selectAllPrograms(bool flag)
 
 void ChoiceGuide::refreshFinishState()
 {
+    qDebug() << "refresh..";
     if(!userChoice.architecture.isEmpty()
         && !userChoice.set.isEmpty()
         && !userChoice.programs.isEmpty()

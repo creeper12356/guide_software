@@ -11,6 +11,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QButtonGroup>
 
 #include <QJsonDocument>
 #include <QJsonObject>

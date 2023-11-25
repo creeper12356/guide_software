@@ -2,7 +2,7 @@
 #ifndef CHOICEGUIDE_H
 #define CHOICEGUIDE_H
 #include "inc.h"
-
+class Core;
 //用户选择的结构体
 struct Choice{
     QString architecture = "";
@@ -26,17 +26,20 @@ private:
         "请选择程序集", "请选择程序", "请选择测试集，并输入线程数"
     };
 private:
-    /*
-     * loaded from file ./program_choices.json
-     * stores info of program choice branches
-     */
     //使用QJsonObject表示的所有程序选择分支信息
     QJsonObject programInfo;
     //使用QJsonObject表示的测试集列表，测试集名称为所引
     QJsonObject testInfo;
     Choice userChoice;
+
+    //选择架构的按钮组
+    QButtonGroup* archGroup = nullptr;
+    //选择程序集的按钮组
+    QButtonGroup* setGroup = nullptr;
+
+    Core* core = nullptr;
 public:
-    explicit ChoiceGuide(QWidget *parent = nullptr);
+    ChoiceGuide(Core* core,QWidget *parent = nullptr);
     ~ChoiceGuide();
 protected:
     //每次打开时的配置
@@ -44,6 +47,10 @@ protected:
 private:
     //从json文件中加载选择分支信息
     void loadChoices();
+    //清除所有程序集选择
+    inline void clearSetChoice();
+    //清除所有程序选择
+    inline void clearProgramChoice();
 private slots:
     /* jump back and force */
     void on_next_button_clicked();

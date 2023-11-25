@@ -19,7 +19,7 @@ Core::Core(QApplication* a):
     mainPage = new MainPage(this);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
-    guide = new ChoiceGuide(nullptr);
+    guide = new ChoiceGuide(this);
 
     initConnections();
 
@@ -62,6 +62,14 @@ void Core::initConnections()
 
     connect(mainPage->getUi()->conf_button,&QPushButton::clicked,
             guide,&ChoiceGuide::show);
+
+    connect(mainPage->getUi()->gen_button,&QPushButton::clicked,
+            this,&Core::writeScripts);
+}
+
+void Core::setUserChoice(Choice *choice)
+{
+    this->userChoice = choice;
 }
 
 void Core::initPwdDialog()
@@ -79,6 +87,17 @@ void Core::reportError(QString errMsg)
      * the software will crash.
      */
     app->quit();
+}
+
+void Core::writeScripts()
+{
+    QString writeScriptCmd = "./writescripts.pl %1 %2";
+    if(userChoice->programs.empty()){
+        qDebug() << "Please configure first.";
+    }
+    for(auto program : userChoice->programs){
+        qDebug() << writeScriptCmd.arg(program,QString::number(userChoice->threadNum));
+    }
 }
 
 void Core::configure()

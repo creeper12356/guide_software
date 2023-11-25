@@ -3,6 +3,8 @@
 * 安装失败时，界面上报错。
 * 读取json格式失败时，进行异常处理.
 * 全选操作进行优化
+* ChoiceGuide存在一些GUI切换的bug
+
 ## 开发记录
 2023.11.10
 * 初步设计MainPage,DependencyInstaller的GUI界面。
@@ -126,7 +128,9 @@
 * (**Solved**)MainPage一开始黑屏，DependencyInstaller显示后才一起显示,初步怀疑是MainPage初始化时还没有事件循环。
 * (**Solved**)下载软件包过程中，出现GUI冻结导致程序无响应
 * (**Solved**)execute wrong sequence of switchGUI* function.(may need to checkout Qt source code)
-* ChoiceGuide选择程序集时，多选会出现问题。
+* (**Solved**)ChoiceGuide选择程序集时，多选会出现问题。
+* (**Solved**)架构选择按钮按下无法弹起.
+原因： 按钮所在的QButtonGroup的isExclusive参数为true,无法取消单个按钮选择。
 
 
 2023.11.19
