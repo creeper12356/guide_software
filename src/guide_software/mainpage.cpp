@@ -2,6 +2,7 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 #include "core.h"
+#include "aboutdialog.h"
 
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
@@ -43,4 +44,10 @@ void MainPage::keyPressEvent(QKeyEvent *event)
 void MainPage::closeEvent(QCloseEvent *event)
 {
     emit closed();
+}
+
+void MainPage::on_action_triggered()
+{
+    AboutDialog aboutDialog(this);
+    aboutDialog.exec();
 }

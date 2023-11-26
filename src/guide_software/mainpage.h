@@ -20,6 +20,8 @@ public:
     Ui::MainPage* getUi(){return ui;}
 private slots:
     void on_exit_button_clicked();
+    void on_action_triggered();
+
 public slots:
     //在界面上显示生成脚本
     void displayWritingScript(bool state);
