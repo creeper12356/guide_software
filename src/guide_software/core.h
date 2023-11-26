@@ -45,6 +45,8 @@ private slots:
     void reportError(QString errMsg);
     //根据用户选择，生成脚本
     void writeScripts();
+    //性能仿真
+    void simulate();
 signals:
     //发送给前端的信号，true表示生成成功，false表示未生成
     void scriptsWriteState(bool state);

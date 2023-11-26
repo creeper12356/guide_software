@@ -145,6 +145,15 @@
 * 从现在开始，代码中的所有注释都为中文
 2023.11.25
 * 完成选择程序集和脚本生成部分。
+2023.11.26
+* 运行仿真时，发现了一些问题(Ubuntu20.04)
+    1. 报错: ```./build/X86/gem5.opt: error while loading shared libraries: libpython2.7.so.1.0: cannot open shared object file: No such file or directory```\
+    解决：推断python2.7未安装，手动安装python2.7-dev
+        ```bash
+        sudo apt install python2.7-dev
+        ```
+    2. 报错：```./build/X86/gem5.opt: error while loading shared libraries: libprotobuf.so.9: cannot open shared object file: No such file or directory```\
+    解决：推测libprotobuf版本不对,使用```apt show libprotobuf-dev```命令查看，发现版本过高(17) 
 ## 学习记录
 2023.11.11
 * 检查Ubuntu系统是否安装某软件包的几种方式:

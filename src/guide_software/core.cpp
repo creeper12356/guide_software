@@ -118,6 +118,18 @@ void Core::writeScripts()
     QDir::setCurrent(oldDir.path());
 }
 
+void Core::simulate()
+{
+    //TODO: 判断条件
+    QDir oldDir = QDir::current();
+    QDir::setCurrent("../experiment/gem5_output");
+    //清空目录
+    proc->setArguments(QStringList() << "-c" << "rm ./* -rf");
+    proc->start();
+    eventLoop->exec();
+    QDir::setCurrent(oldDir.path());
+}
+
 void Core::configure()
 {
     QFile reader("./config.json");
