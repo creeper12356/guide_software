@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/conf_icon.png</file>
+        <file>img/gen_icon.png</file>
+        <file>img/per_sim_icon.png</file>
+        <file>img/clean_icon.png</file>
+    </qresource>
+</RCC>

@@ -10,6 +10,15 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
+    //初始化toolBar
+    QToolBar* toolBar = new QToolBar(this);
+    this->addToolBar(toolBar);
+    toolBar->setIconSize(QSize(50,50));
+    toolBar->addAction(ui->action_conf);
+    toolBar->addAction(ui->action_clean);
+    toolBar->addAction(ui->action_gen);
+    toolBar->addAction(ui->action_sim);
+
 }
 
 MainPage::~MainPage()
@@ -18,36 +27,30 @@ MainPage::~MainPage()
     delete ui;
 }
 
-void MainPage::on_exit_button_clicked()
-{
-    this->close();
-}
-
-void MainPage::displayWritingScript(bool state)
-{
-    if(state)
-        ui->gen_button->setStyleSheet("background-color: green");
-    else
-        ui->gen_button->setStyleSheet("background-color: red");
-    QTimer::singleShot(1 * SECOND,this,[this](){
-        ui->gen_button->setStyleSheet("");
-    });
-}
-
-void MainPage::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Escape){
-        this->close();
-    }
-}
-
 void MainPage::closeEvent(QCloseEvent *event)
 {
     emit closed();
 }
 
-void MainPage::on_action_triggered()
+void MainPage::on_action_about_triggered()
 {
     AboutDialog aboutDialog(this);
     aboutDialog.exec();
+}
+
+void MainPage::on_action_exit_triggered()
+{
+    this->close();
+}
+
+void MainPage::scriptCleanedSlot()
+{
+    qDebug() << "script cleaned.";
+    ui->statusbar->showMessage("清理脚本完成",3 * SECOND);
+}
+
+void MainPage::scriptGeneratedSlot()
+{
+    qDebug() << "script generated.";
+    ui->statusbar->showMessage("脚本已成功生成",3 * SECOND);
 }

@@ -63,13 +63,19 @@ void Core::initConnections()
 
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
-
-    connect(mainPage->getUi()->conf_button,&QPushButton::clicked,
+    connect(mainPage->getUi()->action_conf,&QAction::triggered,
             guide,&ChoiceGuide::show);
 
-    connect(mainPage->getUi()->gen_button,&QPushButton::clicked,
-            this,&Core::writeScripts);
-    connect(this,&Core::scriptsWriteState,mainPage,&MainPage::displayWritingScript);
+    connect(mainPage->getUi()->action_clean,&QAction::triggered,
+            this,&Core::cleanScript);
+    connect(this,&Core::scriptCleaned,mainPage,&MainPage::scriptCleanedSlot);
+
+    connect(mainPage->getUi()->action_gen,&QAction::triggered,
+            this,&Core::generateScript);
+    connect(this,&Core::scriptGenerated,mainPage,&MainPage::scriptGeneratedSlot);
+
+    connect(mainPage->getUi()->action_sim,&QAction::triggered,
+            this,&Core::performanceSimulate);
 }
 
 void Core::copyUserChoice(Choice *choice)
@@ -94,15 +100,26 @@ void Core::reportError(QString errMsg)
     app->quit();
 }
 
-void Core::writeScripts()
+void Core::cleanScript()
+{
+    //暂存路径
+    QDir oldDir = QDir::current();
+    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
+    //清空之前生成的脚本
+    proc->setArguments(QStringList() << "-c" << "rm ./*.rcS");
+    proc->start();
+    eventLoop->exec();
+    QDir::setCurrent(oldDir.path());
+    emit scriptCleaned();
+}
+
+void Core::generateScript()
 {
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     if(userChoice->programs.empty()){
-        emit scriptsWriteState(false);
         QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
-    emit scriptsWriteState(true);
     //暂存路径
     QDir oldDir = QDir::current();
     QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
@@ -116,10 +133,12 @@ void Core::writeScripts()
         eventLoop->exec();
     }
     QDir::setCurrent(oldDir.path());
+    emit scriptGenerated();
 }
 
-void Core::simulate()
+void Core::performanceSimulate()
 {
+    qDebug() << "simulate.";
     //TODO: 判断条件
     QDir oldDir = QDir::current();
     QDir::setCurrent("../experiment/gem5_output");
@@ -127,6 +146,33 @@ void Core::simulate()
     proc->setArguments(QStringList() << "-c" << "rm ./* -rf");
     proc->start();
     eventLoop->exec();
+    //新建文件夹
+    for(auto program: userChoice->programs){
+        QDir::current().mkdir(program);
+    }
+    //进入仿真模块文件夹
+    QDir::setCurrent("../gem5");
+    //运行性能仿真
+    QString simulateCmd =
+            "M5_PATH=../full_system_images/ ./build/X86/gem5.opt configs/example/fs.py "
+            "--script=../TR-09-32-parsec-2.1-alpha-files/%1_%2c_%3.rcS "
+            "--disk-image=x86root-parsec.img "
+            "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
+            "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
+    for(auto program: userChoice->programs){
+        proc->setArguments(QStringList() << "-c" <<
+                           simulateCmd.arg(program,
+                                           QString::number(userChoice->threadNum),
+                                           userChoice->test));
+        qDebug() << proc->arguments()[1];
+        //print process output
+        connect(proc,&QProcess::readyRead,this,[this](){
+            qDebug() << proc->readLine();
+        });
+//        proc->start();
+//        eventLoop->exec();
+//        qDebug() << "simulate " << program << " finished..";
+    }
     QDir::setCurrent(oldDir.path());
 }
 

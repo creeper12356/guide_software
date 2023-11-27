@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>ChoiceGuide</class>
  <widget class="QMainWindow" name="ChoiceGuide">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,6 +15,10 @@
   </property>
   <property name="windowTitle">
    <string>配置</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../res.qrc">
+    <normaloff>:/img/conf_icon.png</normaloff>:/img/conf_icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stacked_widget">
@@ -225,6 +232,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="../res.qrc"/>
+ </resources>
  <connections/>
 </ui>

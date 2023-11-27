@@ -43,13 +43,16 @@ public:
     void copyUserChoice(Choice* userChoice);
 private slots:
     void reportError(QString errMsg);
+    void cleanScript();
     //根据用户选择，生成脚本
-    void writeScripts();
+    void generateScript();
     //性能仿真
-    void simulate();
+    void performanceSimulate();
 signals:
-    //发送给前端的信号，true表示生成成功，false表示未生成
-    void scriptsWriteState(bool state);
+    //清理脚本成功的信号
+    void scriptCleaned();
+    //脚本成功生成的信号
+    void scriptGenerated();
 };
 
 #endif // CORE_H

@@ -19,14 +19,12 @@ public:
     //getters
     Ui::MainPage* getUi(){return ui;}
 private slots:
-    void on_exit_button_clicked();
-    void on_action_triggered();
-
+    void on_action_about_triggered();
+    void on_action_exit_triggered();
 public slots:
-    //在界面上显示生成脚本
-    void displayWritingScript(bool state);
+    void scriptCleanedSlot();
+    void scriptGeneratedSlot();
 protected:
-    void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent *event) override;
 private:
     Ui::MainPage *ui;

@@ -193,12 +193,12 @@ void PyLibInstaller::initCmds()
 {
     updateCmd = "";
     getNotInstalledCmd =
-            "pip3 list | tail -n +3 | cut -f 1 -d ' ' | sort > py_installed.txt "
+            "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > py_installed.txt "
             "&& "
             "comm py_installed.txt py_requirements.txt -13 "
             "&& "
             "rm py_installed.txt ";
     installCmd =
-            "%1pip3 install %2 "
+            "%1pip install %2 "
             "2> /dev/null";
 }

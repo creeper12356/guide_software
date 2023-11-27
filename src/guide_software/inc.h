@@ -6,12 +6,15 @@
 #include <QApplication>
 #include <QProcess>
 
+#include <QSize>
+
 #include <QDialog>
 #include <QInputDialog>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QButtonGroup>
+#include <QToolBar>
 
 #include <QJsonDocument>
 #include <QJsonObject>
