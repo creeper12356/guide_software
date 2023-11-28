@@ -13,8 +13,5 @@
 	},
 	"Simlarge":{
 		"description":"Large-scale experiments"
-	},
-	"Native":{
-		"description":"Real-world behavior"
 	}
 }

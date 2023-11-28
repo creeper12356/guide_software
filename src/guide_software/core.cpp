@@ -205,11 +205,12 @@ void Core::performanceSimulate()
         qDebug() << proc->arguments()[1];
         //print process output
         connect(proc,&QProcess::readyRead,this,[this](){
-            qDebug() << proc->readLine();
+             mainPage->getUi()->textBrowser->append(QString::fromUtf8(proc->readLine()));
+
         });
-//        proc->start();
-//        eventLoop->exec();
-//        qDebug() << "simulate " << program << " finished..";
+        proc->start();
+        eventLoop->exec();
+        qDebug() << "simulate " << program << " finished..";
     }
     QDir::setCurrent(oldDir.path());
 }
