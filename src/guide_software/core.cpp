@@ -78,6 +78,31 @@ void Core::initConnections()
             this,&Core::performanceSimulate);
 }
 
+bool Core::checkConfigured()
+{
+    return !userChoice->programs.empty();
+}
+
+bool Core::checkScriptGenerated()
+{
+    QDir oldDir = QDir::current();
+    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files/");
+    QString scriptFormat("%1_%2c_%3.rcS");
+    QString script;
+    bool res = true;
+    for(auto& program:userChoice->programs){
+        script = scriptFormat.arg(program,QString::number(userChoice->threadNum),userChoice->test.toLower());
+        qDebug() << "script: " << script;
+        if(!QDir::current().exists(script)){
+            qDebug() << "script " << script << " does not exist.";
+            res = false;
+            break;
+        }
+    }
+    QDir::setCurrent(oldDir.path());
+    return res;
+}
+
 void Core::copyUserChoice(Choice *choice)
 {
     *userChoice = *choice;
@@ -115,11 +140,13 @@ void Core::cleanScript()
 
 void Core::generateScript()
 {
-    QString writeScriptCmd = "./writescripts.pl %1 %2";
-    if(userChoice->programs.empty()){
+    //检查前置条件
+    if(!checkConfigured()){
         QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
+
+    QString writeScriptCmd = "./writescripts.pl %1 %2";
     //暂存路径
     QDir oldDir = QDir::current();
     QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
@@ -129,6 +156,7 @@ void Core::generateScript()
     eventLoop->exec();
     for(auto program : userChoice->programs){
         proc->setArguments(QStringList() << "-c" << writeScriptCmd.arg(program,QString::number(userChoice->threadNum)));
+        qDebug() << proc->arguments();
         proc->start();
         eventLoop->exec();
     }
@@ -138,8 +166,17 @@ void Core::generateScript()
 
 void Core::performanceSimulate()
 {
+    //检查前置条件
+    if(!checkConfigured()){
+        QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
+        return ;
+    }
+    if(!checkScriptGenerated()){
+        QMessageBox::warning(mainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
+        return ;
+    }
+
     qDebug() << "simulate.";
-    //TODO: 判断条件
     QDir oldDir = QDir::current();
     QDir::setCurrent("../experiment/gem5_output");
     //清空目录
@@ -153,6 +190,7 @@ void Core::performanceSimulate()
     //进入仿真模块文件夹
     QDir::setCurrent("../gem5");
     //运行性能仿真
+    //TODO: 大小写敏感
     QString simulateCmd =
             "M5_PATH=../full_system_images/ ./build/X86/gem5.opt configs/example/fs.py "
             "--script=../TR-09-32-parsec-2.1-alpha-files/%1_%2c_%3.rcS "

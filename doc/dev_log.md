@@ -133,6 +133,12 @@
 * (**Solved**)架构选择按钮按下无法弹起.
 原因： 按钮所在的QButtonGroup的isExclusive参数为true,无法取消单个按钮选择。
 
+* DependencyInstaller cannot quit properly
+* (**Solved**) raytrace脚本无法生成。
+原因： 版本问题，将raytrace换成rtview即可
+
+* 无法生成Native测试集对应的脚本
+
 
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。

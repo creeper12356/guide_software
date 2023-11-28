@@ -7,6 +7,7 @@ class DependencyInstaller;
 class PyLibInstaller;
 class ChoiceGuide;
 struct Choice;
+
 class Core:public QObject
 {
     Q_OBJECT
@@ -25,29 +26,36 @@ private:
     //指向ChoiceGuide::userChoice的副本
     Choice* userChoice = nullptr;
 
-private:
-    //在启动所有窗体前，从config.json文件中读取配置
-    void configure();
 public:
     Core(QApplication* app);
     ~Core();
 private:
     //初始化函数
+    //在启动所有窗体前，从config.json文件中读取配置
+    void configure();
     //初始化密码对话框GUI
     inline void initPwdDialog();
-    /* init signals and slots connection */
     //初始化信号槽连接
     inline void initConnections();
+private:
+    //检查用户是否配置成功
+    bool checkConfigured();
+    //根据用户配置，检查脚本是否成功生成，若用户没有配置，直接返回true
+    bool checkScriptGenerated();
 public:
-    //复制用户选择
+    //配置完成后，复制用户选择
     void copyUserChoice(Choice* userChoice);
+
 private slots:
-    void reportError(QString errMsg);
+    //清理脚本
     void cleanScript();
     //根据用户选择，生成脚本
     void generateScript();
     //性能仿真
     void performanceSimulate();
+
+    //TODO : 报错
+    void reportError(QString errMsg);
 signals:
     //清理脚本成功的信号
     void scriptCleaned();
