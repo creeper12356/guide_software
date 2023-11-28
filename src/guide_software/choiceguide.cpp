@@ -24,6 +24,11 @@ ChoiceGuide::~ChoiceGuide()
     delete ui;
 }
 
+const Choice *ChoiceGuide::userChoice() const
+{
+    return &_userChoice;
+}
+
 void ChoiceGuide::showEvent(QShowEvent *)
 {
     ui->stacked_widget->setCurrentIndex(0);
@@ -48,9 +53,9 @@ void ChoiceGuide::showEvent(QShowEvent *)
     ui->test_list->setCurrentRow(-1);
     ui->thread_num_box->setValue(0);
 
-    userChoice.architecture = "";
-    userChoice.test = "";
-    userChoice.threadNum = 0;
+    _userChoice.architecture = "";
+    _userChoice.test = "";
+    _userChoice.threadNum = 0;
 }
 
 void ChoiceGuide::initArchitectButtons()
@@ -112,14 +117,14 @@ void ChoiceGuide::clearSetChoice()
         delete ui->set_grid->takeAt(0)->widget();
     }
     //后端清除
-    userChoice.set = "";
+    _userChoice.set = "";
 }
 
 void ChoiceGuide::clearProgramChoice()
 {
     ui->prog_list->clear();
     ui->select_all->setChecked(false);
-    userChoice.programs.clear();
+    _userChoice.programs.clear();
 }
 
 void ChoiceGuide::on_next_button_clicked()
@@ -138,7 +143,7 @@ void ChoiceGuide::on_stacked_widget_currentChanged(int index)
 
 void ChoiceGuide::architectChosenSlot(QString name)
 {
-    userChoice.architecture = name;
+    _userChoice.architecture = name;
     clearSetChoice();
     clearProgramChoice();
 
@@ -162,14 +167,14 @@ void ChoiceGuide::architectChosenSlot(QString name)
 
 void ChoiceGuide::setChosenSlot(QString name)
 {
-    userChoice.set = name;
+    _userChoice.set = name;
     clearProgramChoice();
-    if(programInfo[userChoice.architecture].toObject()[name].isBool()){
+    if(programInfo[_userChoice.architecture].toObject()[name].isBool()){
         //not implemented
         return ;
     }
 
-    auto programs = programInfo[userChoice.architecture].toObject()[name].toArray();
+    auto programs = programInfo[_userChoice.architecture].toObject()[name].toArray();
     for(auto program:programs){
         ui->prog_list->addItem(program.toString());
     }
@@ -178,23 +183,23 @@ void ChoiceGuide::setChosenSlot(QString name)
 
 void ChoiceGuide::programChosenSlot()
 {
-    userChoice.programs.clear();
+    _userChoice.programs.clear();
     int selectedCount = ui->prog_list->selectedItems().size();
     for(auto* item: ui->prog_list->selectedItems()){
-        userChoice.programs.append(item->text());
+        _userChoice.programs.append(item->text());
     }
     refreshFinishState();
 }
 
 void ChoiceGuide::testChosenSlot(QString name)
 {
-    userChoice.test = name;
+    _userChoice.test = name;
     refreshFinishState();
 }
 
 void ChoiceGuide::threadNumSetSlot(int threadNum)
 {
-    userChoice.threadNum = threadNum;
+    _userChoice.threadNum = threadNum;
     refreshFinishState();
 }
 
@@ -209,11 +214,11 @@ void ChoiceGuide::selectAllPrograms(bool flag)
 
 void ChoiceGuide::refreshFinishState()
 {
-    if(!userChoice.architecture.isEmpty()
-        && !userChoice.set.isEmpty()
-        && !userChoice.programs.isEmpty()
-        && !userChoice.test.isEmpty()
-        && !!userChoice.threadNum){
+    if(!_userChoice.architecture.isEmpty()
+        && !_userChoice.set.isEmpty()
+        && !_userChoice.programs.isEmpty()
+        && !_userChoice.test.isEmpty()
+        && !!_userChoice.threadNum){
         ui->finish_button->setEnabled(true);
         return ;
     }
@@ -233,9 +238,8 @@ void ChoiceGuide::on_cancel_button_clicked()
 
 void ChoiceGuide::on_finish_button_clicked()
 {
-    //保存所有的更改
-    core->copyUserChoice(&userChoice);
-    qDebug() << "saved!";
+    emit configureFinished();
+//    core->copyUserChoice(&userChoice);
     this->close();
 }
 

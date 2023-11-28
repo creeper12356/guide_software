@@ -63,6 +63,16 @@ void Core::initConnections()
 
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
+
+    connect(guide,&ChoiceGuide::configureFinished,
+            this,[this](){
+        //TODO:抽象接口
+        this->copyUserChoice(guide->userChoice());
+        mainPage->getUi()->prog_list->clear();
+        mainPage->getUi()->prog_list->addItems(userChoice->programs);
+        mainPage->getUi()->test_label->setText(userChoice->test);
+        mainPage->getUi()->thread_num_label->setText(QString::number(userChoice->threadNum));
+    });
     connect(mainPage->getUi()->action_conf,&QAction::triggered,
             guide,&ChoiceGuide::show);
 
@@ -103,7 +113,7 @@ bool Core::checkScriptGenerated()
     return res;
 }
 
-void Core::copyUserChoice(Choice *choice)
+void Core::copyUserChoice(const Choice *choice)
 {
     *userChoice = *choice;
 }
@@ -204,12 +214,12 @@ void Core::performanceSimulate()
                                            userChoice->test));
         qDebug() << proc->arguments()[1];
         //print process output
-        connect(proc,&QProcess::readyRead,this,[this](){
-             mainPage->getUi()->textBrowser->append(QString::fromUtf8(proc->readLine()));
+//        connect(proc,&QProcess::readyRead,this,[this](){
+//             mainPage->getUi()->textBrowser->append(QString::fromUtf8(proc->readLine()));
 
-        });
-        proc->start();
-        eventLoop->exec();
+//        });
+//        proc->start();
+//        eventLoop->exec();
         qDebug() << "simulate " << program << " finished..";
     }
     QDir::setCurrent(oldDir.path());

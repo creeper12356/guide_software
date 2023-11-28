@@ -44,7 +44,7 @@ private:
     bool checkScriptGenerated();
 public:
     //配置完成后，复制用户选择
-    void copyUserChoice(Choice* userChoice);
+    void copyUserChoice(const Choice* userChoice);
 
 private slots:
     //清理脚本

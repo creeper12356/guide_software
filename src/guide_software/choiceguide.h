@@ -30,7 +30,8 @@ private:
     QJsonObject programInfo;
     //使用QJsonObject表示的测试集列表，测试集名称为所引
     QJsonObject testInfo;
-    Choice userChoice;
+    //用户选择
+    Choice _userChoice;
 
     //选择架构的按钮组
     QButtonGroup* archGroup = nullptr;
@@ -41,6 +42,11 @@ private:
 public:
     ChoiceGuide(Core* core,QWidget *parent = nullptr);
     ~ChoiceGuide();
+public:
+    //getters
+    //返回指向用户选择的常量指针
+    const Choice *userChoice() const;
+
 protected:
     //每次打开时的配置
     void showEvent(QShowEvent *event) override;
@@ -78,6 +84,9 @@ private slots:
     void selectAllPrograms(bool flag);
 private:
     Ui::ChoiceGuide *ui;
+signals:
+    //配置完成时，该信号发送给主页面
+    void configureFinished();
 };
 
 #endif // CHOICEGUIDE_H
