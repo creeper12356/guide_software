@@ -2,7 +2,6 @@
 #ifndef CHOICEGUIDE_H
 #define CHOICEGUIDE_H
 #include "inc.h"
-class Core;
 //用户选择的结构体
 struct Choice{
     QString architecture = "";

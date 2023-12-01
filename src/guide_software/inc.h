@@ -29,4 +29,22 @@
 
 #include <QDebug>
 #define SECOND 1000
+/*
+ * 无阻塞等待
+ * QProcess* process,
+ * QString command,
+ * QEventLoop* eventLoop
+ */
+#define noBlockWait(process,command,eventLoop) \
+    process->setArguments(QStringList() << "-c" << command);\
+    proc->start();\
+    eventLoop->exec();
+class Core;
+class MainPage;
+class DependencyInstaller;
+class PyLibInstaller;
+class ChoiceGuide;
+struct Choice;
+
+
 #endif // INC_H

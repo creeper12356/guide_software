@@ -46,14 +46,17 @@ void MainPage::on_action_exit_triggered()
 
 void MainPage::scriptCleanedSlot()
 {
-    qDebug() << "script cleaned.";
     ui->statusbar->showMessage("清理脚本完成",3 * SECOND);
 }
 
 void MainPage::scriptGeneratedSlot()
 {
-    qDebug() << "script generated.";
     ui->statusbar->showMessage("脚本已成功生成",3 * SECOND);
+}
+
+void MainPage::performanceSimulationFinishedSlot()
+{
+    ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
 }
 
 void MainPage::refreshUserChoice(const Choice *userChoice)

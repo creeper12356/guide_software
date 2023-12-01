@@ -6,7 +6,6 @@ class Choice;
 namespace Ui {
 class MainPage;
 }
-class Core;
 class MainPage : public QMainWindow
 {
     Q_OBJECT
@@ -24,6 +23,7 @@ private slots:
 public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();
+    void performanceSimulationFinishedSlot();
     //将用户选择更新到界面上
     void refreshUserChoice(const Choice* userChoice);
 protected:

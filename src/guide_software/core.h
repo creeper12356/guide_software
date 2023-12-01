@@ -2,12 +2,6 @@
 #ifndef CORE_H
 #define CORE_H
 #include "inc.h"
-class MainPage;
-class DependencyInstaller;
-class PyLibInstaller;
-class ChoiceGuide;
-struct Choice;
-
 class Core:public QObject
 {
     Q_OBJECT
@@ -42,6 +36,7 @@ private:
     //根据用户配置，检查脚本是否成功生成，若用户没有配置，直接返回true
     bool checkScriptGenerated();
 private:
+    //关闭软件时写入配置
     void saveConfiguration();
 public:
     //配置完成后，复制用户选择
@@ -54,7 +49,7 @@ private slots:
     void generateScript();
     //性能仿真
     void performanceSimulate();
-
+    //
     //TODO : 报错
     void reportError(QString errMsg);
 signals:
@@ -62,6 +57,8 @@ signals:
     void scriptCleaned();
     //脚本成功生成的信号
     void scriptGenerated();
+    //性能仿真运行成功信号
+    void performanceSimulationFinished();
 };
 
 #endif // CORE_H

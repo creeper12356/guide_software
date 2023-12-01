@@ -6,7 +6,6 @@
 namespace Ui {
 class DependencyInstaller;
 }
-class Core;
 //依赖安装程序的抽象基类
 class DependencyInstaller : public QDialog
 {
