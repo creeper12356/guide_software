@@ -13,12 +13,14 @@ Core::Core(QApplication* a):
     eventLoop = new QEventLoop(this);
     proc = new QProcess(this);
     proc->setProgram("bash");
-    userChoice = new Choice;
-    //使用文件配置
-    configure();
+    _userChoice = new Choice;
+    //读取文件配置
+    restoreConfiguration();
     //初始化窗体
     initPwdDialog();
     mainPage = new MainPage(this);
+    //刷新界面
+    mainPage->refreshUserChoice(_userChoice);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
     guide = new ChoiceGuide(this);
@@ -38,8 +40,9 @@ Core::Core(QApplication* a):
 Core::~Core()
 {
     qDebug() << "~Core()";
-    delete userChoice;
-    delete config;
+    //写入文件配置
+    saveConfiguration();
+    delete _userChoice;
     delete installer;
     delete py_installer;
     delete mainPage;
@@ -65,14 +68,10 @@ void Core::initConnections()
             eventLoop,&QEventLoop::quit);
 
     connect(guide,&ChoiceGuide::configureFinished,
-            this,[this](){
-        //TODO:抽象接口
-        this->copyUserChoice(guide->userChoice());
-        mainPage->getUi()->prog_list->clear();
-        mainPage->getUi()->prog_list->addItems(userChoice->programs);
-        mainPage->getUi()->test_label->setText(userChoice->test);
-        mainPage->getUi()->thread_num_label->setText(QString::number(userChoice->threadNum));
-    });
+            this,&Core::copyUserChoice);
+    connect(guide,&ChoiceGuide::configureFinished,
+            mainPage,&MainPage::refreshUserChoice);
+
     connect(mainPage->getUi()->action_conf,&QAction::triggered,
             guide,&ChoiceGuide::show);
 
@@ -90,7 +89,7 @@ void Core::initConnections()
 
 bool Core::checkConfigured()
 {
-    return !userChoice->programs.empty();
+    return !_userChoice->programs.empty();
 }
 
 bool Core::checkScriptGenerated()
@@ -100,8 +99,8 @@ bool Core::checkScriptGenerated()
     QString scriptFormat("%1_%2c_%3.rcS");
     QString script;
     bool res = true;
-    for(auto& program:userChoice->programs){
-        script = scriptFormat.arg(program,QString::number(userChoice->threadNum),userChoice->test.toLower());
+    for(auto& program:_userChoice->programs){
+        script = scriptFormat.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower());
         qDebug() << "script: " << script;
         if(!QDir::current().exists(script)){
             qDebug() << "script " << script << " does not exist.";
@@ -113,9 +112,30 @@ bool Core::checkScriptGenerated()
     return res;
 }
 
+void Core::saveConfiguration()
+{
+    QJsonObject config;
+    QJsonObject userChoice;
+    userChoice.insert("architecture",_userChoice->architecture);
+    userChoice.insert("set",_userChoice->set);
+    QJsonArray programs;
+    for(auto& program:_userChoice->programs){
+        programs.append(program);
+    }
+    userChoice.insert("programs",programs);
+    userChoice.insert("test",_userChoice->test);
+    userChoice.insert("threadNum",_userChoice->threadNum);
+    config.insert("userChoice",userChoice);
+
+    QFile writer("./config.json");
+    writer.open(QIODevice::WriteOnly);
+    writer.write(QJsonDocument(config).toJson());
+    writer.close();
+}
+
 void Core::copyUserChoice(const Choice *choice)
 {
-    *userChoice = *choice;
+    *_userChoice = *choice;
 }
 
 void Core::initPwdDialog()
@@ -164,8 +184,8 @@ void Core::generateScript()
     proc->setArguments(QStringList() << "-c" << "rm ./*.rcS");
     proc->start();
     eventLoop->exec();
-    for(auto program : userChoice->programs){
-        proc->setArguments(QStringList() << "-c" << writeScriptCmd.arg(program,QString::number(userChoice->threadNum)));
+    for(auto program : _userChoice->programs){
+        proc->setArguments(QStringList() << "-c" << writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)));
         qDebug() << proc->arguments();
         proc->start();
         eventLoop->exec();
@@ -194,7 +214,7 @@ void Core::performanceSimulate()
     proc->start();
     eventLoop->exec();
     //新建文件夹
-    for(auto program: userChoice->programs){
+    for(auto program: _userChoice->programs){
         QDir::current().mkdir(program);
     }
     //进入仿真模块文件夹
@@ -207,11 +227,11 @@ void Core::performanceSimulate()
             "--disk-image=x86root-parsec.img "
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
-    for(auto program: userChoice->programs){
+    for(auto program: _userChoice->programs){
         proc->setArguments(QStringList() << "-c" <<
                            simulateCmd.arg(program,
-                                           QString::number(userChoice->threadNum),
-                                           userChoice->test));
+                                           QString::number(_userChoice->threadNum),
+                                           _userChoice->test));
         qDebug() << proc->arguments()[1];
         //print process output
 //        connect(proc,&QProcess::readyRead,this,[this](){
@@ -225,14 +245,21 @@ void Core::performanceSimulate()
     QDir::setCurrent(oldDir.path());
 }
 
-void Core::configure()
+void Core::restoreConfiguration()
 {
     QFile reader("./config.json");
     reader.open(QIODevice::ReadOnly);
     if(!reader.isOpen()){
         qDebug() << "Exception: file not open";
     }
-    config = new QJsonObject(QJsonDocument::fromJson(reader.readAll()).object());
+    QJsonObject config = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();
-    qDebug() << "config = " << *config;
+    _userChoice->architecture = config["userChoice"].toObject()["architecture"].toString();
+    _userChoice->set = config["userChoice"].toObject()["set"].toString();
+    //copy programs
+    for(auto program:config["userChoice"].toObject()["programs"].toArray()){
+        _userChoice->programs.append(program.toString());
+    }
+    _userChoice->test = config["userChoice"].toObject()["test"].toString();
+    _userChoice->threadNum = config["userChoice"].toObject()["threadNum"].toInt();
 }

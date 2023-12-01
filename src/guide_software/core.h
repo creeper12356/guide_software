@@ -12,7 +12,6 @@ class Core:public QObject
 {
     Q_OBJECT
 private:
-    QJsonObject* config = nullptr;
     QApplication* app = nullptr;
     QEventLoop* eventLoop = nullptr;
     QProcess* proc = nullptr;
@@ -24,7 +23,7 @@ private:
     //由所有可能询问密码的窗体共享
     QInputDialog* pwdDialog = nullptr;
     //指向ChoiceGuide::userChoice的副本
-    Choice* userChoice = nullptr;
+    Choice* _userChoice = nullptr;
 
 public:
     Core(QApplication* app);
@@ -32,7 +31,7 @@ public:
 private:
     //初始化函数
     //在启动所有窗体前，从config.json文件中读取配置
-    void configure();
+    void restoreConfiguration();
     //初始化密码对话框GUI
     inline void initPwdDialog();
     //初始化信号槽连接
@@ -42,9 +41,11 @@ private:
     bool checkConfigured();
     //根据用户配置，检查脚本是否成功生成，若用户没有配置，直接返回true
     bool checkScriptGenerated();
+private:
+    void saveConfiguration();
 public:
     //配置完成后，复制用户选择
-    void copyUserChoice(const Choice* userChoice);
+    void copyUserChoice(const Choice* _userChoice);
 
 private slots:
     //清理脚本

@@ -1,3 +1,11 @@
 {
-	"isDependencyInstalled":false
+    "userChoice": {
+        "architecture": "X86",
+        "programs": [
+            "bodytrack"
+        ],
+        "set": "PARSEC",
+        "test": "Test",
+        "threadNum": 3
+    }
 }

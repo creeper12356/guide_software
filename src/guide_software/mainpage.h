@@ -2,7 +2,7 @@
 #ifndef MAINPAGE_H
 #define MAINPAGE_H
 #include "inc.h"
-
+class Choice;
 namespace Ui {
 class MainPage;
 }
@@ -24,6 +24,8 @@ private slots:
 public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();
+    //将用户选择更新到界面上
+    void refreshUserChoice(const Choice* userChoice);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:

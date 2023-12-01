@@ -238,8 +238,7 @@ void ChoiceGuide::on_cancel_button_clicked()
 
 void ChoiceGuide::on_finish_button_clicked()
 {
-    emit configureFinished();
-//    core->copyUserChoice(&userChoice);
+    emit configureFinished(&_userChoice);
     this->close();
 }
 

@@ -3,6 +3,7 @@
 #include "ui_mainpage.h"
 #include "core.h"
 #include "aboutdialog.h"
+#include "choiceguide.h"
 
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
@@ -53,4 +54,12 @@ void MainPage::scriptGeneratedSlot()
 {
     qDebug() << "script generated.";
     ui->statusbar->showMessage("脚本已成功生成",3 * SECOND);
+}
+
+void MainPage::refreshUserChoice(const Choice *userChoice)
+{
+    ui->prog_list->clear();
+    ui->prog_list->addItems(userChoice->programs);
+    ui->test_label->setText(userChoice->test);
+    ui->thread_num_label->setText(QString::number(userChoice->threadNum));
 }
