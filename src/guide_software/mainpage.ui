@@ -44,7 +44,7 @@
     </property>
     <addaction name="action_sim"/>
     <addaction name="action_3"/>
-    <addaction name="action_4"/>
+    <addaction name="action_temp"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -196,9 +196,16 @@
     <string>功耗仿真</string>
    </property>
   </action>
-  <action name="action_4">
+  <action name="action_temp">
+   <property name="icon">
+    <iconset resource="../res.qrc">
+     <normaloff>:/img/temp_icon.png</normaloff>:/img/temp_icon.png</iconset>
+   </property>
    <property name="text">
-    <string>温度仿真</string>
+    <string>生成温度图</string>
+   </property>
+   <property name="toolTip">
+    <string>生成温度图</string>
    </property>
   </action>
   <action name="action_gen">

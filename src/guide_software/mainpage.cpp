@@ -19,6 +19,7 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     toolBar->addAction(ui->action_clean);
     toolBar->addAction(ui->action_gen);
     toolBar->addAction(ui->action_sim);
+    toolBar->addAction(ui->action_temp);
 
 }
 

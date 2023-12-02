@@ -4,5 +4,6 @@
         <file>img/gen_icon.png</file>
         <file>img/per_sim_icon.png</file>
         <file>img/clean_icon.png</file>
+        <file>img/temp_icon.png</file>
     </qresource>
 </RCC>

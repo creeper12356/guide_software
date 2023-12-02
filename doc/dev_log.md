@@ -139,6 +139,7 @@
 原因： 版本问题，将raytrace换成rtview即可
 
 * (**Solved**)无法生成Native测试集对应的脚本
+* (12.2**Solved**) 运行python脚本报错，`Non-ASCII character '\xe6' in file split.py`，解决： 在开头添加： ```# -*- coding: utf-8 -*-```
 
 
 2023.11.19

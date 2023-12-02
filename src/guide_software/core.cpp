@@ -15,7 +15,7 @@ Core::Core(QApplication* a):
     proc->setProgram("bash");
     _userChoice = new Choice;
     //读取文件配置
-    restoreConfiguration();
+    readConfig();
     //初始化窗体
     initPwdDialog();
     mainPage = new MainPage(this);
@@ -41,7 +41,7 @@ Core::~Core()
 {
     qDebug() << "~Core()";
     //写入文件配置
-    saveConfiguration();
+    writeConfig();
     delete _userChoice;
     delete installer;
     delete py_installer;
@@ -77,16 +77,19 @@ void Core::initConnections()
     //清理脚本相关
     connect(mainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);
-    connect(this,&Core::scriptCleaned,mainPage,&MainPage::scriptCleanedSlot);
+    connect(this,&Core::cleanScriptFinished,mainPage,&MainPage::scriptCleanedSlot);
     //生成脚本相关
     connect(mainPage->getUi()->action_gen,&QAction::triggered,
-            this,&Core::generateScript);
-    connect(this,&Core::scriptGenerated,mainPage,&MainPage::scriptGeneratedSlot);
+            this,&Core::genScript);
+    connect(this,&Core::genScriptFinished,mainPage,&MainPage::scriptGeneratedSlot);
     //性能仿真相关
     connect(mainPage->getUi()->action_sim,&QAction::triggered,
-            this,&Core::performanceSimulate);
-    connect(this,&Core::performanceSimulationFinished,
+            this,&Core::simulatePerformance);
+    connect(this,&Core::simulatePerformanceFinished,
             mainPage,&MainPage::performanceSimulationFinishedSlot);
+    //生成温度图相关
+    connect(mainPage->getUi()->action_temp,&QAction::triggered,
+            this,&Core::genTempGraph);
 }
 
 bool Core::checkConfigured()
@@ -94,7 +97,7 @@ bool Core::checkConfigured()
     return !_userChoice->programs.empty();
 }
 
-bool Core::checkScriptGenerated()
+bool Core::checkGenScript()
 {
     QDir oldDir = QDir::current();
     QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files/");
@@ -114,7 +117,7 @@ bool Core::checkScriptGenerated()
     return res;
 }
 
-void Core::saveConfiguration()
+void Core::writeConfig()
 {
     QJsonObject config;
     QJsonObject userChoice;
@@ -166,10 +169,10 @@ void Core::cleanScript()
     //清空之前生成的脚本
     noBlockWait(proc,"rm ./*.rcS",eventLoop);
     QDir::setCurrent(oldDir.path());
-    emit scriptCleaned();
+    emit cleanScriptFinished();
 }
 
-void Core::generateScript()
+void Core::genScript()
 {
     //检查前置条件
     if(!checkConfigured()){
@@ -189,23 +192,22 @@ void Core::generateScript()
                     eventLoop);
     }
     QDir::setCurrent(oldDir.path());
-    emit scriptGenerated();
+    emit genScriptFinished();
 }
 
-void Core::performanceSimulate()
+void Core::simulatePerformance()
 {
     //检查前置条件
     if(!checkConfigured()){
         QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
-    if(!checkScriptGenerated()){
+    if(!checkGenScript()){
         QMessageBox::warning(mainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
         return ;
     }
 
     QDir oldDir = QDir::current();
-    QString dstPath = ;
     QDir::setCurrent("../experiment/gem5_output");
     //清空目录
     noBlockWait(proc,"rm ./* -rf",eventLoop);
@@ -232,10 +234,34 @@ void Core::performanceSimulate()
     }
 
     QDir::setCurrent(oldDir.path());
-    emit performanceSimulationFinished();
+    emit simulatePerformanceFinished();
 }
 
-void Core::restoreConfiguration()
+void Core::genTempGraph()
+{
+    QDir oldDir = QDir::current();
+    QDir::setCurrent("../experiment/gem5_output");
+    QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
+    //检查仿真是否成功
+    for(auto program: resultPrograms){
+        qDebug() << program;
+        qDebug() << QDir(program).entryList();
+        if(QDir(program).entryList(QDir::Files).count() != 5){
+            //buggy here.
+            //文件数不为５，仿真失败
+            qDebug() << program << " performance simulation fails.";
+            resultPrograms.removeOne(program);
+        }
+    }
+    qDebug() << "left: " << resultPrograms;
+    for(auto program: resultPrograms){
+        noBlockWait(proc,QString("python ../scripts/split.py %1/stats.txt %1").arg(program),eventLoop);
+    }
+
+    QDir::setCurrent(oldDir.path());
+}
+
+void Core::readConfig()
 {
     QFile reader("./config.json");
     reader.open(QIODevice::ReadOnly);
