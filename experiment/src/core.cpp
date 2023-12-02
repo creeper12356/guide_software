@@ -92,7 +92,8 @@ void Core::initConnections()
             this,&Core::genTempGraph);
     //终端相关
     connect(proc,&QProcess::readyRead,this,[this](){
-        mainPage->getUi()->terminal_reflect->append(proc->readAll());
+        cache = proc->readAll();
+        mainPage->getUi()->terminal_reflect->append(QString::fromUtf8(cache));
     });
     connect(mainPage->getUi()->action_terminate,&QAction::triggered,this,[this](){
         proc->terminate();
@@ -242,6 +243,13 @@ void Core::simulatePerformance()
 
 void Core::genTempGraph()
 {
+    //准备输入文件夹
+    if(QDir::current().exists("McPAT_input")){
+        noBlockWait(proc,"rm McPAT_input/* -rf",eventLoop);
+    }
+    else {
+        QDir::current().mkdir("McPAT_input");
+    }
     QDir::setCurrent("gem5_output");
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     //检查仿真是否成功
@@ -254,11 +262,19 @@ void Core::genTempGraph()
         }
     }
     qDebug() << "simulation success list: " << resultPrograms;
+    QDir::setCurrent("../McPAT_input");
     for(auto program: resultPrograms){
-        //将处理过的文件放入cache
-        noBlockWait(proc,QString("python ../scripts/split.py %1/stats.txt cache").arg(program),eventLoop);
+        //处理性能数据
+        noBlockWait(proc,QString("python ../scripts/split.py ../gem5_output/%1/stats.txt .").arg(program),eventLoop);
+        if(cache == "True\n"){
+            //in folder McPAT_input
+            qDebug() << "split success";
+            noBlockWait(proc,QString("mkdir %1 && mv ./*.txt %1/").arg(program),eventLoop);
+        }
     }
-    noBlockWait(proc,"ls -a",eventLoop);
+    //TODO : 判断是否分割正确
+
+
     QDir::setCurrent("..");
 }
 

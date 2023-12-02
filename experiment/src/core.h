@@ -18,6 +18,8 @@ private:
     QInputDialog* pwdDialog = nullptr;
     //指向ChoiceGuide::_userChoice的副本
     Choice* _userChoice = nullptr;
+    //记录上一次readAll操作读到的进程输出
+    QByteArray cache;
 
 public:
     Core(QApplication* app);

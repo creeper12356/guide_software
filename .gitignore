@@ -3,5 +3,9 @@ experiment/build-*
 experiment/scripts/
 experiment/TR-*
 experiment/full*
+experiment/*input/
+experiment/*output/
+experiment/mcpat/
+experiment/cache/
 
 
