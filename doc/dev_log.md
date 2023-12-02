@@ -141,6 +141,7 @@
 * (**Solved**)无法生成Native测试集对应的脚本
 * (12.2**Solved**) 运行python脚本报错，`Non-ASCII character '\xe6' in file split.py`，解决： 在开头添加： ```# -*- coding: utf-8 -*-```
 
+* 点击仿真后再次点击报错脚本缺失
 
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。

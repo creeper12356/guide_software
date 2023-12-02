@@ -90,6 +90,10 @@ void Core::initConnections()
     //生成温度图相关
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genTempGraph);
+
+    connect(proc,&QProcess::readyRead,this,[this](){
+        mainPage->getUi()->terminal_reflect->append(proc->readAll());
+    });
 }
 
 bool Core::checkConfigured()
@@ -99,21 +103,19 @@ bool Core::checkConfigured()
 
 bool Core::checkGenScript()
 {
-    QDir oldDir = QDir::current();
-    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files/");
+    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/");
     QString scriptFormat("%1_%2c_%3.rcS");
     QString script;
     bool res = true;
     for(auto& program:_userChoice->programs){
         script = scriptFormat.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower());
-        qDebug() << "script: " << script;
         if(!QDir::current().exists(script)){
-            qDebug() << "script " << script << " does not exist.";
+            qDebug() << "script " << script << " absent.";
             res = false;
             break;
         }
     }
-    QDir::setCurrent(oldDir.path());
+    QDir::setCurrent("..");
     return res;
 }
 
@@ -133,7 +135,7 @@ void Core::writeConfig()
     userChoice.insert("threadNum",_userChoice->threadNum);
     config.insert("userChoice",userChoice);
 
-    QFile writer("./config.json");
+    QFile writer("config/config.json");
     writer.open(QIODevice::WriteOnly);
     writer.write(QJsonDocument(config).toJson());
     writer.close();
@@ -163,12 +165,11 @@ void Core::reportError(QString errMsg)
 
 void Core::cleanScript()
 {
-    //暂存路径
-    QDir oldDir = QDir::current();
-    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
+    //进入脚本文件夹
+    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
     noBlockWait(proc,"rm ./*.rcS",eventLoop);
-    QDir::setCurrent(oldDir.path());
+    QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
 
@@ -179,11 +180,9 @@ void Core::genScript()
         QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
-
+    //进入脚本文件夹
+    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
-    //暂存路径
-    QDir oldDir = QDir::current();
-    QDir::setCurrent("../experiment/TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
     noBlockWait(proc,"rm ./*.rcS",eventLoop);
     for(auto program : _userChoice->programs){
@@ -191,7 +190,7 @@ void Core::genScript()
                     writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)),
                     eventLoop);
     }
-    QDir::setCurrent(oldDir.path());
+    QDir::setCurrent("..");
     emit genScriptFinished();
 }
 
@@ -207,14 +206,14 @@ void Core::simulatePerformance()
         return ;
     }
 
-    QDir oldDir = QDir::current();
-    QDir::setCurrent("../experiment/gem5_output");
     //清空目录
+    QDir::setCurrent("gem5_output");
     noBlockWait(proc,"rm ./* -rf",eventLoop);
     //新建文件夹
     for(auto program: _userChoice->programs){
         QDir::current().mkdir(program);
     }
+
     //进入仿真模块文件夹 并运行性能仿真
     QDir::setCurrent("../gem5");
     QString simulateCmd =
@@ -223,6 +222,7 @@ void Core::simulatePerformance()
             "--disk-image=x86root-parsec.img "
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
+
     for(auto program: _userChoice->programs){
         //文件名中测试集均为小写
         //运行仿真，耗时较长
@@ -233,37 +233,34 @@ void Core::simulatePerformance()
         noBlockWait(proc,"cp m5out/* ../gem5_output/" + program,eventLoop);
     }
 
-    QDir::setCurrent(oldDir.path());
+    QDir::setCurrent("..");
     emit simulatePerformanceFinished();
 }
 
 void Core::genTempGraph()
 {
-    QDir oldDir = QDir::current();
-    QDir::setCurrent("../experiment/gem5_output");
+    QDir::setCurrent("gem5_output");
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     //检查仿真是否成功
     for(auto program: resultPrograms){
-        qDebug() << program;
-        qDebug() << QDir(program).entryList();
         if(QDir(program).entryList(QDir::Files).count() != 5){
-            //buggy here.
+            //backend buggy here.
             //文件数不为５，仿真失败
             qDebug() << program << " performance simulation fails.";
             resultPrograms.removeOne(program);
         }
     }
-    qDebug() << "left: " << resultPrograms;
+    qDebug() << "simulation success list: " << resultPrograms;
     for(auto program: resultPrograms){
-        noBlockWait(proc,QString("python ../scripts/split.py %1/stats.txt %1").arg(program),eventLoop);
+        //将处理过的文件放入cache
+        noBlockWait(proc,QString("python ../scripts/split.py %1/stats.txt cache").arg(program),eventLoop);
     }
-
-    QDir::setCurrent(oldDir.path());
+    QDir::setCurrent("..");
 }
 
 void Core::readConfig()
 {
-    QFile reader("./config.json");
+    QFile reader("config/config.json");
     reader.open(QIODevice::ReadOnly);
     if(!reader.isOpen()){
         qDebug() << "Exception: file not open";

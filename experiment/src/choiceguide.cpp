@@ -96,11 +96,11 @@ void ChoiceGuide::initTestList()
 
 void ChoiceGuide::loadChoices()
 {
-    QFile reader("./program_choices.json");
+    QFile reader("config/program_choices.json");
     reader.open(QIODevice::ReadOnly);
     programInfo = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();
-    reader.setFileName("./test_choices.json");
+    reader.setFileName("config/test_choices.json");
     reader.open(QIODevice::ReadOnly);
     testInfo = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();

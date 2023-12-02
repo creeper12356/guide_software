@@ -20,6 +20,8 @@ public:
 private slots:
     void on_action_about_triggered();
     void on_action_exit_triggered();
+    void on_action_sim_triggered();
+
 public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();

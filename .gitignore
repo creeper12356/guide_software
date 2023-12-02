@@ -1,2 +1,7 @@
-experiment/
-src/build-guide_software-Desktop-Debug/
+experiment/gem5/
+experiment/build-*
+experiment/scripts/
+experiment/TR-*
+experiment/full*
+
+

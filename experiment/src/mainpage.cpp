@@ -20,7 +20,6 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     toolBar->addAction(ui->action_gen);
     toolBar->addAction(ui->action_sim);
     toolBar->addAction(ui->action_temp);
-
 }
 
 MainPage::~MainPage()
@@ -57,6 +56,7 @@ void MainPage::scriptGeneratedSlot()
 
 void MainPage::performanceSimulationFinishedSlot()
 {
+    ui->action_sim->setEnabled(true);
     ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
 }
 
@@ -66,4 +66,9 @@ void MainPage::refreshUserChoice(const Choice *userChoice)
     ui->prog_list->addItems(userChoice->programs);
     ui->test_label->setText(userChoice->test);
     ui->thread_num_label->setText(QString::number(userChoice->threadNum));
+}
+
+void MainPage::on_action_sim_triggered()
+{
+    ui->action_sim->setDisabled(true);
 }
