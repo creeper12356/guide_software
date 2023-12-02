@@ -165,15 +165,15 @@ void AptInstaller::initCmds()
     updateCmd =
             "echo %1 | sudo -S apt update";
     getNotInstalledCmd =
-            "xargs apt list --installed < requirements.txt "
+            "xargs apt list --installed < config/requirements.txt "
             "| tail -n +2 "
             "| cut -f 1 -d / "
             "| sort "
-            "> installed.txt "
+            "> config/installed.txt "
             "&& "
-            "comm installed.txt requirements.txt -13 "
+            "comm config/installed.txt config/requirements.txt -13 "
             "&& "
-            "rm installed.txt ";
+            "rm config/installed.txt ";
    installCmd =
             "echo %1"
             " | sudo -S apt install %2 -y "
@@ -193,11 +193,11 @@ void PyLibInstaller::initCmds()
 {
     updateCmd = "";
     getNotInstalledCmd =
-            "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > py_installed.txt "
+            "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > config/py_installed.txt "
             "&& "
-            "comm py_installed.txt py_requirements.txt -13 "
+            "comm config/py_installed.txt config/py_requirements.txt -13 "
             "&& "
-            "rm py_installed.txt ";
+            "rm config/py_installed.txt ";
     installCmd =
             "%1pip install %2 "
             "2> /dev/null";

@@ -60,9 +60,16 @@
     </property>
     <addaction name="action_exit"/>
    </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>终端</string>
+    </property>
+    <addaction name="action_terminate"/>
+   </widget>
    <addaction name="menu_4"/>
    <addaction name="menu_3"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_5"/>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -299,6 +306,11 @@
    </property>
    <property name="toolTip">
     <string>清理脚本</string>
+   </property>
+  </action>
+  <action name="action_terminate">
+   <property name="text">
+    <string>停止</string>
    </property>
   </action>
  </widget>

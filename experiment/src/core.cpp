@@ -90,9 +90,12 @@ void Core::initConnections()
     //生成温度图相关
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genTempGraph);
-
+    //终端相关
     connect(proc,&QProcess::readyRead,this,[this](){
         mainPage->getUi()->terminal_reflect->append(proc->readAll());
+    });
+    connect(mainPage->getUi()->action_terminate,&QAction::triggered,this,[this](){
+        proc->terminate();
     });
 }
 
@@ -255,6 +258,7 @@ void Core::genTempGraph()
         //将处理过的文件放入cache
         noBlockWait(proc,QString("python ../scripts/split.py %1/stats.txt cache").arg(program),eventLoop);
     }
+    noBlockWait(proc,"ls -a",eventLoop);
     QDir::setCurrent("..");
 }
 
