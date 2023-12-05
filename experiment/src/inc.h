@@ -37,8 +37,13 @@
  */
 #define noBlockWait(process,command,eventLoop) \
     process->setArguments(QStringList() << "-c" << command);\
-    proc->start();\
+    process->start();\
     eventLoop->exec();
+#define blockWait(process,command) \
+    process->setArguments(QStringList() << "-c" << command);\
+    process->start();\
+    process->waitForFinished(-1);
+
 class Core;
 class MainPage;
 class DependencyInstaller;

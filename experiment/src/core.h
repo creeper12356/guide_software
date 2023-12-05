@@ -8,7 +8,10 @@ class Core:public QObject
 private:
     QApplication* app = nullptr;
     QEventLoop* eventLoop = nullptr;
-    QProcess* proc = nullptr;
+    //pub_proc : 进程输出会显示出来
+    //pri_proc : 进程输出不显示
+    QProcess* pub_proc = nullptr;
+    QProcess* pri_proc = nullptr;
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
@@ -53,6 +56,11 @@ private slots:
     void simulatePerformance();
     //生成温度图
     void genTempGraph();
+private:
+    //处理gem5输出，program对应的性能数据
+    bool splitGem5Output(const QString& program);
+    //运行mcpat模块，处理program对应的xml文件
+    void runMcpat(const QString &program);
     //
     //TODO : 报错
     void reportError(QString errMsg);

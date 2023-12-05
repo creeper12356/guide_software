@@ -142,6 +142,15 @@
 * (12.2**Solved**) 运行python脚本报错，`Non-ASCII character '\xe6' in file split.py`，解决： 在开头添加： ```# -*- coding: utf-8 -*-```
 
 * 点击仿真后再次点击报错脚本缺失
+* mcpat 二进制文件无法运行: no such file or directory;
+	删除mcpat,从github上克隆仓库, git clone https://github.com/HewlettPackard/mcpat.git,进入mcpat文件夹，报错：
+	fatal error: sys/cdefs.h: No such file or directory
+	尝试解决(https://askubuntu.com/questions/470796/fatal-error-sys-cdefs-h-no-such-file-or-directory)：
+	sudo apt install libc6-dev-i386,
+	报错：fatal error: bits/c++config.h: No such file or directory
+	尝试解决(https://stackoverflow.com/questions/4643197/missing-include-bits-cconfig-h-when-cross-compiling-64-bit-program-on-32-bit)：sudo apt-get install gcc-multilib g++-multilib
+,运行成功,大概需要几十秒
+
 
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。

@@ -11,8 +11,12 @@ Core::Core(QApplication* a):
     app(a)
 {
     eventLoop = new QEventLoop(this);
-    proc = new QProcess(this);
-    proc->setProgram("bash");
+    //prepare processes
+    pub_proc = new QProcess(this);
+    pub_proc->setProgram("bash");
+    pri_proc = new QProcess(this);
+    pri_proc->setProgram("bash");
+
     _userChoice = new Choice;
     //读取文件配置
     readConfig();
@@ -59,7 +63,7 @@ void Core::initConnections()
     connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
 
-    connect(proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
+    connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
@@ -91,12 +95,17 @@ void Core::initConnections()
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genTempGraph);
     //终端相关
-    connect(proc,&QProcess::readyRead,this,[this](){
-        cache = proc->readAll();
+    //公有进程更新cache，并打印到界面
+    connect(pub_proc,&QProcess::readyRead,this,[this](){
+        cache = pub_proc->readAll();
         mainPage->getUi()->terminal_reflect->append(QString::fromUtf8(cache));
     });
+    //私有进程只更新cache
+    connect(pri_proc,&QProcess::readyRead,this,[this](){
+        cache = pri_proc->readAll();
+    });
     connect(mainPage->getUi()->action_terminate,&QAction::triggered,this,[this](){
-        proc->terminate();
+        pub_proc->terminate();
     });
 }
 
@@ -172,7 +181,7 @@ void Core::cleanScript()
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
-    noBlockWait(proc,"rm ./*.rcS",eventLoop);
+    noBlockWait(pub_proc,"rm ./*.rcS",eventLoop);
     QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
@@ -188,9 +197,9 @@ void Core::genScript()
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
-    noBlockWait(proc,"rm ./*.rcS",eventLoop);
+    noBlockWait(pub_proc,"rm ./*.rcS",eventLoop);
     for(auto program : _userChoice->programs){
-        noBlockWait(proc,
+        noBlockWait(pub_proc,
                     writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)),
                     eventLoop);
     }
@@ -212,7 +221,7 @@ void Core::simulatePerformance()
 
     //清空目录
     QDir::setCurrent("gem5_output");
-    noBlockWait(proc,"rm ./* -rf",eventLoop);
+    noBlockWait(pub_proc,"rm ./* -rf",eventLoop);
     //新建文件夹
     for(auto program: _userChoice->programs){
         QDir::current().mkdir(program);
@@ -230,11 +239,11 @@ void Core::simulatePerformance()
     for(auto program: _userChoice->programs){
         //文件名中测试集均为小写
         //运行仿真，耗时较长
-        noBlockWait(proc,
+        noBlockWait(pub_proc,
                     simulateCmd.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower()),
                     eventLoop);
         //将输出文件拷贝到对应目标路径
-        noBlockWait(proc,"cp m5out/* ../gem5_output/" + program,eventLoop);
+        noBlockWait(pub_proc,"cp m5out/* ../gem5_output/" + program,eventLoop);
     }
 
     QDir::setCurrent("..");
@@ -245,15 +254,16 @@ void Core::genTempGraph()
 {
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
-        noBlockWait(proc,"rm McPAT_input/* -rf",eventLoop);
+        noBlockWait(pub_proc,"rm McPAT_input/* -rf",eventLoop);
     }
     else {
         QDir::current().mkdir("McPAT_input");
     }
     QDir::setCurrent("gem5_output");
+    //仿真结果的所有文件夹列表
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     //检查仿真是否成功
-    for(auto program: resultPrograms){
+    for(auto& program: resultPrograms){
         if(QDir(program).entryList(QDir::Files).count() != 5){
             //backend buggy here.
             //文件数不为５，仿真失败
@@ -261,21 +271,66 @@ void Core::genTempGraph()
             resultPrograms.removeOne(program);
         }
     }
-    qDebug() << "simulation success list: " << resultPrograms;
-    QDir::setCurrent("../McPAT_input");
-    for(auto program: resultPrograms){
-        //处理性能数据
-        noBlockWait(proc,QString("python ../scripts/split.py ../gem5_output/%1/stats.txt .").arg(program),eventLoop);
-        if(cache == "True\n"){
-            //in folder McPAT_input
-            qDebug() << "split success";
-            noBlockWait(proc,QString("mkdir %1 && mv ./*.txt %1/").arg(program),eventLoop);
+    QDir::setCurrent("..");
+    //处理性能数据
+    for(auto& program: resultPrograms){
+        if(!splitGem5Output(program)){
+            //TODO notify user
+            //remove program from resultProgram
+            qDebug() << "split fails";
         }
     }
-    //TODO : 判断是否分割正确
+    //调用mcpat模块
+    for(auto& program: resultPrograms){
+        qDebug() << "input MCpat" << program;
+        runMcpat(program);
+    }
+}
 
+bool Core::splitGem5Output(const QString &program)
+{
+    //分割stats文件
+    blockWait(pri_proc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
+    if(cache == "True\n"){
+        //分割成功
+        //in folder McPAT_input
+        qDebug() << "split success";
+        //在McPAT_input中创建文件夹，
+        //将分割好的数据移动到该文件夹
+        blockWait(pri_proc,QString("cd McPAT_input ; "
+                                   "mkdir %1 ; "
+                                   "mv ./*.txt %1/ ; "
+                                   "cd ..").arg(program));
+        return true;
+    }
+    else{
+        //分割失败
+        //TODO: 删除所在文件夹
+        //notify user
+        return false;
+    }
+}
 
-    QDir::setCurrent("..");
+void Core::runMcpat(const QString &program)
+{
+    QProcess pr(this);
+    pr.setProgram("bash");
+    pr.setArguments(QStringList() << "-c" << "ls xml/" + program + "/*3.xml");
+    pr.start();
+    pr.waitForFinished(-1);
+    QString xmlFile(pr.readAll());
+    xmlFile = xmlFile.trimmed();
+    qDebug() << "xml" << xmlFile;
+    QString mkdirCmd = "mkdir -p McPAT_output/%1";
+    mkdirCmd = mkdirCmd.arg(program);
+    QString mcpatCmd = "mcpat/mcpat "
+                       "-infile %2 "
+                       "-print_level 5 "
+                       "> McPAT_output/%1/3.txt";
+    mcpatCmd = mcpatCmd.arg(program,xmlFile);
+    noBlockWait(pub_proc,mkdirCmd + ";" + mcpatCmd,eventLoop);
+    qDebug() << pr.readAllStandardError();
+    qDebug() << "finished!";
 }
 
 void Core::readConfig()
