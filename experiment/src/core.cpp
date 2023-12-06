@@ -285,10 +285,19 @@ void Core::genTempGraph()
         qDebug() << "input MCpat" << program;
         runMcpat(program);
     }
+    //writeptrace
+    for(auto& program: resultPrograms){
+        writePtrace(program);
+    }
 }
 
 bool Core::splitGem5Output(const QString &program)
 {
+    //准备输出文件夹
+    QString mkdirCmd = "mkdir -p McPAT_input/%1";
+    mkdirCmd = mkdirCmd.arg(program);
+    blockWait(pri_proc,mkdirCmd);
+
     //分割stats文件
     blockWait(pri_proc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
     if(cache == "True\n"){
@@ -333,6 +342,20 @@ void Core::runMcpat(const QString &program)
     noBlockWait(pub_proc,mkdirCmd + ";" + mcpatCmd,eventLoop);
     qDebug() << pr.readAllStandardError();
     qDebug() << "finished!";
+}
+
+void Core::writePtrace(const QString &program)
+{
+    //准备输出文件夹
+    QString mkdirCmd = "mkdir HotSpot_input";
+    blockWait(pri_proc,mkdirCmd);
+    //调用python脚本
+    QString writePtraceCmd = "python scripts/writeptrace.py "
+                             "scripts/ev6.flp "
+                             "McPAT_output/%1/3.txt "
+                             "HotSpot_input/3.ptrace";
+    writePtraceCmd = writePtraceCmd.arg(program);
+    blockWait(pri_proc,writePtraceCmd);
 }
 
 void Core::readConfig()

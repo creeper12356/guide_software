@@ -61,6 +61,8 @@ private:
     bool splitGem5Output(const QString& program);
     //运行mcpat模块，处理program对应的xml文件
     void runMcpat(const QString &program);
+    //将功耗数据(txt)转换为ptrace文件
+    void writePtrace(const QString& program);
     //
     //TODO : 报错
     void reportError(QString errMsg);
