@@ -2,14 +2,7 @@
 #ifndef CHOICEGUIDE_H
 #define CHOICEGUIDE_H
 #include "inc.h"
-//用户选择的结构体
-struct Choice{
-    QString architecture = "";
-    QString set = "";
-    QStringList programs;
-    QString test = "";
-    int threadNum = 0;
-};
+
 
 namespace Ui {
 class ChoiceGuide;

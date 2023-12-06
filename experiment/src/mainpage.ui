@@ -16,7 +16,36 @@
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTextBrowser" name="terminal_reflect">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>10</y>
+      <width>351</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTextBrowser{color:white;background:black}</string>
+    </property>
+   </widget>
+   <widget class="ChoiceWidget" name="choice_widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>371</width>
+      <height>291</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -76,165 +105,6 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
-  </widget>
-  <widget class="QDockWidget" name="config_dockwidget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>356</width>
-     <height>275</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>356</width>
-     <height>275</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string>当前配置</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>321</width>
-       <height>225</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>程序集：</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListWidget" name="prog_list"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>测试集：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="test_label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>线程数：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="thread_num_label">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="terminal_dockwidget">
-   <property name="minimumSize">
-    <size>
-     <width>356</width>
-     <height>275</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>356</width>
-     <height>275</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string>终端</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <property name="minimumSize">
-     <size>
-      <width>356</width>
-      <height>275</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>356</width>
-      <height>275</height>
-     </size>
-    </property>
-    <widget class="QTextBrowser" name="terminal_reflect">
-     <property name="geometry">
-      <rect>
-       <x>5</x>
-       <y>11</y>
-       <width>311</width>
-       <height>221</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QTextBrowser{color:white;background:black}</string>
-     </property>
-    </widget>
-   </widget>
   </widget>
   <action name="action_about">
    <property name="text">
@@ -314,6 +184,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ChoiceWidget</class>
+   <extends>QWidget</extends>
+   <header>choicewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../res.qrc"/>
  </resources>

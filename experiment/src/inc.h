@@ -49,7 +49,12 @@ class MainPage;
 class DependencyInstaller;
 class PyLibInstaller;
 class ChoiceGuide;
-struct Choice;
-
-
+//用户选择的结构体
+struct Choice{
+    QString architecture = "";
+    QString set = "";
+    QStringList programs;
+    QString test = "";
+    int threadNum = 0;
+};
 #endif // INC_H

@@ -24,7 +24,7 @@ Core::Core(QApplication* a):
     initPwdDialog();
     mainPage = new MainPage(this);
     //刷新界面
-    mainPage->refreshUserChoice(_userChoice);
+    mainPage->getUi()->choice_widget->refreshUserChoice(_userChoice);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
     guide = new ChoiceGuide(this);
@@ -74,7 +74,7 @@ void Core::initConnections()
     connect(guide,&ChoiceGuide::configureFinished,
             this,&Core::copyUserChoice);
     connect(guide,&ChoiceGuide::configureFinished,
-            mainPage,&MainPage::refreshUserChoice);
+            mainPage->getUi()->choice_widget,&ChoiceWidget::refreshUserChoice);
 
     connect(mainPage->getUi()->action_conf,&QAction::triggered,
             guide,&ChoiceGuide::show);

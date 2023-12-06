@@ -26,8 +26,6 @@ public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();
     void performanceSimulationFinishedSlot();
-    //将用户选择更新到界面上
-    void refreshUserChoice(const Choice* userChoice);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:

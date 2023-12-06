@@ -21,7 +21,8 @@ SOURCES += \
     core.cpp \
     dependencyinstaller.cpp \
     main.cpp \
-    mainpage.cpp
+    mainpage.cpp \
+    choicewidget.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -30,12 +31,14 @@ HEADERS += \
     dependencyinstaller.h \
     inc.h \
     mainpage.h \
+    choicewidget.h
 
 FORMS += \
     aboutdialog.ui \
     choiceguide.ui \
     dependencyinstaller.ui \
-    mainpage.ui
+    mainpage.ui \
+    choicewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

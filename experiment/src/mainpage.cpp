@@ -61,13 +61,7 @@ void MainPage::performanceSimulationFinishedSlot()
     ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
 }
 
-void MainPage::refreshUserChoice(const Choice *userChoice)
-{
-    ui->prog_list->clear();
-    ui->prog_list->addItems(userChoice->programs);
-    ui->test_label->setText(userChoice->test);
-    ui->thread_num_label->setText(QString::number(userChoice->threadNum));
-}
+
 
 void MainPage::on_action_sim_triggered()
 {
