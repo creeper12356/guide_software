@@ -55,7 +55,7 @@ private slots:
     //性能仿真
     void simulatePerformance();
     //生成温度图
-    void genTempGraph();
+    void genHeatMap();
 private:
     //处理gem5输出，program对应的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
@@ -63,7 +63,10 @@ private:
     void runMcpat(const QString &program);
     //将功耗数据(txt)转换为ptrace文件
     void writePtrace(const QString& program);
-    //
+    //运行hotSpot模块
+    void runHotspot(const QString& program);
+    //根据steady文件画温度图
+    void drawHeatMap(const QString& program);
     //TODO : 报错
     void reportError(QString errMsg);
 signals:

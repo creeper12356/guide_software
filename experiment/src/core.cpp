@@ -93,7 +93,7 @@ void Core::initConnections()
             mainPage,&MainPage::performanceSimulationFinishedSlot);
     //生成温度图相关
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
-            this,&Core::genTempGraph);
+            this,&Core::genHeatMap);
     //终端相关
     //公有进程更新cache，并打印到界面
     connect(pub_proc,&QProcess::readyRead,this,[this](){
@@ -250,7 +250,7 @@ void Core::simulatePerformance()
     emit simulatePerformanceFinished();
 }
 
-void Core::genTempGraph()
+void Core::genHeatMap()
 {
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
@@ -288,6 +288,12 @@ void Core::genTempGraph()
     //writeptrace
     for(auto& program: resultPrograms){
         writePtrace(program);
+    }
+    //调用hotspot模块
+    for(auto& program: resultPrograms){
+        runHotspot(program);
+        //TODO change
+        drawHeatMap(program);
     }
 }
 
@@ -351,11 +357,48 @@ void Core::writePtrace(const QString &program)
     blockWait(pri_proc,mkdirCmd);
     //调用python脚本
     QString writePtraceCmd = "python scripts/writeptrace.py "
-                             "scripts/ev6.flp "
+                             "utils/ev6.flp "
                              "McPAT_output/%1/3.txt "
-                             "HotSpot_input/3.ptrace";
+                             "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
     blockWait(pri_proc,writePtraceCmd);
+}
+
+void Core::runHotspot(const QString &program)
+{
+    QString mkdirCmd = "mkdir -p HotSpot_output/%1";
+    mkdirCmd = mkdirCmd.arg(program);
+    blockWait(pri_proc,mkdirCmd);
+    QDir::setCurrent("HotSpot-master");
+    QString hotspotCmd = "./hotspot "
+                         "-c ../utils/example.config "
+                         "-f ../utils/ev6.flp "
+                         "-p ../HotSpot_input/%1.ptrace "
+                         "-materials_file ../utils/example.materials "
+                         "-o ../HotSpot_output/%1/%1.ttrace "
+                         "-steady_file ../HotSpot_output/%1/%1.steady "
+                         "-model_type grid "
+                         "-grid_steady_file ../HotSpot_output/%1/%1.grid.steady ";
+    hotspotCmd = hotspotCmd.arg(program);
+    qDebug() << hotspotCmd;
+
+    noBlockWait(pub_proc,hotspotCmd,eventLoop);
+    qDebug() << "finish..";
+    QDir::setCurrent("..");
+}
+
+void Core::drawHeatMap(const QString &program)
+{
+    //TODO: 检查输出文件夹./HeatMap
+    QString heatMapCmd = "python scripts/flpdraw.py "
+                         "utils/ev6.flp "
+                         "HotSpot_output/%1/%1.grid.steady "
+                         "0 "
+                         "标题 "
+                         "HeatMap/%1_map";
+    heatMapCmd = heatMapCmd.arg(program);
+    blockWait(pri_proc,heatMapCmd);
+    qDebug() << heatMapCmd;
 }
 
 void Core::readConfig()
