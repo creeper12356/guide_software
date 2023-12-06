@@ -181,7 +181,7 @@ void Core::cleanScript()
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
-    noBlockWait(pub_proc,"rm ./*.rcS",eventLoop);
+    blockWait(pub_proc,"rm ./*.rcS");
     QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
@@ -197,7 +197,7 @@ void Core::genScript()
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
-    noBlockWait(pub_proc,"rm ./*.rcS",eventLoop);
+    blockWait(pub_proc,"rm ./*.rcS");
     for(auto program : _userChoice->programs){
         noBlockWait(pub_proc,
                     writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)),
@@ -221,7 +221,7 @@ void Core::simulatePerformance()
 
     //清空目录
     QDir::setCurrent("gem5_output");
-    noBlockWait(pub_proc,"rm ./* -rf",eventLoop);
+    blockWait(pri_proc,"rm ./* -rf");
     //新建文件夹
     for(auto program: _userChoice->programs){
         QDir::current().mkdir(program);
@@ -243,7 +243,7 @@ void Core::simulatePerformance()
                     simulateCmd.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower()),
                     eventLoop);
         //将输出文件拷贝到对应目标路径
-        noBlockWait(pub_proc,"cp m5out/* ../gem5_output/" + program,eventLoop);
+        blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
     }
 
     QDir::setCurrent("..");
@@ -315,12 +315,14 @@ void Core::runMcpat(const QString &program)
 {
     QProcess pr(this);
     pr.setProgram("bash");
+    //查找第三段xml文件
     pr.setArguments(QStringList() << "-c" << "ls xml/" + program + "/*3.xml");
     pr.start();
     pr.waitForFinished(-1);
     QString xmlFile(pr.readAll());
+    //去除末尾\n
     xmlFile = xmlFile.trimmed();
-    qDebug() << "xml" << xmlFile;
+//    qDebug() << "xml" << xmlFile;
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
     QString mcpatCmd = "mcpat/mcpat "

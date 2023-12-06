@@ -57,7 +57,7 @@ private slots:
     //生成温度图
     void genTempGraph();
 private:
-    //处理gem5输出，program对应的性能数据
+    //处理gem5输出，program对应的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
     //运行mcpat模块，处理program对应的xml文件
     void runMcpat(const QString &program);
