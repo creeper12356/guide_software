@@ -56,6 +56,7 @@ private slots:
     void simulatePerformance();
     //生成温度图
     void genHeatMap();
+    void terminate();
 private:
     //处理gem5输出，program对应的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
@@ -77,6 +78,12 @@ signals:
     void genScriptFinished();
     //性能仿真运行成功信号
     void simulatePerformanceFinished();
+
+    void longTaskStarted();
+    void longTaskFinished();
+
+    void logProgram(QString program,QString info);
+    void log(QString info);
 };
 
 #endif // CORE_H

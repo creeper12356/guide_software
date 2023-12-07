@@ -12,7 +12,7 @@ MainPage::MainPage(Core *c, QWidget *parent) :
 {
     ui->setupUi(this);
     //初始化toolBar
-    QToolBar* toolBar = new QToolBar(this);
+    toolBar = new QToolBar(this);
     this->addToolBar(toolBar);
     toolBar->setIconSize(QSize(50,50));
     toolBar->addAction(ui->action_conf);
@@ -21,6 +21,7 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     toolBar->addAction(ui->action_sim);
     toolBar->addAction(ui->action_temp);
     toolBar->addAction(ui->action_terminate);
+    ui->action_terminate->setDisabled(true);
 }
 
 MainPage::~MainPage()
@@ -59,6 +60,40 @@ void MainPage::performanceSimulationFinishedSlot()
 {
     ui->action_sim->setEnabled(true);
     ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
+}
+
+void MainPage::longTaskStartedSlot()
+{
+    //forbid all actions but terminate when running long tasks
+    for(auto action: toolBar->actions()){
+        action->setDisabled(true);
+    }
+    ui->action_terminate->setEnabled(true);
+}
+
+void MainPage::longTaskFinishedSlot()
+{
+    for(auto action: toolBar->actions()){
+        action->setEnabled(true);
+    }
+    ui->action_terminate->setDisabled(true);
+
+}
+
+void MainPage::refreshLog(QString info)
+{
+    if(info.isEmpty()){
+        ui->log_browser->clear();
+        return ;
+    }
+    ui->log_browser->append(info);
+}
+
+void MainPage::refreshLogProgram(QString program, QString info)
+{
+    QString prefix = "程序\"%1\": ";
+    prefix = prefix.arg(program);
+    ui->log_browser->append(prefix + info);
 }
 
 

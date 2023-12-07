@@ -104,9 +104,14 @@ void Core::initConnections()
     connect(pri_proc,&QProcess::readyRead,this,[this](){
         cache = pri_proc->readAll();
     });
-    connect(mainPage->getUi()->action_terminate,&QAction::triggered,this,[this](){
-        pub_proc->terminate();
-    });
+    connect(mainPage->getUi()->action_terminate,
+            &QAction::triggered,this,&Core::terminate);
+
+    connect(this,&Core::log,mainPage,&MainPage::refreshLog);
+    connect(this,&Core::logProgram,mainPage,&MainPage::refreshLogProgram);
+
+    connect(this,&Core::longTaskStarted,mainPage,&MainPage::longTaskStartedSlot);
+    connect(this,&Core::longTaskFinished,mainPage,&MainPage::longTaskFinishedSlot);
 }
 
 bool Core::checkConfigured()
@@ -252,6 +257,9 @@ void Core::simulatePerformance()
 
 void Core::genHeatMap()
 {
+    emit longTaskStarted();
+    emit log("开始生成温度图...");
+    emit log("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
         noBlockWait(pub_proc,"rm McPAT_input/* -rf",eventLoop);
@@ -267,34 +275,41 @@ void Core::genHeatMap()
         if(QDir(program).entryList(QDir::Files).count() != 5){
             //backend buggy here.
             //文件数不为５，仿真失败
-            qDebug() << program << " performance simulation fails.";
+            emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
             resultPrograms.removeOne(program);
         }
     }
     QDir::setCurrent("..");
     //处理性能数据
     for(auto& program: resultPrograms){
+        emit log(program + ": 分割性能仿真输出...");
         if(!splitGem5Output(program)){
-            //TODO notify user
-            //remove program from resultProgram
-            qDebug() << "split fails";
+            emit logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
+            continue;
         }
-    }
-    //调用mcpat模块
-    for(auto& program: resultPrograms){
-        qDebug() << "input MCpat" << program;
+        emit logProgram(program,"运行McPAT模块...");
         runMcpat(program);
-    }
-    //writeptrace
-    for(auto& program: resultPrograms){
+        emit log("完成!");
+        emit logProgram(program,"生成ptrace文件...");
         writePtrace(program);
-    }
-    //调用hotspot模块
-    for(auto& program: resultPrograms){
+        emit logProgram(program,"运行Hotspot模块...");
         runHotspot(program);
-        //TODO change
+        emit log("完成!");
+        emit logProgram(program,"生成温度图...");
         drawHeatMap(program);
+        emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
+    //TODO : remove all the inteval folders
+    emit longTaskFinished();
+}
+
+void Core::terminate()
+{
+    //TODO:really terminate the program.
+    qDebug() << "kill.";
+    pub_proc->kill();
+    pri_proc->kill();
+//    emit
 }
 
 bool Core::splitGem5Output(const QString &program)
@@ -394,8 +409,8 @@ void Core::drawHeatMap(const QString &program)
                          "utils/ev6.flp "
                          "HotSpot_output/%1/%1.grid.steady "
                          "0 "
-                         "标题 "
-                         "HeatMap/%1_map";
+                         "%1 "
+                         "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
     blockWait(pri_proc,heatMapCmd);
     qDebug() << heatMapCmd;

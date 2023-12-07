@@ -6,6 +6,7 @@
 * (Ok)ChoiceGuide存在一些GUI切换的bug
 * (Ok)重构代码 ， 区分私有、公有成员
 * 清除配置功能
+* allow user to stop running processes.
 
 ## 开发记录
 2023.11.10

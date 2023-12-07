@@ -11,6 +11,7 @@ class MainPage : public QMainWindow
     Q_OBJECT
 private:
     Core* core = nullptr;
+    QToolBar* toolBar = nullptr;
 public:
     MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();
@@ -26,6 +27,12 @@ public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();
     void performanceSimulationFinishedSlot();
+
+    void longTaskStartedSlot();
+    void longTaskFinishedSlot();
+
+    void refreshLog(QString info);
+    void refreshLogProgram(QString program,QString info);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:
