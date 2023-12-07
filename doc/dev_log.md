@@ -124,6 +124,7 @@
 最终确定使用第二种方法，为Core类增加QEventLoop* 类成员eventLoop，使用该eventLoop来相应长时间阻塞线程时的GUI事件。
 * 重构代码
 原本计划的前后端分离架构，会造成大量的信号槽连接，大大降低代码可读性。因此，仍然将软件模块化，每个模块是前后端集成的整体（除了Core只有后端），同时，每个窗体模块共享Core中的事件循环，用于处理其长时间操作时的GUI事件。
+
 ## Bug Report
 * 可能存在GUI界面在不同电脑上显示不同的适配问题。
 * 不确定对于不同版本的Ubuntu,requirements.txt是否需要改动,同时，requirements.txt必须为有序文件。
@@ -139,18 +140,32 @@
 原因： 版本问题，将raytrace换成rtview即可
 
 * (**Solved**)无法生成Native测试集对应的脚本
-* (12.2**Solved**) 运行python脚本报错，`Non-ASCII character '\xe6' in file split.py`，解决： 在开头添加： ```# -*- coding: utf-8 -*-```
+* (**Solved**) 运行python脚本报错: 
+    ```Non-ASCII character '\xe6' in file split.py```\
+    解决： 在开头添加：
+     ```# -*- coding: utf-8 -*-```\
+    总结：所有python脚本之前，需要添加编码此行。
 
 * 点击仿真后再次点击报错脚本缺失
-* mcpat 二进制文件无法运行: no such file or directory;
-	删除mcpat,从github上克隆仓库, git clone https://github.com/HewlettPackard/mcpat.git,进入mcpat文件夹，报错：
-	fatal error: sys/cdefs.h: No such file or directory
-	尝试解决(https://askubuntu.com/questions/470796/fatal-error-sys-cdefs-h-no-such-file-or-directory)：
-	sudo apt install libc6-dev-i386,
-	报错：fatal error: bits/c++config.h: No such file or directory
-	尝试解决(https://stackoverflow.com/questions/4643197/missing-include-bits-cconfig-h-when-cross-compiling-64-bit-program-on-32-bit)：sudo apt-get install gcc-multilib g++-multilib
-,运行成功,大概需要几十秒
-
+* (**Solved**)mcpat 二进制文件无法运行\
+    终端输入：```./mcpat [args]```\
+    报错：```no such file or directory```\
+	尝试：删除mcpat,从github上克隆仓库, ```git clone https://github.com/HewlettPackard/mcpat.git```,进入mcpat文件夹，手动make编译。\
+    报错：```fatal error: sys/cdefs.h: No such file or directory```\
+	尝试: (https://askubuntu.com/questions/470796/fatal-error-sys-cdefs-h-no-such-file-or-directory)：
+	```sudo apt install libc6-dev-i386```\
+	报错：```fatal error: bits/c++config.h: No such file or directory```\
+	尝试:(https://stackoverflow.com/questions/4643197/missing-include-bits-cconfig-h-when-cross-compiling-64-bit-program-on-32-bit)：
+    ```sudo apt-get install gcc-multilib g++-multilib```\
+    运行成功,大概需要几十秒\
+    总结： 经过多次测试，想要直接使用mcpat模块，需要安装以下依赖（仅限于Ubuntu16.04）:\
+    ```
+    sudo apt install libc6-dev-i386
+    sudo apt-get install gcc-multilib g++-multilib
+    ```
+* (**Solved**) matplotlib无法通过pip安装
+    解决：matplotlib需要通过apt安装，
+    ```sudo apt install python-matplotlib```
 
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
