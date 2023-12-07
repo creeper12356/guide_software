@@ -58,7 +58,6 @@ void MainPage::scriptGeneratedSlot()
 
 void MainPage::performanceSimulationFinishedSlot()
 {
-    ui->action_sim->setEnabled(true);
     ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
 }
 
@@ -77,7 +76,7 @@ void MainPage::longTaskFinishedSlot()
         action->setEnabled(true);
     }
     ui->action_terminate->setDisabled(true);
-
+    //TODO
 }
 
 void MainPage::refreshLog(QString info)
@@ -94,11 +93,4 @@ void MainPage::refreshLogProgram(QString program, QString info)
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);
     ui->log_browser->append(prefix + info);
-}
-
-
-
-void MainPage::on_action_sim_triggered()
-{
-    ui->action_sim->setDisabled(true);
 }

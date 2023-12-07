@@ -223,7 +223,7 @@ void Core::simulatePerformance()
         QMessageBox::warning(mainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
         return ;
     }
-
+    emit longTaskStarted();
     //清空目录
     QDir::setCurrent("gem5_output");
     blockWait(pri_proc,"rm ./* -rf");
@@ -253,6 +253,7 @@ void Core::simulatePerformance()
 
     QDir::setCurrent("..");
     emit simulatePerformanceFinished();
+    emit longTaskFinished();
 }
 
 void Core::genHeatMap()
@@ -270,6 +271,9 @@ void Core::genHeatMap()
     QDir::setCurrent("gem5_output");
     //仿真结果的所有文件夹列表
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
+    if(resultPrograms.empty()){
+        emit log("[FAIL]找不到可用的程序，请检查目录gem5_output。");
+    }
     //检查仿真是否成功
     for(auto& program: resultPrograms){
         if(QDir(program).entryList(QDir::Files).count() != 5){
@@ -310,6 +314,7 @@ void Core::terminate()
     pub_proc->kill();
     pri_proc->kill();
 //    emit
+    emit longTaskFinished();
 }
 
 bool Core::splitGem5Output(const QString &program)
