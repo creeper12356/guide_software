@@ -82,6 +82,7 @@ void MainPage::longTaskFinishedSlot()
 void MainPage::refreshLog(QString info)
 {
     if(info.isEmpty()){
+        //若信息为空则清空日志
         ui->log_browser->clear();
         return ;
     }

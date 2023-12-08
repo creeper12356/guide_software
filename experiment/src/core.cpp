@@ -55,6 +55,7 @@ Core::~Core()
 }
 void Core::initConnections()
 {
+    //退出逻辑
     //主页面关闭时，软件关闭
     connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
     //用户拒绝安装前置软件包，退出软件
@@ -63,21 +64,23 @@ void Core::initConnections()
     connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
             app,&QApplication::quit,Qt::QueuedConnection);
 
-    connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
-    //report installer error
+        //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
 
+    //事件循环相关
+    connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     connect(pwdDialog,&QInputDialog::finished,
             eventLoop,&QEventLoop::quit);
 
+    //配置相关
+    connect(mainPage->getUi()->action_conf,&QAction::triggered,
+            guide,&ChoiceGuide::show);
     connect(guide,&ChoiceGuide::configureFinished,
             this,&Core::copyUserChoice);
     connect(guide,&ChoiceGuide::configureFinished,
             mainPage->getUi()->choice_widget,&ChoiceWidget::refreshUserChoice);
 
-    connect(mainPage->getUi()->action_conf,&QAction::triggered,
-            guide,&ChoiceGuide::show);
     //清理脚本相关
     connect(mainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);
@@ -95,15 +98,14 @@ void Core::initConnections()
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genHeatMap);
     //终端相关
-    //公有进程更新cache，并打印到界面
     connect(pub_proc,&QProcess::readyRead,this,[this](){
         cache = pub_proc->readAll();
         mainPage->getUi()->terminal_reflect->append(QString::fromUtf8(cache));
     });
-    //私有进程只更新cache
     connect(pri_proc,&QProcess::readyRead,this,[this](){
         cache = pri_proc->readAll();
     });
+    //TODO
     connect(mainPage->getUi()->action_terminate,
             &QAction::triggered,this,&Core::terminate);
 
@@ -128,7 +130,7 @@ bool Core::checkGenScript()
     for(auto& program:_userChoice->programs){
         script = scriptFormat.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower());
         if(!QDir::current().exists(script)){
-            qDebug() << "script " << script << " absent.";
+//            qDebug() << "script " << script << " absent.";
             res = false;
             break;
         }
@@ -170,6 +172,12 @@ void Core::initPwdDialog()
     pwdDialog->setLabelText("我们需要您提供用户的密码：");
     pwdDialog->setTextEchoMode(QLineEdit::Password);
     pwdDialog->setModal(true);
+}
+
+void Core::initGUIConnection()
+{
+
+
 }
 
 void Core::reportError(QString errMsg)
@@ -277,8 +285,8 @@ void Core::genHeatMap()
     //检查仿真是否成功
     for(auto& program: resultPrograms){
         if(QDir(program).entryList(QDir::Files).count() != 5){
-            //backend buggy here.
-            //文件数不为５，仿真失败
+//            backend buggy here.
+//            文件数不为５，仿真失败
             emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
             resultPrograms.removeOne(program);
         }
@@ -357,7 +365,6 @@ void Core::runMcpat(const QString &program)
     QString xmlFile(pr.readAll());
     //去除末尾\n
     xmlFile = xmlFile.trimmed();
-//    qDebug() << "xml" << xmlFile;
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
     QString mcpatCmd = "mcpat/mcpat "
@@ -366,8 +373,6 @@ void Core::runMcpat(const QString &program)
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
     noBlockWait(pub_proc,mkdirCmd + ";" + mcpatCmd,eventLoop);
-    qDebug() << pr.readAllStandardError();
-    qDebug() << "finished!";
 }
 
 void Core::writePtrace(const QString &program)
@@ -400,10 +405,7 @@ void Core::runHotspot(const QString &program)
                          "-model_type grid "
                          "-grid_steady_file ../HotSpot_output/%1/%1.grid.steady ";
     hotspotCmd = hotspotCmd.arg(program);
-    qDebug() << hotspotCmd;
-
     noBlockWait(pub_proc,hotspotCmd,eventLoop);
-    qDebug() << "finish..";
     QDir::setCurrent("..");
 }
 
@@ -418,7 +420,6 @@ void Core::drawHeatMap(const QString &program)
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
     blockWait(pri_proc,heatMapCmd);
-    qDebug() << heatMapCmd;
 }
 
 void Core::readConfig()

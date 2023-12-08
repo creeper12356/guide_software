@@ -10,19 +10,23 @@ private:
     QEventLoop* eventLoop = nullptr;
     //pub_proc : 进程输出会显示出来
     //pri_proc : 进程输出不显示
+    //调用外部程序的进程
+    //pub_proc为公有进程，将输出打印到终端，更新cache
+    //pri_proc为私有进程，不打印输出，只更新cache
     QProcess* pub_proc = nullptr;
     QProcess* pri_proc = nullptr;
+    //缓冲区,记录上一次readAll操作读到的进程输出
+    QByteArray cache;
+
 
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
     PyLibInstaller* py_installer = nullptr;
     ChoiceGuide* guide = nullptr;
-    //由所有可能询问密码的窗体共享
+    //密码对话框，由所有可能询问密码的窗体共享
     QInputDialog* pwdDialog = nullptr;
-    //指向ChoiceGuide::_userChoice的副本
+    //用户的配置选择
     Choice* _userChoice = nullptr;
-    //记录上一次readAll操作读到的进程输出
-    QByteArray cache;
 
 public:
     Core(QApplication* app);
@@ -33,6 +37,7 @@ private:
     void readConfig();
     //初始化密码对话框GUI
     inline void initPwdDialog();
+    inline void initGUIConnection();
     //初始化信号槽连接
     inline void initConnections();
 private:
@@ -56,22 +61,23 @@ private slots:
     void simulatePerformance();
     //生成温度图
     void genHeatMap();
+    //终止当前任务,TODO: to be finished
     void terminate();
 private:
-    //处理gem5输出，program对应的性能数据, temporarily useless?
+    //处理gem5输出的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
     //运行mcpat模块，处理program对应的xml文件
     void runMcpat(const QString &program);
-    //将功耗数据(txt)转换为ptrace文件
+    //将功耗数据转换为ptrace文件
     void writePtrace(const QString& program);
-    //运行hotSpot模块
+    //运行hotSpot模块,生成grid.steady文件
     void runHotspot(const QString& program);
     //根据steady文件画温度图
     void drawHeatMap(const QString& program);
     //TODO : 报错
     void reportError(QString errMsg);
 signals:
-    //finished signal
+    //任务完成的信号
     //清理脚本成功的信号
     void cleanScriptFinished();
     //脚本成功生成的信号
@@ -79,9 +85,11 @@ signals:
     //性能仿真运行成功信号
     void simulatePerformanceFinished();
 
+    //长时间任务开始和结束信号
     void longTaskStarted();
     void longTaskFinished();
 
+    //日志信号
     void logProgram(QString program,QString info);
     void log(QString info);
 };
