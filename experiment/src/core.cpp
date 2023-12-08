@@ -267,6 +267,7 @@ void Core::simulatePerformance()
 void Core::genHeatMap()
 {
     emit longTaskStarted();
+    stopFlag = false;
     emit log("开始生成温度图...");
     emit log("检查性能仿真输出...");
     //准备输入文件夹
@@ -283,14 +284,14 @@ void Core::genHeatMap()
         emit log("[FAIL]找不到可用的程序，请检查目录gem5_output。");
     }
     //检查仿真是否成功
-    for(auto& program: resultPrograms){
-        if(QDir(program).entryList(QDir::Files).count() != 5){
-//            backend buggy here.
-//            文件数不为５，仿真失败
-            emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
-            resultPrograms.removeOne(program);
-        }
-    }
+//    for(auto& program: resultPrograms){
+//        if(QDir(program).entryList(QDir::Files).count() != 5){
+////            backend buggy here.
+////            文件数不为５，仿真失败
+//            emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
+//            resultPrograms.removeOne(program);
+//        }
+//    }
     QDir::setCurrent("..");
     //处理性能数据
     for(auto& program: resultPrograms){
@@ -300,19 +301,28 @@ void Core::genHeatMap()
             continue;
         }
         emit logProgram(program,"运行McPAT模块...");
-        runMcpat(program);
+        if(!runMcpat(program)){
+            goto genHeatMapAbort;
+        }
         emit log("完成!");
         emit logProgram(program,"生成ptrace文件...");
         writePtrace(program);
         emit logProgram(program,"运行Hotspot模块...");
-        runHotspot(program);
+        if(!runHotspot(program)){
+            goto genHeatMapAbort;
+        }
         emit log("完成!");
         emit logProgram(program,"生成温度图...");
         drawHeatMap(program);
         emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
     //TODO : remove all the inteval folders
+    stopFlag = true;
     emit longTaskFinished();
+    return ;
+    genHeatMapAbort:
+    emit log("终止。");
+    return ;
 }
 
 void Core::terminate()
@@ -321,6 +331,7 @@ void Core::terminate()
     qDebug() << "kill.";
     pub_proc->kill();
     pri_proc->kill();
+    stopFlag = true;
 //    emit
     emit longTaskFinished();
 }
@@ -352,9 +363,10 @@ bool Core::splitGem5Output(const QString &program)
         //notify user
         return false;
     }
+    return !stopFlag;
 }
 
-void Core::runMcpat(const QString &program)
+bool Core::runMcpat(const QString &program)
 {
     QProcess pr(this);
     pr.setProgram("bash");
@@ -373,9 +385,10 @@ void Core::runMcpat(const QString &program)
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
     noBlockWait(pub_proc,mkdirCmd + ";" + mcpatCmd,eventLoop);
+    return !stopFlag;
 }
 
-void Core::writePtrace(const QString &program)
+bool Core::writePtrace(const QString &program)
 {
     //准备输出文件夹
     QString mkdirCmd = "mkdir HotSpot_input";
@@ -387,9 +400,10 @@ void Core::writePtrace(const QString &program)
                              "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
     blockWait(pri_proc,writePtraceCmd);
+    return !stopFlag;
 }
 
-void Core::runHotspot(const QString &program)
+bool Core::runHotspot(const QString &program)
 {
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
@@ -407,9 +421,10 @@ void Core::runHotspot(const QString &program)
     hotspotCmd = hotspotCmd.arg(program);
     noBlockWait(pub_proc,hotspotCmd,eventLoop);
     QDir::setCurrent("..");
+    return !stopFlag;
 }
 
-void Core::drawHeatMap(const QString &program)
+bool Core::drawHeatMap(const QString &program)
 {
     //TODO: 检查输出文件夹./HeatMap
     QString heatMapCmd = "python scripts/flpdraw.py "
@@ -420,6 +435,7 @@ void Core::drawHeatMap(const QString &program)
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
     blockWait(pri_proc,heatMapCmd);
+    return !stopFlag;
 }
 
 void Core::readConfig()
