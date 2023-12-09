@@ -33,6 +33,8 @@ private:
 public:
     Core(QApplication* app);
     ~Core();
+    //返回是否有进程正在运行
+    bool isProcessRunning() const;
 private:
     //初始化函数
     //在启动所有窗体前，从config.json文件中读取配置

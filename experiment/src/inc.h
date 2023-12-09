@@ -39,6 +39,11 @@
     process->setArguments(QStringList() << "-c" << command);\
     process->start();\
     eventLoop->exec();
+/*
+ * 阻塞等待
+ * QProcess* process,
+ * QString command
+ */
 #define blockWait(process,command) \
     process->setArguments(QStringList() << "-c" << command);\
     process->start();\
@@ -57,4 +62,8 @@ struct Choice{
     QString test = "";
     int threadNum = 0;
 };
+enum Exception{
+    UserAbort
+};
+
 #endif // INC_H

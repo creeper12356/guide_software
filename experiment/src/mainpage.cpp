@@ -32,6 +32,21 @@ MainPage::~MainPage()
 
 void MainPage::closeEvent(QCloseEvent *event)
 {
+    if(core->isProcessRunning()){
+        if(QMessageBox::warning(this,"警告",
+                             "有一个进程正在运行，您未完成的工作可能丢失，仍然关闭?",
+                             QMessageBox::Yes|QMessageBox::No)
+                == QMessageBox::Yes){
+            //用户强行关闭进程
+            //kill进程
+            ui->action_terminate->trigger();
+        }
+        else{
+            //用户取消强行关闭
+            event->ignore();
+            return ;
+        }
+    }
     emit closed();
 }
 

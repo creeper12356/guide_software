@@ -53,6 +53,12 @@ Core::~Core()
     delete pwdDialog;
     delete guide;
 }
+
+bool Core::isProcessRunning() const
+{
+    return pub_proc->state() == QProcess::Running
+            || pri_proc->state() == QProcess::Running;
+}
 void Core::initConnections()
 {
     //退出逻辑
@@ -248,15 +254,27 @@ void Core::simulatePerformance()
             "--disk-image=x86root-parsec.img "
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
-
-    for(auto program: _userChoice->programs){
-        //文件名中测试集均为小写
-        //运行仿真，耗时较长
-        noBlockWait(pub_proc,
-                    simulateCmd.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower()),
-                    eventLoop);
-        //将输出文件拷贝到对应目标路径
-        blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
+    try{
+        for(auto program: _userChoice->programs){
+            //文件名中测试集均为小写
+            emit logProgram(program,"开始性能仿真...");
+            //运行仿真，耗时较长
+            noBlockWait(pub_proc,
+                        simulateCmd.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower()),
+                        eventLoop);
+            if(stopFlag){
+                throw UserAbort;
+            }
+            //将输出文件拷贝到对应目标路径
+            blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
+            emit logProgram(program,"[SUCCESS]性能仿真完成.");
+        }
+    }
+    catch(Exception e){
+        //abort
+        emit log("终止。");
+        QDir::setCurrent("..");
+        return ;
     }
 
     QDir::setCurrent("..");
@@ -293,46 +311,45 @@ void Core::genHeatMap()
 //        }
 //    }
     QDir::setCurrent("..");
-    //处理性能数据
-    for(auto& program: resultPrograms){
-        emit log(program + ": 分割性能仿真输出...");
-        if(!splitGem5Output(program)){
-            emit logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
-            continue;
+    try{
+        //处理性能数据
+        for(auto& program: resultPrograms){
+            emit log(program + ": 分割性能仿真输出...");
+            if(!splitGem5Output(program)){
+                emit logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
+                continue;
+            }
+            emit logProgram(program,"运行McPAT模块...");
+            if(!runMcpat(program)){
+                throw UserAbort;
+            }
+            emit log("完成!");
+            emit logProgram(program,"生成ptrace文件...");
+            writePtrace(program);
+            emit logProgram(program,"运行Hotspot模块...");
+            if(!runHotspot(program)){
+                throw UserAbort;
+            }
+            emit log("完成!");
+            emit logProgram(program,"生成温度图...");
+            drawHeatMap(program);
+            emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
         }
-        emit logProgram(program,"运行McPAT模块...");
-        if(!runMcpat(program)){
-            goto genHeatMapAbort;
-        }
-        emit log("完成!");
-        emit logProgram(program,"生成ptrace文件...");
-        writePtrace(program);
-        emit logProgram(program,"运行Hotspot模块...");
-        if(!runHotspot(program)){
-            goto genHeatMapAbort;
-        }
-        emit log("完成!");
-        emit logProgram(program,"生成温度图...");
-        drawHeatMap(program);
-        emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+        //TODO : remove all the inteval folders
+        stopFlag = true;
+        emit longTaskFinished();
     }
-    //TODO : remove all the inteval folders
-    stopFlag = true;
-    emit longTaskFinished();
-    return ;
-    genHeatMapAbort:
-    emit log("终止。");
-    return ;
+    catch(Exception e){
+        emit log("终止。");
+    }
 }
 
 void Core::terminate()
 {
-    //TODO:really terminate the program.
     qDebug() << "kill.";
     pub_proc->kill();
     pri_proc->kill();
     stopFlag = true;
-//    emit
     emit longTaskFinished();
 }
 
