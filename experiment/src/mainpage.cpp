@@ -79,6 +79,7 @@ void MainPage::performanceSimulationFinishedSlot()
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
+    ui->log_browser->clear();
     for(auto action: toolBar->actions()){
         action->setDisabled(true);
     }
@@ -91,7 +92,6 @@ void MainPage::longTaskFinishedSlot()
         action->setEnabled(true);
     }
     ui->action_terminate->setDisabled(true);
-    //TODO
 }
 
 void MainPage::refreshLog(QString info)

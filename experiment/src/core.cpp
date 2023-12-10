@@ -136,7 +136,6 @@ bool Core::checkGenScript()
     for(auto& program:_userChoice->programs){
         script = scriptFormat.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower());
         if(!QDir::current().exists(script)){
-//            qDebug() << "script " << script << " absent.";
             res = false;
             break;
         }
@@ -178,12 +177,6 @@ void Core::initPwdDialog()
     pwdDialog->setLabelText("我们需要您提供用户的密码：");
     pwdDialog->setTextEchoMode(QLineEdit::Password);
     pwdDialog->setModal(true);
-}
-
-void Core::initGUIConnection()
-{
-
-
 }
 
 void Core::reportError(QString errMsg)
@@ -335,12 +328,14 @@ void Core::genHeatMap()
             drawHeatMap(program);
             emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
         }
-        //TODO : remove all the inteval folders
+        //删除所有中间文件夹
+        blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
         stopFlag = true;
         emit longTaskFinished();
     }
     catch(Exception e){
         emit log("终止。");
+        blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
     }
 }
 

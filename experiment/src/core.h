@@ -41,7 +41,6 @@ private:
     void readConfig();
     //初始化密码对话框GUI
     inline void initPwdDialog();
-    inline void initGUIConnection();
     //初始化信号槽连接
     inline void initConnections();
 private:
