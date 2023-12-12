@@ -23,7 +23,6 @@ Core::Core(QApplication* a):
     //初始化窗体
     initPwdDialog();
     mainPage = new MainPage(this);
-    //刷新界面
     mainPage->getUi()->choice_widget->refreshUserChoice(_userChoice);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
