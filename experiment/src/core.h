@@ -8,8 +8,6 @@ class Core:public QObject
 private:
     QApplication* app = nullptr;
     QEventLoop* eventLoop = nullptr;
-    //pub_proc : 进程输出会显示出来
-    //pri_proc : 进程输出不显示
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
     //pri_proc为私有进程，不打印输出，只更新cache
@@ -18,23 +16,23 @@ private:
     //缓冲区,记录上一次readAll操作读到的进程输出
     QByteArray cache;
 
-
+    //窗口
     MainPage* mainPage = nullptr;
     DependencyInstaller* installer = nullptr;
     PyLibInstaller* py_installer = nullptr;
     ChoiceGuide* guide = nullptr;
     //密码对话框，由所有可能询问密码的窗体共享
     QInputDialog* pwdDialog = nullptr;
+
     //用户的配置选择
     Choice* _userChoice = nullptr;
-
+    //标记耗时任务是否停止
     bool stopFlag = true;
 
 public:
     Core(QApplication* app);
     ~Core();
-    //返回是否有进程正在运行
-    bool isProcessRunning() const;
+
 private:
     //初始化函数
     //在启动所有窗体前，从config.json文件中读取配置
@@ -54,6 +52,8 @@ private:
 public:
     //配置完成后，复制用户选择
     void copyUserChoice(const Choice* _userChoice);
+     //返回是否有进程正在运行
+    bool isProcessRunning() const;
 
 private slots:
     //清理脚本

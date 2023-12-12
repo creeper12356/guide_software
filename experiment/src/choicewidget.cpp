@@ -5,6 +5,8 @@ ChoiceWidget::ChoiceWidget(QWidget *parent) :
     ui(new Ui::ChoiceWidget)
 {
     ui->setupUi(this);
+    connect(ui->prog_list,&QListWidget::currentTextChanged,
+            this,&ChoiceWidget::currentTextChanged);
 }
 
 ChoiceWidget::~ChoiceWidget()

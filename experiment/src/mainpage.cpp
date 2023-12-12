@@ -10,7 +10,20 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
-    //初始化toolBar
+    initToolBar();
+    initDockWidgets();
+    initConnections();
+    this->setDockNestingEnabled(false);
+}
+
+MainPage::~MainPage()
+{
+    qDebug() << "~MainPage()";
+    delete ui;
+}
+
+void MainPage::initToolBar()
+{
     toolBar = new QToolBar(this);
     this->addToolBar(toolBar);
     toolBar->setIconSize(QSize(50,50));
@@ -21,34 +34,28 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     toolBar->addAction(ui->action_temp);
     toolBar->addAction(ui->action_terminate);
     ui->action_terminate->setDisabled(true);
+}
 
-    connect(ui->action_full_screen,&QAction::triggered,this,&MainPage::switchFullScreen);
-    QDockWidget* terminalDock = new QDockWidget(this);
-    terminalDock->setWindowTitle("终端");
-    terminalDock->setWidget(ui->terminal_reflect);
-    QDockWidget* choiceDock = new QDockWidget(this);
-    choiceDock->setWidget(ui->choice_widget);
-    choiceDock->setWindowTitle("当前配置");
-    QDockWidget* logDock = new QDockWidget(this);
-    logDock->setWindowTitle("日志");
-    logDock->setWidget(ui->log_browser);
+void MainPage::initDockWidgets()
+{
+    (terminalDock = new QDockWidget("终端",this))->setWidget(ui->terminal_reflect);
+    (choiceDock = new QDockWidget("配置",this))->setWidget(ui->choice_widget);
+    (logDock = new QDockWidget("日志",this))->setWidget(ui->log_browser);
+    (heatMapDock = new QDockWidget("温度仿真图",this))->setWidget(ui->heat_map);
+
     this->addDockWidget(Qt::RightDockWidgetArea,terminalDock);
     this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
     this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
-    //TODO: 整理
-    QDockWidget* imgDock = new QDockWidget(this);
-    imgDock->setWindowTitle("温度仿真");
-    imgDock->show();
-    imgDock->setWidget(ui->image_display);
-    this->addDockWidget(Qt::NoDockWidgetArea,imgDock);
-    ui->image_display->loadFromFile("HeatMap/blackscholes.png");
-
+    this->addDockWidget(Qt::LeftDockWidgetArea,heatMapDock);
 }
 
-MainPage::~MainPage()
+void MainPage::initConnections()
 {
-    qDebug() << "~MainPage()";
-    delete ui;
+    //显示选中的程序对应的温度图
+    connect(ui->choice_widget,&ChoiceWidget::currentTextChanged,
+            this,[this](const QString& program){
+       ui->heat_map->loadFromFile(QString("HeatMap/%1.png").arg(program));
+    });
 }
 
 void MainPage::closeEvent(QCloseEvent *event)
@@ -80,16 +87,6 @@ void MainPage::on_action_about_triggered()
 void MainPage::on_action_exit_triggered()
 {
     this->close();
-}
-
-void MainPage::switchFullScreen()
-{
-    if(this->isFullScreen()){
-        this->showNormal();
-    }
-    else{
-        this->showFullScreen();
-    }
 }
 
 void MainPage::scriptCleanedSlot()
@@ -140,4 +137,19 @@ void MainPage::refreshLogProgram(QString program, QString info)
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);
     ui->log_browser->append(prefix + info);
+}
+
+void MainPage::on_action_maximize_triggered()
+{
+    if(this->isMaximized()){
+        this->showNormal();
+    }
+    else{
+        this->showMaximized();
+    }
+}
+
+void MainPage::on_action_show_heatmap_triggered()
+{
+    heatMapDock->setVisible(!heatMapDock->isVisible());
 }

@@ -19,6 +19,8 @@ public slots:
     void refreshUserChoice(const Choice *userChoice);
 private:
     Ui::ChoiceWidget *ui;
+signals:
+    void currentTextChanged(const QString& currentText);
 };
 
 #endif // USERCHOICEWIDGET_H

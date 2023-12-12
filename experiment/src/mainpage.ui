@@ -56,6 +56,16 @@
       <height>251</height>
      </rect>
     </property>
+    <widget class="ImageDisplay" name="heat_map" native="true">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>40</y>
+       <width>421</width>
+       <height>301</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QTextBrowser" name="log_browser">
     <property name="geometry">
@@ -64,16 +74,6 @@
       <y>310</y>
       <width>761</width>
       <height>161</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="ImageDisplay" name="image_display" native="true">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>40</y>
-      <width>451</width>
-      <height>321</height>
      </rect>
     </property>
    </widget>
@@ -131,7 +131,14 @@
     <property name="title">
      <string>窗口</string>
     </property>
-    <addaction name="action_full_screen"/>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>显示</string>
+     </property>
+     <addaction name="action_show_heatmap"/>
+    </widget>
+    <addaction name="action_maximize"/>
+    <addaction name="menu_7"/>
    </widget>
    <addaction name="menu_4"/>
    <addaction name="menu_3"/>
@@ -229,12 +236,23 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_full_screen">
+  <action name="action_maximize">
    <property name="text">
-    <string>全屏</string>
+    <string>最大化</string>
    </property>
    <property name="shortcut">
     <string>F11</string>
+   </property>
+  </action>
+  <action name="action_show_heatmap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>温度图</string>
    </property>
   </action>
  </widget>

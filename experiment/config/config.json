@@ -17,7 +17,7 @@
             "x264"
         ],
         "set": "PARSEC",
-        "test": "Simlarge",
+        "test": "Simdev",
         "threadNum": 2
     }
 }
