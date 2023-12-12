@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>552</width>
-    <height>448</height>
+    <width>400</width>
+    <height>250</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>当前配置</string>

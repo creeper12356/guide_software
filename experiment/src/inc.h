@@ -15,6 +15,8 @@
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QToolBar>
+#include <QDockWidget>
+#include <QPixmap>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -24,6 +26,8 @@
 #include <QDir>
 
 #include <QKeyEvent>
+#include <QPaintEvent>
+#include <QPainter>
 #include <QEventLoop>
 #include <QTimer>
 

@@ -4,7 +4,6 @@
 #include "core.h"
 #include "aboutdialog.h"
 #include "choiceguide.h"
-
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
     core(c),
@@ -22,6 +21,28 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     toolBar->addAction(ui->action_temp);
     toolBar->addAction(ui->action_terminate);
     ui->action_terminate->setDisabled(true);
+
+    connect(ui->action_full_screen,&QAction::triggered,this,&MainPage::switchFullScreen);
+    QDockWidget* terminalDock = new QDockWidget(this);
+    terminalDock->setWindowTitle("终端");
+    terminalDock->setWidget(ui->terminal_reflect);
+    QDockWidget* choiceDock = new QDockWidget(this);
+    choiceDock->setWidget(ui->choice_widget);
+    choiceDock->setWindowTitle("当前配置");
+    QDockWidget* logDock = new QDockWidget(this);
+    logDock->setWindowTitle("日志");
+    logDock->setWidget(ui->log_browser);
+    this->addDockWidget(Qt::RightDockWidgetArea,terminalDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
+    this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
+    //TODO: 整理
+    QDockWidget* imgDock = new QDockWidget(this);
+    imgDock->setWindowTitle("温度仿真");
+    imgDock->show();
+    imgDock->setWidget(ui->image_display);
+    this->addDockWidget(Qt::NoDockWidgetArea,imgDock);
+    ui->image_display->loadFromFile("HeatMap/blackscholes.png");
+
 }
 
 MainPage::~MainPage()
@@ -39,7 +60,7 @@ void MainPage::closeEvent(QCloseEvent *event)
                 == QMessageBox::Yes){
             //用户强行关闭进程
             //kill进程
-            ui->action_terminate->trigger();
+            core->terminate();
         }
         else{
             //用户取消强行关闭
@@ -59,6 +80,16 @@ void MainPage::on_action_about_triggered()
 void MainPage::on_action_exit_triggered()
 {
     this->close();
+}
+
+void MainPage::switchFullScreen()
+{
+    if(this->isFullScreen()){
+        this->showNormal();
+    }
+    else{
+        this->showFullScreen();
+    }
 }
 
 void MainPage::scriptCleanedSlot()

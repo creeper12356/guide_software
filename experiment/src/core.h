@@ -64,7 +64,8 @@ private slots:
     void simulatePerformance();
     //生成温度图
     void genHeatMap();
-    //终止当前任务,TODO: to be finished
+public slots:
+    //终止当前任务
     void terminate();
 private:
     //处理gem5输出的性能数据, temporarily useless?

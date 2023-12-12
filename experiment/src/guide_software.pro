@@ -22,7 +22,8 @@ SOURCES += \
     dependencyinstaller.cpp \
     main.cpp \
     mainpage.cpp \
-    choicewidget.cpp
+    choicewidget.cpp \
+    imagedisplay.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -31,7 +32,8 @@ HEADERS += \
     dependencyinstaller.h \
     inc.h \
     mainpage.h \
-    choicewidget.h
+    choicewidget.h \
+    imagedisplay.h
 
 FORMS += \
     aboutdialog.ui \
