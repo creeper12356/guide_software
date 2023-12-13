@@ -10,8 +10,8 @@ Core::Core(QApplication* a):
     QObject(nullptr),
     app(a)
 {
+    //初始化进程和事件循环
     eventLoop = new QEventLoop(this);
-    //prepare processes
     pub_proc = new QProcess(this);
     pub_proc->setProgram("bash");
     pri_proc = new QProcess(this);
@@ -20,7 +20,7 @@ Core::Core(QApplication* a):
     _userChoice = new Choice;
     //读取文件配置
     readConfig();
-    //初始化窗体
+    //初始化界面
     initPwdDialog();
     mainPage = new MainPage(this);
     mainPage->getUi()->choice_widget->refreshUserChoice(_userChoice);
@@ -110,7 +110,6 @@ void Core::initConnections()
     connect(pri_proc,&QProcess::readyRead,this,[this](){
         cache = pri_proc->readAll();
     });
-    //TODO
     connect(mainPage->getUi()->action_terminate,
             &QAction::triggered,this,&Core::terminate);
 
@@ -341,9 +340,9 @@ void Core::genHeatMap()
 void Core::terminate()
 {
     qDebug() << "kill.";
+    stopFlag = true;
     pub_proc->kill();
     pri_proc->kill();
-    stopFlag = true;
     emit longTaskFinished();
 }
 
@@ -371,7 +370,6 @@ bool Core::splitGem5Output(const QString &program)
     else{
         //分割失败
         //TODO: 删除所在文件夹
-        //notify user
         return false;
     }
     return !stopFlag;
