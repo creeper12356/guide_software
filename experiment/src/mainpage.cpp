@@ -25,6 +25,7 @@ MainPage::~MainPage()
 void MainPage::initToolBar()
 {
     toolBar = new QToolBar(this);
+    toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(toolBar);
     toolBar->setIconSize(QSize(50,50));
     toolBar->addAction(ui->action_conf);
