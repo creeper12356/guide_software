@@ -13,7 +13,7 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     initToolBar();
     initDockWidgets();
     initConnections();
-    this->setDockNestingEnabled(false);
+//    this->setDockNestingEnabled(false);
 }
 
 MainPage::~MainPage()
