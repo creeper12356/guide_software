@@ -44,10 +44,10 @@ void MainPage::initDockWidgets()
     (logDock = new QDockWidget("日志",this))->setWidget(ui->log_browser);
     (heatMapDock = new QDockWidget("温度仿真图",this))->setWidget(ui->heat_map);
 
-    this->addDockWidget(Qt::RightDockWidgetArea,terminalDock);
+    this->addDockWidget(Qt::BottomDockWidgetArea,terminalDock);
     this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
     this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea,heatMapDock);
+    this->addDockWidget(Qt::RightDockWidgetArea,heatMapDock);
 }
 
 void MainPage::initConnections()

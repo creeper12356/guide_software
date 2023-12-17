@@ -3,10 +3,21 @@
         "architecture": "X86",
         "programs": [
             "blackscholes",
-            "canneal"
+            "bodytrack",
+            "canneal",
+            "dedup",
+            "facesim",
+            "ferret",
+            "fluidanimate",
+            "freqmine",
+            "rtview",
+            "streamcluster",
+            "swaptions",
+            "vips",
+            "x264"
         ],
         "set": "PARSEC",
-        "test": "Simmedium",
-        "threadNum": 6
+        "test": "Simlarge",
+        "threadNum": 2
     }
 }
