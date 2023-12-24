@@ -4,6 +4,7 @@
 #include "core.h"
 #include "aboutdialog.h"
 #include "choiceguide.h"
+#include "choicewidget.h"
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
     core(c),
@@ -12,14 +13,24 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui->setupUi(this);
     initToolBar();
     initDockWidgets();
-    initConnections();
 //    this->setDockNestingEnabled(false);
 }
 
 MainPage::~MainPage()
 {
+    qDebug() << this->size();
     qDebug() << "~MainPage()";
     delete ui;
+}
+
+QTextBrowser *MainPage::getTerminalReflect()
+{
+    return dynamic_cast<QTextBrowser*> (terminalDock->widget());
+}
+
+ChoiceWidget *MainPage::getChoiceWidget()
+{
+    return dynamic_cast<ChoiceWidget*> (choiceDock->widget());
 }
 
 void MainPage::initToolBar()
@@ -39,24 +50,25 @@ void MainPage::initToolBar()
 
 void MainPage::initDockWidgets()
 {
-    (terminalDock = new QDockWidget("终端",this))->setWidget(ui->terminal_reflect);
-    (choiceDock = new QDockWidget("配置",this))->setWidget(ui->choice_widget);
+    QTextBrowser *terminalReflect = new QTextBrowser(this);
+    terminalReflect->setStyleSheet("QTextBrowser{color:white;background:black}");
+    (terminalDock = new QDockWidget("终端",this))->setWidget(terminalReflect);
+
+    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
+    connect(choiceWidget,&ChoiceWidget::currentTextChanged,
+            this,[this](const QString& program){
+       ui->heat_map->loadFromFile(QString("HeatMap/%1.png").arg(program));
+    });
+
+    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
+
     (logDock = new QDockWidget("日志",this))->setWidget(ui->log_browser);
-    (heatMapDock = new QDockWidget("温度仿真图",this))->setWidget(ui->heat_map);
 
     this->addDockWidget(Qt::BottomDockWidgetArea,terminalDock);
     this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
     this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
-    this->addDockWidget(Qt::RightDockWidgetArea,heatMapDock);
-}
 
-void MainPage::initConnections()
-{
-    //显示选中的程序对应的温度图
-    connect(ui->choice_widget,&ChoiceWidget::currentTextChanged,
-            this,[this](const QString& program){
-       ui->heat_map->loadFromFile(QString("HeatMap/%1.png").arg(program));
-    });
+    this->tabifyDockWidget(terminalDock,logDock);
 }
 
 void MainPage::closeEvent(QCloseEvent *event)
@@ -152,5 +164,6 @@ void MainPage::on_action_maximize_triggered()
 
 void MainPage::on_action_show_heatmap_triggered()
 {
-    heatMapDock->setVisible(!heatMapDock->isVisible());
+    //TODO: implement this
+//    heatMapDock->setVisible(!heatMapDock->isVisible());
 }

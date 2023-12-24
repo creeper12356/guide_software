@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1152</width>
+    <height>908</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,73 +17,21 @@
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTextBrowser" name="terminal_reflect">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>30</y>
-      <width>400</width>
-      <height>250</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>400</width>
-      <height>250</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>600</width>
-      <height>400</height>
-     </size>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QTextBrowser{color:white;background:black}</string>
-    </property>
-   </widget>
-   <widget class="ChoiceWidget" name="choice_widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>331</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <widget class="ImageDisplay" name="heat_map" native="true">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>40</y>
-       <width>421</width>
-       <height>301</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QTextBrowser" name="log_browser">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>310</y>
-      <width>761</width>
-      <height>161</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="ImageDisplay" name="heat_map" native="true"/>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="log_browser"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1152</width>
      <height>28</height>
     </rect>
    </property>
@@ -257,12 +205,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ChoiceWidget</class>
-   <extends>QWidget</extends>
-   <header>choicewidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>ImageDisplay</class>
    <extends>QWidget</extends>

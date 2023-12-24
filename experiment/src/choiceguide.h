@@ -14,8 +14,8 @@ class ChoiceGuide : public QMainWindow
 private:
     const QStringList infos =
     {
-        "请选择架构",
-        "请选择程序集", "请选择程序", "请选择测试集，并输入线程数"
+        "请选择架构和程序集",
+        "请选择程序", "请选择测试集，并输入线程数"
     };
 private:
     //使用QJsonObject表示的所有程序选择分支信息

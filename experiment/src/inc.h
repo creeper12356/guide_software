@@ -17,6 +17,7 @@
 #include <QToolBar>
 #include <QDockWidget>
 #include <QPixmap>
+#include <QTextBrowser>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -28,6 +29,7 @@
 #include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QResizeEvent>
 #include <QEventLoop>
 #include <QTimer>
 
@@ -58,6 +60,8 @@ class MainPage;
 class DependencyInstaller;
 class PyLibInstaller;
 class ChoiceGuide;
+class ChoiceWidget;
+
 //用户选择的结构体
 struct Choice{
     QString architecture = "";

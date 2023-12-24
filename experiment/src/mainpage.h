@@ -16,17 +16,17 @@ private:
     QDockWidget* terminalDock = nullptr;
     QDockWidget* choiceDock = nullptr;
     QDockWidget* logDock = nullptr;
-    QDockWidget* heatMapDock = nullptr;
 public:
     MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();
 public:
     //getters
     Ui::MainPage* getUi(){return ui;}
+    QTextBrowser* getTerminalReflect();
+    ChoiceWidget* getChoiceWidget();
 private:
     inline void initToolBar() ;
     inline void initDockWidgets() ;
-    inline void initConnections();
 private slots:
     void on_action_about_triggered();
     void on_action_exit_triggered();

@@ -5,6 +5,7 @@
 #include "ui_dependencyinstaller.h"
 #include "choiceguide.h"
 #include "ui_choiceguide.h"
+#include "choicewidget.h"
 
 Core::Core(QApplication* a):
     QObject(nullptr),
@@ -23,7 +24,7 @@ Core::Core(QApplication* a):
     //初始化界面
     initPwdDialog();
     mainPage = new MainPage(this);
-    mainPage->getUi()->choice_widget->refreshUserChoice(_userChoice);
+    mainPage->getChoiceWidget()->refreshUserChoice(_userChoice);
     installer = new AptInstaller(this,eventLoop,pwdDialog);
     py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
     guide = new ChoiceGuide(this);
@@ -84,7 +85,7 @@ void Core::initConnections()
     connect(guide,&ChoiceGuide::configureFinished,
             this,&Core::copyUserChoice);
     connect(guide,&ChoiceGuide::configureFinished,
-            mainPage->getUi()->choice_widget,&ChoiceWidget::refreshUserChoice);
+            mainPage->getChoiceWidget(),&ChoiceWidget::refreshUserChoice);
 
     //清理脚本相关
     connect(mainPage->getUi()->action_clean,&QAction::triggered,
@@ -105,7 +106,7 @@ void Core::initConnections()
     //终端相关
     connect(pub_proc,&QProcess::readyRead,this,[this](){
         cache = pub_proc->readAll();
-        mainPage->getUi()->terminal_reflect->append(QString::fromUtf8(cache));
+        mainPage->getTerminalReflect()->append(QString::fromUtf8(cache));
     });
     connect(pri_proc,&QProcess::readyRead,this,[this](){
         cache = pri_proc->readAll();
