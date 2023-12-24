@@ -7,5 +7,9 @@ experiment/*input/
 experiment/*output/
 experiment/mcpat/
 experiment/cache/
-
+experiment/HeatMap/
+experiment/HotSpot-master
+experiment/utils
+experiment/xml
+phase2/
 
