@@ -24,7 +24,6 @@ const QString &ImageDisplay::getFileName() const
 ImageLabel::ImageLabel(QWidget *parent)
     :QLabel(parent)
 {
-
 }
 
 void ImageLabel::loadFromFile(const QString &fileName)

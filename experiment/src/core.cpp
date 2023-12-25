@@ -303,6 +303,10 @@ void Core::genHeatMap()
 //        }
 //    }
     QDir::setCurrent("..");
+    //准备温度图文件夹
+    blockWait(pri_proc,"mkdir HeatMap ; rm HeatMap/* -rf");
+
+
     try{
         //处理性能数据
         for(auto& program: resultPrograms){
@@ -437,6 +441,7 @@ bool Core::runHotspot(const QString &program)
 bool Core::drawHeatMap(const QString &program)
 {
     //TODO: 检查输出文件夹./HeatMap
+
     QString heatMapCmd = "python scripts/flpdraw.py "
                          "utils/ev6.flp "
                          "HotSpot_output/%1/%1.grid.steady "
