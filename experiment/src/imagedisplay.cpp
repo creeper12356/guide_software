@@ -2,31 +2,52 @@
 
 ImageDisplay::ImageDisplay(QWidget *parent) : QWidget(parent)
 {
-//    this->setMinimumSize(300,300);
-//    this->setMaximumSize(800,800);
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    QLabel* title = new QLabel(this);
+    title->setText("温度图");
+    display = new ImageLabel(this);
+    layout->addWidget(title);
+    layout->addWidget(display);
+    layout->setStretchFactor(display,1);
 }
 
 void ImageDisplay::loadFromFile(const QString &fileName)
 {
+    display->loadFromFile(fileName);
+}
+
+const QString &ImageDisplay::getFileName() const
+{
+    return display->fileName;
+}
+
+ImageLabel::ImageLabel(QWidget *parent)
+    :QLabel(parent)
+{
+
+}
+
+void ImageLabel::loadFromFile(const QString &fileName)
+{
+    this->fileName = fileName;
     img.load(fileName);
     update();
 }
 
-void ImageDisplay::paintEvent(QPaintEvent *event)
+void ImageLabel::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    painter.translate(this->geometry().topLeft());
     if(img.isNull()){
-        //图片加载失败
-        painter.eraseRect(this->geometry());
+        painter.setPen(Qt::red);
+        painter.drawText(0,0,width(),height(),Qt::AlignTop,"找不到文件" + fileName);
         return ;
     }
+    QPixmap painted;
     if(img.width() / this->width() > img.height() / this->height()){
-        painter.drawImage(0,0,img.scaledToWidth(width()));
+        painted = QPixmap::fromImage(img).scaledToWidth(this->width());
     }
     else{
-        painter.drawImage(0,0,img.scaledToHeight(height()));
+        painted = QPixmap::fromImage(img).scaledToHeight(this->height());
     }
+    painter.drawPixmap(0,0,painted);
 }
-
-

@@ -15,10 +15,11 @@ private:
     QToolBar* toolBar = nullptr;
 
     QDockWidget* terminalDock = nullptr;
-    QDockWidget* choiceDock = nullptr;
+//    QDockWidget* choiceDock = nullptr;
     QDockWidget* logDock = nullptr;
 
     ImageDisplay* heatMap = nullptr;
+    ChoiceWidget* choiceWidget = nullptr;
 public:
     MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();

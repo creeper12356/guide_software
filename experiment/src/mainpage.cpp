@@ -6,6 +6,7 @@
 #include "choiceguide.h"
 #include "choicewidget.h"
 #include "imagedisplay.h"
+
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
     core(c),
@@ -14,12 +15,28 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui->setupUi(this);
     initToolBar();
     initDockWidgets();
+
+
+    QHBoxLayout* centralLayout = new QHBoxLayout(ui->centralwidget);
+    QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
+
     heatMap = new ImageDisplay(ui->centralwidget);
-    ui->central_layout->addWidget(heatMap);
-    connect(getChoiceWidget(),&ChoiceWidget::currentTextChanged,
+
+    choiceWidget = new ChoiceWidget(ui->centralwidget);
+    connect(choiceWidget,&ChoiceWidget::currentTextChanged,
             this,[this](const QString& program){
        heatMap->loadFromFile(QString("HeatMap/%1.png").arg(program));
     });
+
+    heatMap->resize(choiceWidget->size());
+
+    splitter->addWidget(choiceWidget);
+    splitter->addWidget(heatMap);
+
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
+
+    centralLayout->addWidget(splitter);
 }
 
 MainPage::~MainPage()
@@ -35,7 +52,8 @@ QTextBrowser *MainPage::getTerminalReflect()
 
 ChoiceWidget *MainPage::getChoiceWidget()
 {
-    return dynamic_cast<ChoiceWidget*> (choiceDock->widget());
+//    return dynamic_cast<ChoiceWidget*> (choiceDock->widget());
+    return choiceWidget;
 }
 
 QTextBrowser *MainPage::getLogBrowser()
@@ -72,10 +90,10 @@ void MainPage::initDockWidgets()
 
     this->tabifyDockWidget(terminalDock,logDock);
 
-    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
+//    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
 
-    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
-    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
+//    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
+//    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
 }
 
 void MainPage::closeEvent(QCloseEvent *event)

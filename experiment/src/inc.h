@@ -17,7 +17,12 @@
 #include <QToolBar>
 #include <QDockWidget>
 #include <QPixmap>
+#include <QLabel>
 #include <QTextBrowser>
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QSplitter>
 
 #include <QJsonDocument>
 #include <QJsonObject>
