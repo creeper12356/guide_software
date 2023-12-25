@@ -17,14 +17,7 @@
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="ImageDisplay" name="heat_map" native="true"/>
-    </item>
-    <item>
-     <widget class="QTextBrowser" name="log_browser"/>
-    </item>
-   </layout>
+   <layout class="QVBoxLayout" name="central_layout"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -204,14 +197,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ImageDisplay</class>
-   <extends>QWidget</extends>
-   <header>imagedisplay.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../res.qrc"/>
  </resources>

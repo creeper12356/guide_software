@@ -14,6 +14,7 @@ class ChoiceWidget : public QWidget
 public:
     explicit ChoiceWidget(QWidget *parent = 0);
     ~ChoiceWidget();
+    QSize sizeHint() const override;
 public slots:
     //将用户选择更新到界面上
     void refreshUserChoice(const Choice *userChoice);

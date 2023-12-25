@@ -5,6 +5,7 @@
 #include "aboutdialog.h"
 #include "choiceguide.h"
 #include "choicewidget.h"
+#include "imagedisplay.h"
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
     core(c),
@@ -13,12 +14,16 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui->setupUi(this);
     initToolBar();
     initDockWidgets();
-//    this->setDockNestingEnabled(false);
+    heatMap = new ImageDisplay(ui->centralwidget);
+    ui->central_layout->addWidget(heatMap);
+    connect(getChoiceWidget(),&ChoiceWidget::currentTextChanged,
+            this,[this](const QString& program){
+       heatMap->loadFromFile(QString("HeatMap/%1.png").arg(program));
+    });
 }
 
 MainPage::~MainPage()
 {
-    qDebug() << this->size();
     qDebug() << "~MainPage()";
     delete ui;
 }
@@ -33,11 +38,16 @@ ChoiceWidget *MainPage::getChoiceWidget()
     return dynamic_cast<ChoiceWidget*> (choiceDock->widget());
 }
 
+QTextBrowser *MainPage::getLogBrowser()
+{
+    return dynamic_cast<QTextBrowser*> (logDock->widget());
+}
+
 void MainPage::initToolBar()
 {
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    this->addToolBar(toolBar);
+    this->addToolBar(Qt::TopToolBarArea,toolBar);
     toolBar->setIconSize(QSize(50,50));
     toolBar->addAction(ui->action_conf);
     toolBar->addAction(ui->action_clean);
@@ -53,22 +63,19 @@ void MainPage::initDockWidgets()
     QTextBrowser *terminalReflect = new QTextBrowser(this);
     terminalReflect->setStyleSheet("QTextBrowser{color:white;background:black}");
     (terminalDock = new QDockWidget("终端",this))->setWidget(terminalReflect);
-
-    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
-    connect(choiceWidget,&ChoiceWidget::currentTextChanged,
-            this,[this](const QString& program){
-       ui->heat_map->loadFromFile(QString("HeatMap/%1.png").arg(program));
-    });
-
-    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
-
-    (logDock = new QDockWidget("日志",this))->setWidget(ui->log_browser);
-
     this->addDockWidget(Qt::BottomDockWidgetArea,terminalDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
+
+    QTextBrowser *logBrowser = new QTextBrowser(this);
+//    logBrowser->setStyleSheet("QTextBrowser{color:black;background:white}");
+    (logDock = new QDockWidget("日志",this))->setWidget(logBrowser);
     this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
 
     this->tabifyDockWidget(terminalDock,logDock);
+
+    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
+
+    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
+    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
 }
 
 void MainPage::closeEvent(QCloseEvent *event)
@@ -120,7 +127,7 @@ void MainPage::performanceSimulationFinishedSlot()
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
-    ui->log_browser->clear();
+    getLogBrowser()->clear();
     for(auto action: toolBar->actions()){
         action->setDisabled(true);
     }
@@ -139,17 +146,17 @@ void MainPage::refreshLog(QString info)
 {
     if(info.isEmpty()){
         //若信息为空则清空日志
-        ui->log_browser->clear();
+        getLogBrowser()->clear();
         return ;
     }
-    ui->log_browser->append(info);
+    getLogBrowser()->append(info);
 }
 
 void MainPage::refreshLogProgram(QString program, QString info)
 {
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);
-    ui->log_browser->append(prefix + info);
+    getLogBrowser()->append(prefix + info);
 }
 
 void MainPage::on_action_maximize_triggered()

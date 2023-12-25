@@ -61,6 +61,7 @@ class DependencyInstaller;
 class PyLibInstaller;
 class ChoiceGuide;
 class ChoiceWidget;
+class ImageDisplay;
 
 //用户选择的结构体
 struct Choice{

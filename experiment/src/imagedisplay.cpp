@@ -22,10 +22,10 @@ void ImageDisplay::paintEvent(QPaintEvent *event)
         return ;
     }
     if(img.width() / this->width() > img.height() / this->height()){
-        painter.drawImage(this->geometry().topLeft(),img.scaledToWidth(this->width()));
+        painter.drawImage(0,0,img.scaledToWidth(width()));
     }
     else{
-        painter.drawImage(this->geometry().topLeft(),img.scaledToHeight(this->height()));
+        painter.drawImage(0,0,img.scaledToHeight(height()));
     }
 }
 

@@ -14,6 +14,11 @@ ChoiceWidget::~ChoiceWidget()
     delete ui;
 }
 
+QSize ChoiceWidget::sizeHint() const
+{
+    return this->minimumSize();
+}
+
 void ChoiceWidget::refreshUserChoice(const Choice *userChoice)
 {
     ui->prog_list->clear();

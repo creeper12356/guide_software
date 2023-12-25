@@ -13,9 +13,12 @@ private:
     Core* core = nullptr;
 
     QToolBar* toolBar = nullptr;
+
     QDockWidget* terminalDock = nullptr;
     QDockWidget* choiceDock = nullptr;
     QDockWidget* logDock = nullptr;
+
+    ImageDisplay* heatMap = nullptr;
 public:
     MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();
@@ -24,6 +27,7 @@ public:
     Ui::MainPage* getUi(){return ui;}
     QTextBrowser* getTerminalReflect();
     ChoiceWidget* getChoiceWidget();
+    QTextBrowser* getLogBrowser();
 private:
     inline void initToolBar() ;
     inline void initDockWidgets() ;
