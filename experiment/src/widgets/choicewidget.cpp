@@ -1,4 +1,4 @@
-#include "choicewidget.h"
+#include "widgets/choicewidget.h"
 #include "ui_choicewidget.h"
 ChoiceWidget::ChoiceWidget(QWidget *parent) :
     QWidget(parent),

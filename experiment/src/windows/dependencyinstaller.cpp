@@ -1,7 +1,6 @@
-#include "inc.h"
-#include "dependencyinstaller.h"
-#include "ui_dependencyinstaller.h"
+#include "windows/dependencyinstaller.h"
 #include "core.h"
+#include "ui_dependencyinstaller.h"
 DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialog *&pd, QWidget *parent)
    :QDialog(parent),
     core(c),

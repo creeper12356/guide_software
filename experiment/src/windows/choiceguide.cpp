@@ -1,4 +1,4 @@
-#include "choiceguide.h"
+#include "windows/choiceguide.h"
 #include "ui_choiceguide.h"
 #include "core.h"
 

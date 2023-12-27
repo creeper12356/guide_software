@@ -1,11 +1,12 @@
 #include "core.h"
-#include "mainpage.h"
+#include "windows/mainpage.h"
+#include "windows/choiceguide.h"
+#include "windows/dependencyinstaller.h"
+#include "widgets/choicewidget.h"
+
 #include "ui_mainpage.h"
-#include "dependencyinstaller.h"
 #include "ui_dependencyinstaller.h"
-#include "choiceguide.h"
 #include "ui_choiceguide.h"
-#include "choicewidget.h"
 
 Core::Core(QApplication* a):
     QObject(nullptr),

@@ -1,11 +1,10 @@
-#include "inc.h"
-#include "mainpage.h"
+#include "windows/mainpage.h"
+#include "windows/aboutdialog.h"
+#include "windows/choiceguide.h"
+#include "widgets/choicewidget.h"
+#include "widgets/imagedisplay.h"
 #include "ui_mainpage.h"
 #include "core.h"
-#include "aboutdialog.h"
-#include "choiceguide.h"
-#include "choicewidget.h"
-#include "imagedisplay.h"
 
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),

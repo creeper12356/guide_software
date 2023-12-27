@@ -16,31 +16,31 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    aboutdialog.cpp \
-    choiceguide.cpp \
+    windows/aboutdialog.cpp \
+    windows/choiceguide.cpp \
+    windows/dependencyinstaller.cpp \
+    windows/mainpage.cpp \
+    widgets/choicewidget.cpp \
+    widgets/imagedisplay.cpp \
     core.cpp \
-    dependencyinstaller.cpp \
-    main.cpp \
-    mainpage.cpp \
-    choicewidget.cpp \
-    imagedisplay.cpp
+    main.cpp
 
 HEADERS += \
-    aboutdialog.h \
-    choiceguide.h \
+    windows/aboutdialog.h \
+    windows/choiceguide.h \
+    windows/dependencyinstaller.h \
+    windows/mainpage.h \
+    widgets/choicewidget.h \
+    widgets/imagedisplay.h \
     core.h \
-    dependencyinstaller.h \
-    inc.h \
-    mainpage.h \
-    choicewidget.h \
-    imagedisplay.h
+    inc.h
 
 FORMS += \
-    aboutdialog.ui \
-    choiceguide.ui \
-    dependencyinstaller.ui \
-    mainpage.ui \
-    choicewidget.ui
+    windows/aboutdialog.ui \
+    windows/choiceguide.ui \
+    windows/dependencyinstaller.ui \
+    windows/mainpage.ui \
+    widgets/choicewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
