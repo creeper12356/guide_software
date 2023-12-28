@@ -5,6 +5,8 @@
 #include "widgets/imagedisplay.h"
 #include "ui_mainpage.h"
 #include "core.h"
+#include "widgets/consoledock.h"
+
 
 MainPage::MainPage(Core *c, QWidget *parent) :
     QMainWindow(parent),
@@ -36,6 +38,9 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     splitter->setStretchFactor(1,1);
 
     centralLayout->addWidget(splitter);
+    //test
+    ConsoleDock* console  = new ConsoleDock(this);
+    this->addDockWidget(Qt::BottomDockWidgetArea, console);
 }
 
 MainPage::~MainPage()

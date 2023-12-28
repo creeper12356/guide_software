@@ -241,19 +241,26 @@ void Core::simulatePerformance()
 
     //进入仿真模块文件夹 并运行性能仿真
     QDir::setCurrent("../gem5");
-    QString simulateCmd =
+    QString simulateCmdFormat =
             "M5_PATH=../full_system_images/ ./build/X86/gem5.opt configs/example/fs.py "
             "--script=../TR-09-32-parsec-2.1-alpha-files/%1_%2c_%3.rcS "
             "--disk-image=x86root-parsec.img "
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
+    QString simulateCmd;
     try{
         for(auto program: _userChoice->programs){
             //文件名中测试集均为小写
             emit logProgram(program,"开始性能仿真...");
+            simulateCmd = simulateCmdFormat.arg(
+                        program,
+                        QString::number(_userChoice->threadNum),
+                        _userChoice->test.toLower()
+                        );
+            qDebug() << simulateCmd;
             //运行仿真，耗时较长
             noBlockWait(pub_proc,
-                        simulateCmd.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower()),
+                        simulateCmd,
                         eventLoop);
             if(stopFlag){
                 throw UserAbort;

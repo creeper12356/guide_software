@@ -15,7 +15,6 @@ private:
     QToolBar* toolBar = nullptr;
 
     QDockWidget* terminalDock = nullptr;
-//    QDockWidget* choiceDock = nullptr;
     QDockWidget* logDock = nullptr;
 
     ImageDisplay* heatMap = nullptr;

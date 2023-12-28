@@ -23,7 +23,8 @@ SOURCES += \
     widgets/choicewidget.cpp \
     widgets/imagedisplay.cpp \
     core.cpp \
-    main.cpp
+    main.cpp \
+    widgets/consoledock.cpp
 
 HEADERS += \
     windows/aboutdialog.h \
@@ -33,7 +34,8 @@ HEADERS += \
     widgets/choicewidget.h \
     widgets/imagedisplay.h \
     core.h \
-    inc.h
+    inc.h \
+    widgets/consoledock.h
 
 FORMS += \
     windows/aboutdialog.ui \
