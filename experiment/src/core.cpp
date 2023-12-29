@@ -3,6 +3,7 @@
 #include "windows/choiceguide.h"
 #include "windows/dependencyinstaller.h"
 #include "widgets/choicewidget.h"
+#include "widgets/consoledock.h"
 
 #include "ui_mainpage.h"
 #include "ui_dependencyinstaller.h"
@@ -105,10 +106,8 @@ void Core::initConnections()
     connect(mainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genHeatMap);
     //终端相关
-    connect(pub_proc,&QProcess::readyRead,this,[this](){
-        cache = pub_proc->readAll();
-        mainPage->getTerminalReflect()->append(QString::fromUtf8(cache));
-    });
+    mainPage->getConsoleDock()->connectProcess(pub_proc,&cache);
+
     connect(pri_proc,&QProcess::readyRead,this,[this](){
         cache = pri_proc->readAll();
     });
@@ -193,7 +192,7 @@ void Core::cleanScript()
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
-    blockWait(pub_proc,"rm ./*.rcS");
+    blockWait(pub_proc,"rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
@@ -209,7 +208,7 @@ void Core::genScript()
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
-    blockWait(pub_proc,"rm ./*.rcS");
+    blockWait(pub_proc,"rm ./*.rcS 2>/dev/null");
     for(auto program : _userChoice->programs){
         noBlockWait(pub_proc,
                     writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)),
@@ -367,7 +366,7 @@ bool Core::splitGem5Output(const QString &program)
     blockWait(pri_proc,mkdirCmd);
 
     //分割stats文件
-    blockWait(pri_proc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
+    blockWait(pub_proc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
     if(cache == "True\n"){
         //分割成功
         //in folder McPAT_input
@@ -401,12 +400,13 @@ bool Core::runMcpat(const QString &program)
     xmlFile = xmlFile.trimmed();
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
+    blockWait(pri_proc,mkdirCmd);
     QString mcpatCmd = "mcpat/mcpat "
                        "-infile %2 "
                        "-print_level 5 "
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
-    noBlockWait(pub_proc,mkdirCmd + ";" + mcpatCmd,eventLoop);
+    noBlockWait(pub_proc,mcpatCmd,eventLoop);
     return !stopFlag;
 }
 
@@ -421,7 +421,7 @@ bool Core::writePtrace(const QString &program)
                              "McPAT_output/%1/3.txt "
                              "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
-    blockWait(pri_proc,writePtraceCmd);
+    blockWait(pub_proc,writePtraceCmd);
     return !stopFlag;
 }
 
@@ -457,7 +457,7 @@ bool Core::drawHeatMap(const QString &program)
                          "%1 "
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
-    blockWait(pri_proc,heatMapCmd);
+    blockWait(pub_proc,heatMapCmd);
     return !stopFlag;
 }
 

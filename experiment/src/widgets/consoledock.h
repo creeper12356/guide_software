@@ -18,11 +18,8 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #pragma once
-
-#include <QDockWidget>
-#include <QProcess>
+#include "inc.h"
 
 class QLineEdit;
 class QPlainTextEdit;
@@ -31,13 +28,11 @@ class QPushButton;
 class ConsoleDock : public QDockWidget
 {
     Q_OBJECT
-
 public:
     explicit ConsoleDock(QWidget *parent = nullptr);
     ~ConsoleDock() override;
 
-protected:
-    void changeEvent(QEvent *e) override;
+    bool connectProcess(QProcess* process, QByteArray *cache);
 
 private:
     void appendInfo(const QString &str);
@@ -46,16 +41,8 @@ private:
     void appendScript(const QString &str);
     void appendScriptResult(const QString &str);
 
-    void executeScript();
-
-    void moveHistory(int direction);
-
-    void retranslateUi();
-
-    QPlainTextEdit *mPlainTextEdit;
-    QLineEdit *mLineEdit;
-    QPushButton *mClearButton;
-    QStringList mHistory;
-    int mHistoryPosition = 0;
-    QProcess* mBash = nullptr;
+    QPlainTextEdit *mPlainTextEdit = nullptr;
+//    QPushButton *mClearButton;
+    QProcess* mProcess = nullptr;
+    QByteArray* mCache = nullptr;
 };

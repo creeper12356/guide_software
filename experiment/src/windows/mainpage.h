@@ -14,7 +14,7 @@ private:
 
     QToolBar* toolBar = nullptr;
 
-    QDockWidget* terminalDock = nullptr;
+    ConsoleDock* consoleDock = nullptr;
     QDockWidget* logDock = nullptr;
 
     ImageDisplay* heatMap = nullptr;
@@ -25,7 +25,7 @@ public:
 public:
     //getters
     Ui::MainPage* getUi(){return ui;}
-    QTextBrowser* getTerminalReflect();
+    ConsoleDock* getConsoleDock();
     ChoiceWidget* getChoiceWidget();
     QTextBrowser* getLogBrowser();
 private:

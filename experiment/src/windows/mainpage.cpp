@@ -3,6 +3,7 @@
 #include "windows/choiceguide.h"
 #include "widgets/choicewidget.h"
 #include "widgets/imagedisplay.h"
+#include "widgets/consoledock.h"
 #include "ui_mainpage.h"
 #include "core.h"
 #include "widgets/consoledock.h"
@@ -38,20 +39,38 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     splitter->setStretchFactor(1,1);
 
     centralLayout->addWidget(splitter);
-    //test
-    ConsoleDock* console  = new ConsoleDock(this);
-    this->addDockWidget(Qt::BottomDockWidgetArea, console);
+
+    QFile stateRestorer("config/state.txt");
+    if(stateRestorer.open(QIODevice::ReadOnly)){
+        this->restoreState(stateRestorer.readAll());
+        stateRestorer.close();
+    }
+    QFile geometryRestorer("config/geometry.txt");
+    if(geometryRestorer.open(QIODevice::ReadOnly)){
+        this->restoreGeometry(geometryRestorer.readAll());
+        geometryRestorer.close();
+    }
 }
 
 MainPage::~MainPage()
 {
     qDebug() << "~MainPage()";
+
+    QFile stateSaver("config/state.txt");
+    stateSaver.open(QIODevice::WriteOnly);
+    stateSaver.write(this->saveState());
+    stateSaver.close();
+    QFile geometrySaver("config/geometry.txt");
+    geometrySaver.open(QIODevice::WriteOnly);
+    geometrySaver.write(this->saveGeometry());
+    geometrySaver.close();
+
     delete ui;
 }
 
-QTextBrowser *MainPage::getTerminalReflect()
+ConsoleDock *MainPage::getConsoleDock()
 {
-    return dynamic_cast<QTextBrowser*> (terminalDock->widget());
+    return consoleDock;
 }
 
 ChoiceWidget *MainPage::getChoiceWidget()
@@ -68,36 +87,66 @@ QTextBrowser *MainPage::getLogBrowser()
 void MainPage::initToolBar()
 {
     toolBar = new QToolBar(this);
+    toolBar->setObjectName("toolBar");
     toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(Qt::TopToolBarArea,toolBar);
-    toolBar->setIconSize(QSize(50,50));
+    toolBar->setIconSize(QSize(40,40));
     toolBar->addAction(ui->action_conf);
     toolBar->addAction(ui->action_clean);
     toolBar->addAction(ui->action_gen);
     toolBar->addAction(ui->action_sim);
     toolBar->addAction(ui->action_temp);
     toolBar->addAction(ui->action_terminate);
+
+    auto font = toolBar->font();
+    font.setPointSize(12);
+    toolBar->setFont(font);
     ui->action_terminate->setDisabled(true);
 }
 
 void MainPage::initDockWidgets()
 {
-    QTextBrowser *terminalReflect = new QTextBrowser(this);
-    terminalReflect->setStyleSheet("QTextBrowser{color:white;background:black}");
-    (terminalDock = new QDockWidget("终端",this))->setWidget(terminalReflect);
-    this->addDockWidget(Qt::BottomDockWidgetArea,terminalDock);
-
+    consoleDock = new ConsoleDock(this);
     QTextBrowser *logBrowser = new QTextBrowser(this);
-//    logBrowser->setStyleSheet("QTextBrowser{color:black;background:white}");
     (logDock = new QDockWidget("日志",this))->setWidget(logBrowser);
-    this->addDockWidget(Qt::BottomDockWidgetArea,logDock);
+    logDock->setObjectName("logDock");
 
-    this->tabifyDockWidget(terminalDock,logDock);
+    addDockWidget(Qt::BottomDockWidgetArea, consoleDock);
+    addDockWidget(Qt::BottomDockWidgetArea, logDock);
+    tabifyDockWidget(consoleDock,logDock);
 
-//    ChoiceWidget *choiceWidget = new ChoiceWidget(this);
+    consoleDock->setVisible(false);
+    logDock->setVisible(false);
 
-//    (choiceDock = new QDockWidget("配置",this))->setWidget(choiceWidget);
-//    this->addDockWidget(Qt::LeftDockWidgetArea,choiceDock);
+    auto toggleConsoleAction = consoleDock->toggleViewAction();
+//    toggleConsoleAction->setIcon(terminalIcon);
+//    toggleConsoleAction->setIconVisibleInMenu(false);
+    auto consoleToggleButton = new QToolButton;
+    consoleToggleButton->setDefaultAction(toggleConsoleAction);
+    consoleToggleButton->setAutoRaise(true);
+    connect(toggleConsoleAction, &QAction::toggled, this, [this] (bool checked) {
+        if (checked) {
+            consoleDock->show();
+            if (!logDock->isFloating() && tabifiedDockWidgets(consoleDock).contains(logDock))
+                logDock->hide();
+            consoleDock->raise();
+        }
+    });
+
+    auto toggleLogAction = logDock->toggleViewAction();
+    auto logToggleButton = new QToolButton;
+    logToggleButton->setDefaultAction(toggleLogAction);
+    logToggleButton->setAutoRaise(true);
+    connect(toggleLogAction, &QAction::toggled, this, [this] (bool checked) {
+        if (checked) {
+            logDock->show();
+            if (!consoleDock->isFloating() && tabifiedDockWidgets(logDock).contains(consoleDock))
+                consoleDock->hide();
+            logDock->raise();
+        }
+    });
+    ui->statusbar->addWidget(consoleToggleButton);
+    ui->statusbar->addWidget(logToggleButton);
 }
 
 void MainPage::closeEvent(QCloseEvent *event)

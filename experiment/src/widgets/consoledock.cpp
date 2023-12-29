@@ -20,10 +20,6 @@
  */
 
 #include "consoledock.h"
-//#include "logginginterface.h"
-//#include "scriptmanager.h"
-//#include "session.h"
-//#include "utils.h"
 
 #include <QCoreApplication>
 #include <QLineEdit>
@@ -60,7 +56,6 @@ void ConsoleOutputWidget::contextMenuEvent(QContextMenuEvent *event)
 ConsoleDock::ConsoleDock(QWidget *parent)
     : QDockWidget(parent)
     , mPlainTextEdit(new ConsoleOutputWidget)
-    , mLineEdit(new QLineEdit)
 {
     setObjectName(QLatin1String("ConsoleDock"));
 
@@ -76,60 +71,44 @@ ConsoleDock::ConsoleDock(QWidget *parent)
     p.setColor(QPalette::Text, Qt::lightGray);
     mPlainTextEdit->setPalette(p);
 
-    mLineEdit->setClearButtonEnabled(true);
-    connect(mLineEdit, &QLineEdit::returnPressed,
-            this, &ConsoleDock::executeScript);
-
-    auto previousShortcut = new QShortcut(Qt::Key_Up, mLineEdit, nullptr, nullptr, Qt::WidgetShortcut);
-    connect(previousShortcut, &QShortcut::activated, [this] { moveHistory(-1); });
-
-    auto nextShortcut = new QShortcut(Qt::Key_Down, mLineEdit, nullptr, nullptr, Qt::WidgetShortcut);
-    connect(nextShortcut, &QShortcut::activated, [this] { moveHistory(1); });
-
-    auto hintShortcut = new QShortcut(Qt::Key_Tab, mLineEdit , nullptr, nullptr, Qt::WidgetShortcut);
-    connect(hintShortcut,&QShortcut::activated,[this] {mBash->write("\t");});
-
-    mClearButton = new QPushButton(tr("Clear Console"));
-    connect(mClearButton, &QPushButton::clicked, mPlainTextEdit, &QPlainTextEdit::clear);
+//    mClearButton = new QPushButton("清空");
+//    connect(mClearButton, &QPushButton::clicked, mPlainTextEdit, &QPlainTextEdit::clear);
 
     auto bottomBar = new QHBoxLayout;
-    bottomBar->addWidget(mLineEdit);
-    bottomBar->addWidget(mClearButton);
+//    bottomBar->addWidget(mClearButton);
 
     layout->addWidget(mPlainTextEdit);
     layout->addLayout(bottomBar);
 
-//    auto& logger = LoggingInterface::instance();
-//    connect(&logger, &LoggingInterface::info, this, &ConsoleDock::appendInfo);
-//    connect(&logger, &LoggingInterface::warning, this, &ConsoleDock::appendWarning);
-//    connect(&logger, &LoggingInterface::error, this, &ConsoleDock::appendError);
-
     setWidget(widget);
-
-    mHistoryPosition = mHistory.size();
-
-    connect(this, &QDockWidget::visibilityChanged, this, [this](bool visible) {
-        if (visible)
-            mLineEdit->setFocus();
-    });
-
-    mBash = new QProcess(this);
-    mBash->setProgram("bash");
-    connect(mBash,&QProcess::readyReadStandardOutput,this,[this](){
-       this->appendScriptResult(QString::fromUtf8(mBash->readAllStandardOutput()));
-    });
-    connect(mBash,&QProcess::readyReadStandardError,this,[this](){
-       this->appendError(QString::fromUtf8(mBash->readAllStandardError()));
-    });
-    mBash->start();
-    mBash->waitForStarted(-1);
-    retranslateUi();
+    setWindowTitle("终端");
 }
 
 ConsoleDock::~ConsoleDock()
 {
-    mBash->kill();
-    mBash->waitForFinished(-1);
+//    mBash->kill();
+//    mBash->waitForFinished(-1);
+}
+
+bool ConsoleDock::connectProcess(QProcess *process, QByteArray* cache)
+{
+    if(mProcess || !process){
+        return false;
+    }
+    this->mProcess = process;
+    this->mCache = cache;
+    connect(mProcess,&QProcess::started,this,[this](){
+        appendScript(mProcess->arguments()[1]);
+    });
+    connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
+        *mCache = mProcess->readAllStandardOutput();
+        this->appendScriptResult(QString::fromUtf8(*mCache));
+    });
+    connect(mProcess,&QProcess::readyReadStandardError,this,[this](){
+        *mCache = mProcess->readAllStandardError();
+        this->appendError(QString::fromUtf8(*mCache));
+    });
+    return true;
 }
 
 void ConsoleDock::appendInfo(const QString &str)
@@ -152,7 +131,9 @@ void ConsoleDock::appendError(const QString &str)
 
 void ConsoleDock::appendScript(const QString &str)
 {
-    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightgreen'>&gt; ") + str.toHtmlEscaped() +
+    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightblue'>") + QDir::currentPath().toHtmlEscaped() +
+                               QLatin1String("</pre>") +
+                               QLatin1String("<pre style='color:lightgreen'>&gt; ") + str.toHtmlEscaped() +
                                QLatin1String("</pre>"));
 }
 
@@ -161,62 +142,3 @@ void ConsoleDock::appendScriptResult(const QString &str)
      mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightgrey'>") + str.toHtmlEscaped() +
                                QLatin1String("</pre>"));
 }
-
-void ConsoleDock::executeScript()
-{
-    const QString script = mLineEdit->text();
-    if (script.isEmpty())
-        return;
-
-    appendScript(script);
-    mBash->write(script.toUtf8() + "\n");
-//    const QJSValue result = ScriptManager::instance().evaluate(script);
-//    if (!result.isError() && !result.isUndefined()) {
-//        auto name = ScriptManager::instance().createTempValue(result);
-//        appendScriptResult(name, result.toString());
-//    }
-
-    mLineEdit->clear();
-
-    mHistory.append(script);
-    mHistoryPosition = mHistory.size();
-
-    // Remember the last few script lines
-//    session::commandHistory = mHistory.mid(mHistory.size() - 10);
-}
-
-void ConsoleDock::moveHistory(int direction)
-{
-    int newPosition = qBound(0, mHistoryPosition + direction, mHistory.size());
-    if (newPosition == mHistoryPosition)
-        return;
-
-    if (newPosition < mHistory.size())
-        mLineEdit->setText(mHistory.at(newPosition));
-    else
-        mLineEdit->clear();
-
-    mHistoryPosition = newPosition;
-}
-
-void ConsoleDock::changeEvent(QEvent *e)
-{
-    QDockWidget::changeEvent(e);
-
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        retranslateUi();
-        break;
-    default:
-        break;
-    }
-}
-
-void ConsoleDock::retranslateUi()
-{
-    setWindowTitle(tr("Console"));
-    mLineEdit->setPlaceholderText(tr("Execute script"));
-    mClearButton->setText(tr("Clear Console"));
-}
-
-#include "moc_consoledock.cpp"

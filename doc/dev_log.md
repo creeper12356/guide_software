@@ -168,6 +168,7 @@
     解决：matplotlib需要通过apt安装，
     ```sudo apt install python-matplotlib```
 * 强行关闭程序出错
+* 命令行显示命令和显示结果可能存在并发的竞争问题
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
 * 注：requirements.txt和py_requirements.txt必须有序，否则会出现前置软件检测问题。

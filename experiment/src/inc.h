@@ -13,12 +13,14 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QToolButton>
 #include <QButtonGroup>
 #include <QToolBar>
 #include <QDockWidget>
 #include <QPixmap>
 #include <QLabel>
 #include <QTextBrowser>
+#include <QPlainTextEdit>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -67,6 +69,7 @@ class PyLibInstaller;
 class ChoiceGuide;
 class ChoiceWidget;
 class ImageDisplay;
+class ConsoleDock;
 
 //用户选择的结构体
 struct Choice{

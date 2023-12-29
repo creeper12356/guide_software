@@ -2,19 +2,7 @@
     "userChoice": {
         "architecture": "X86",
         "programs": [
-            "blackscholes",
-            "bodytrack",
-            "canneal",
-            "dedup",
-            "facesim",
-            "ferret",
-            "fluidanimate",
-            "freqmine",
-            "rtview",
-            "streamcluster",
-            "swaptions",
-            "vips",
-            "x264"
+            "bodytrack"
         ],
         "set": "PARSEC",
         "test": "Simlarge",
