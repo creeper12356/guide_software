@@ -11,5 +11,15 @@ experiment/HeatMap/
 experiment/HotSpot-master
 experiment/utils
 experiment/xml
+experiment/default.desktop
+experiment/guide_software
+experiment/lib/
+experiment/linuxdeploy*
+experiment/plugins/
+experiment/qt.conf
+experiment/translations/
+experiment/AppRun
+experiment/doc/
 phase2/
+
 

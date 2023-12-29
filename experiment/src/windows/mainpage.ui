@@ -37,6 +37,7 @@
      <string>帮助</string>
     </property>
     <addaction name="action_about"/>
+    <addaction name="action_aboutqt"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -192,6 +193,12 @@
    </property>
    <property name="text">
     <string>温度图</string>
+   </property>
+  </action>
+  <action name="action_aboutqt">
+   <property name="text">
+    <string>关于Qt
+</string>
    </property>
   </action>
  </widget>

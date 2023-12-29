@@ -75,7 +75,6 @@ ConsoleDock *MainPage::getConsoleDock()
 
 ChoiceWidget *MainPage::getChoiceWidget()
 {
-//    return dynamic_cast<ChoiceWidget*> (choiceDock->widget());
     return choiceWidget;
 }
 
@@ -99,7 +98,6 @@ void MainPage::initToolBar()
     toolBar->addAction(ui->action_terminate);
 
     auto font = toolBar->font();
-    font.setPointSize(12);
     toolBar->setFont(font);
     ui->action_terminate->setDisabled(true);
 }
@@ -182,17 +180,17 @@ void MainPage::on_action_exit_triggered()
 
 void MainPage::scriptCleanedSlot()
 {
-    ui->statusbar->showMessage("清理脚本完成",3 * SECOND);
+    refreshLog("清理脚本完成。");
 }
 
 void MainPage::scriptGeneratedSlot()
 {
-    ui->statusbar->showMessage("脚本已成功生成",3 * SECOND);
+    refreshLog("脚本已成功生成。");
 }
 
 void MainPage::performanceSimulationFinishedSlot()
 {
-    ui->statusbar->showMessage("性能仿真结束",3 * SECOND);
+    refreshLog("性能仿真结束。");
 }
 
 void MainPage::longTaskStartedSlot()
@@ -244,4 +242,9 @@ void MainPage::on_action_show_heatmap_triggered()
 {
     //TODO: implement this
 //    heatMapDock->setVisible(!heatMapDock->isVisible());
+}
+
+void MainPage::on_action_aboutqt_triggered()
+{
+    QMessageBox::aboutQt(this,"关于Qt");
 }

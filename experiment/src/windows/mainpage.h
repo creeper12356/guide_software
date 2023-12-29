@@ -38,6 +38,8 @@ private slots:
 
     void on_action_show_heatmap_triggered();
 
+    void on_action_aboutqt_triggered();
+
 public slots:
     void scriptCleanedSlot();
     void scriptGeneratedSlot();
