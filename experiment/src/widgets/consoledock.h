@@ -32,7 +32,7 @@ public:
     explicit ConsoleDock(QWidget *parent = nullptr);
     ~ConsoleDock() override;
 
-    bool connectProcess(QProcess* process, QByteArray *cache);
+    bool connectProcess(TaskProcess *process, QByteArray *cache);
 
 private:
     void appendInfo(const QString &str);
@@ -43,6 +43,6 @@ private:
 
     QPlainTextEdit *mPlainTextEdit = nullptr;
 //    QPushButton *mClearButton;
-    QProcess* mProcess = nullptr;
+    TaskProcess* mProcess = nullptr;
     QByteArray* mCache = nullptr;
 };

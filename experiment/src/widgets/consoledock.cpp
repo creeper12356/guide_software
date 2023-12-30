@@ -20,7 +20,7 @@
  */
 
 #include "consoledock.h"
-
+#include "taskmanager.h"
 #include <QCoreApplication>
 #include <QLineEdit>
 #include <QMenu>
@@ -90,15 +90,17 @@ ConsoleDock::~ConsoleDock()
 //    mBash->waitForFinished(-1);
 }
 
-bool ConsoleDock::connectProcess(QProcess *process, QByteArray* cache)
+bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
 {
     if(mProcess || !process){
         return false;
     }
     this->mProcess = process;
     this->mCache = cache;
-    connect(mProcess,&QProcess::started,this,[this](){
-        appendScript(mProcess->arguments()[1]);
+    connect(mProcess,&TaskProcess::started,this,[this](){
+        if(mProcess->isEnabled()){
+            appendScript(mProcess->arguments()[1]);
+        }
     });
     connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
         *mCache = mProcess->readAllStandardOutput();

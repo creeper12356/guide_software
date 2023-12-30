@@ -90,6 +90,12 @@ void MainPage::initToolBar()
     toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(Qt::TopToolBarArea,toolBar);
     toolBar->setIconSize(QSize(40,40));
+    connect(ui->action_sim,&QAction::triggered,[this](){
+       ui->action_sim->setEnabled(false);
+    });
+    connect(ui->action_temp,&QAction::triggered,[this](){
+        ui->action_temp->setEnabled(false);
+    });
     toolBar->addAction(ui->action_conf);
     toolBar->addAction(ui->action_clean);
     toolBar->addAction(ui->action_gen);
@@ -248,3 +254,7 @@ void MainPage::on_action_aboutqt_triggered()
 {
     QMessageBox::aboutQt(this,"关于Qt");
 }
+
+
+
+

@@ -24,7 +24,8 @@ SOURCES += \
     widgets/imagedisplay.cpp \
     core.cpp \
     main.cpp \
-    widgets/consoledock.cpp
+    widgets/consoledock.cpp \
+    taskmanager.cpp
 
 HEADERS += \
     windows/aboutdialog.h \
@@ -35,7 +36,8 @@ HEADERS += \
     widgets/imagedisplay.h \
     core.h \
     inc.h \
-    widgets/consoledock.h
+    widgets/consoledock.h \
+    taskmanager.h
 
 FORMS += \
     windows/aboutdialog.ui \
