@@ -20,6 +20,8 @@ experiment/qt.conf
 experiment/translations/
 experiment/AppRun
 experiment/doc/
+experiment/config/state.txt
+experiment/config/geometry.txt
 phase2/
 
 
