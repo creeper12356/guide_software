@@ -349,7 +349,7 @@ void Core::terminate()
     pub_proc->waitForFinished(-1);
     qDebug() << "Finished!";
     pri_proc->kill();
-    pub_proc->waitForFinished(-1);
+    pri_proc->waitForFinished(-1);
 }
 
 bool Core::splitGem5Output(const QString &program)
