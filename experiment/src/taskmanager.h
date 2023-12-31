@@ -10,6 +10,17 @@ public:
     explicit TaskProcess(QObject* parent = 0);
     void setEnabled(bool flag);
     bool isEnabled() const;
+    void start(OpenMode mode = ReadWrite);
+private:
+    bool mEnabled = true;
+};
+class TaskEventLoop: public QEventLoop
+{
+    Q_OBJECT
+public :
+    explicit TaskEventLoop(QObject* parent = 0);
+    void setEnabled(bool flag);
+    int exec(ProcessEventsFlags flags=AllEvents);
 private:
     bool mEnabled = true;
 };

@@ -7,7 +7,7 @@ class Core:public QObject
     Q_OBJECT
 private:
     QApplication* app = nullptr;
-    QEventLoop* eventLoop = nullptr;
+    TaskEventLoop* eventLoop = nullptr;
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
     //pri_proc为私有进程，不打印输出，只更新cache

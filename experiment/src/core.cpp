@@ -16,7 +16,7 @@ Core::Core(QApplication* a):
     app(a)
 {
     //初始化进程和事件循环
-    eventLoop = new QEventLoop(this);
+    eventLoop = new TaskEventLoop(this);
     pub_proc = new TaskProcess(this);
     pub_proc->setProgram("bash");
     pri_proc = new TaskProcess(this);
@@ -81,7 +81,7 @@ void Core::initConnections()
     //事件循环相关
     connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     connect(pwdDialog,&QInputDialog::finished,
-            eventLoop,&QEventLoop::quit);
+            eventLoop,&TaskEventLoop::quit);
 
     //配置相关
     connect(mainPage->getUi()->action_conf,&QAction::triggered,
@@ -274,6 +274,7 @@ void Core::simulatePerformance()
     QDir::setCurrent("..");
     pub_proc->setEnabled(true);
     pri_proc->setEnabled(true);
+    eventLoop->setEnabled(true);
 
     emit simulatePerformanceFinished();
     emit longTaskFinished();
@@ -335,6 +336,7 @@ void Core::genHeatMap()
 
     pub_proc->setEnabled(true);
     pri_proc->setEnabled(true);
+    eventLoop->setEnabled(true);
     emit longTaskFinished();
 }
 
@@ -343,11 +345,29 @@ void Core::terminate()
     qDebug() << "kill.";
     pub_proc->setEnabled(false);
     pri_proc->setEnabled(false);
-//    pub_proc->kill();
-//    kill(pub_proc->pid(),SIGINT);
-    pub_proc->terminate();
-    pub_proc->waitForFinished(-1);
-    qDebug() << "Finished!";
+    eventLoop->setEnabled(false);
+
+//ref: https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
+    //回收bash的子进程
+    QProcess get_childs;
+    QStringList get_childs_cmd;
+    auto pid = pub_proc->pid();
+    if(pid){
+        get_childs_cmd << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
+        get_childs.start("ps", get_childs_cmd);
+        get_childs.waitForFinished(5000);
+        QString childIds = get_childs.readAllStandardOutput();
+        qDebug() << "childs: " << childIds;
+        childIds.replace('\n', ' ');
+        if(!childIds.trimmed().isEmpty()){
+            QProcess::execute("kill " + childIds);
+        }
+        else{
+            qDebug() << "no child to kill";
+        }
+        pub_proc->kill();
+        pub_proc->waitForFinished(-1);
+    }
     pri_proc->kill();
     pri_proc->waitForFinished(-1);
 }
