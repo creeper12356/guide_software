@@ -170,8 +170,12 @@
     解决：matplotlib需要通过apt安装，
     ```sudo apt install python-matplotlib```
 * 强行关闭程序出错
-* 命令行显示命令和显示结果可能存在并发的竞争问题
-* bash父进程退出时，子进程不退出
+* 命令行显示命令和显示结果可能存在并发的竞争问题的
+* bash父进程退出时，子进程不退出. 
+    可能的解决方案：
+    * 手动回收bash子进程 ，见 https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
+    * 去除QProcess的bash层 ， 即将```bash -c program arguments``` 改为 ```program arguments```
+    * 弃用QProcess框架，手动进行fork和execve
 2023.11.19
 * 完成DependencyInstaller的所有逻辑部分，增加子类PyLibInstaller，使用pip3检测和安装Python库。
 * 注：requirements.txt和py_requirements.txt必须有序，否则会出现前置软件检测问题。

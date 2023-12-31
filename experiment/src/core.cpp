@@ -9,6 +9,8 @@
 #include "ui_dependencyinstaller.h"
 #include "ui_choiceguide.h"
 
+#include <signal.h>
+#include <unistd.h>
 Core::Core(QApplication* a):
     QObject(nullptr),
     app(a)
@@ -341,7 +343,9 @@ void Core::terminate()
     qDebug() << "kill.";
     pub_proc->setEnabled(false);
     pri_proc->setEnabled(false);
-    pub_proc->kill();
+//    pub_proc->kill();
+//    kill(pub_proc->pid(),SIGINT);
+    pub_proc->terminate();
     pub_proc->waitForFinished(-1);
     qDebug() << "Finished!";
     pri_proc->kill();
