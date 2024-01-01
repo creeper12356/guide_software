@@ -116,9 +116,6 @@ void Core::initConnections()
     connect(mainPage->getUi()->action_terminate,
             &QAction::triggered,this,&Core::terminate);
 
-    connect(this,&Core::log,mainPage,&MainPage::refreshLog);
-    connect(this,&Core::logProgram,mainPage,&MainPage::refreshLogProgram);
-
     connect(this,&Core::longTaskStarted,mainPage,&MainPage::longTaskStartedSlot);
     connect(this,&Core::longTaskFinished,mainPage,&MainPage::longTaskFinishedSlot);
 }
@@ -189,6 +186,20 @@ void Core::reportError(QString errMsg)
     app->quit();
 }
 
+void Core::logConsole(const QString &info)
+{
+    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
+        mainPage->logConsole(info);
+    }
+}
+
+void Core::logConsoleProgram(const QString &program, const QString &info)
+{
+    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
+        mainPage->logConsoleProgram(program , info);
+    }
+}
+
 void Core::cleanScript()
 {
     //进入脚本文件夹
@@ -252,7 +263,7 @@ void Core::simulatePerformance()
     for(auto program: _userChoice->programs){
         //文件名中测试集均为小写
         if(pub_proc->isEnabled()){
-            emit logProgram(program,"开始性能仿真...");
+            logConsoleProgram(program,"开始性能仿真...");
         }
         simulateCmd = simulateCmdFormat.arg(
                     program,
@@ -267,7 +278,7 @@ void Core::simulatePerformance()
         //将输出文件拷贝到对应目标路径
         blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
         if(pub_proc->isEnabled()){
-            emit logProgram(program,"[SUCCESS]性能仿真完成.");
+            logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }
 
@@ -283,8 +294,8 @@ void Core::simulatePerformance()
 void Core::genHeatMap()
 {
     emit longTaskStarted();
-    emit log("开始生成温度图...");
-    emit log("检查性能仿真输出...");
+    logConsole("开始生成温度图...");
+    logConsole("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
         noBlockWait(pub_proc,"rm McPAT_input/* -rf",eventLoop);
@@ -296,7 +307,7 @@ void Core::genHeatMap()
     //仿真结果的所有文件夹列表
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     if(resultPrograms.empty()){
-        emit log("[FAIL]找不到可用的程序，请检查目录gem5_output。");
+        logConsole("[FAIL]找不到可用的程序，请检查目录gem5_output。");
     }
     //检查仿真是否成功
     //may buggy here
@@ -304,7 +315,7 @@ void Core::genHeatMap()
 //        if(QDir(program).entryList(QDir::Files).count() != 5){
 ////            backend buggy here.
 ////            文件数不为５，仿真失败
-//            emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
+//            logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
 //            resultPrograms.removeOne(program);
 //        }
 //    }
@@ -314,22 +325,22 @@ void Core::genHeatMap()
 
     //处理性能数据
     for(auto& program: resultPrograms){
-        emit log(program + ": 分割性能仿真输出...");
+        logConsole(program + ": 分割性能仿真输出...");
         if(!splitGem5Output(program)){
-            emit logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
+            logConsoleProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
             continue;
         }
-        emit logProgram(program,"运行McPAT模块...");
+        logConsoleProgram(program,"运行McPAT模块...");
         runMcpat(program);
-        emit log("完成!");
-        emit logProgram(program,"生成ptrace文件...");
+        logConsole("完成!");
+        logConsoleProgram(program,"生成ptrace文件...");
         writePtrace(program);
-        emit logProgram(program,"运行Hotspot模块...");
+        logConsoleProgram(program,"运行Hotspot模块...");
         runHotspot(program);
-        emit log("完成!");
-        emit logProgram(program,"生成温度图...");
+        logConsole("完成!");
+        logConsoleProgram(program,"生成温度图...");
         drawHeatMap(program);
-        emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+        logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
     //删除所有中间文件夹
     blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");

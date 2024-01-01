@@ -78,6 +78,8 @@ private:
     void drawHeatMap(const QString& program);
     //TODO : 报错
     void reportError(QString errMsg);
+    void logConsole(const QString& info);
+    void logConsoleProgram(const QString& program, const QString& info);
 signals:
     //任务完成的信号
     //清理脚本成功的信号
@@ -92,8 +94,8 @@ signals:
     void longTaskFinished();
 
     //日志信号
-    void logProgram(QString program,QString info);
-    void log(QString info);
+//    void logProgram(QString program,QString info);
+//    void log(QString info);
 };
 
 #endif // CORE_H

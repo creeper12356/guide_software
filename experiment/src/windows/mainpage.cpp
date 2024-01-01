@@ -186,17 +186,17 @@ void MainPage::on_action_exit_triggered()
 
 void MainPage::scriptCleanedSlot()
 {
-    refreshLog("清理脚本完成。");
+    logConsole("清理脚本完成。");
 }
 
 void MainPage::scriptGeneratedSlot()
 {
-    refreshLog("脚本已成功生成。");
+    logConsole("脚本已成功生成。");
 }
 
 void MainPage::performanceSimulationFinishedSlot()
 {
-    refreshLog("性能仿真结束。");
+    logConsole("性能仿真结束。");
 }
 
 void MainPage::longTaskStartedSlot()
@@ -217,7 +217,7 @@ void MainPage::longTaskFinishedSlot()
     ui->action_terminate->setDisabled(true);
 }
 
-void MainPage::refreshLog(QString info)
+void MainPage::logConsole(const QString &info)
 {
     if(info.isEmpty()){
         //若信息为空则清空日志
@@ -227,7 +227,7 @@ void MainPage::refreshLog(QString info)
     getLogBrowser()->append(info);
 }
 
-void MainPage::refreshLogProgram(QString program, QString info)
+void MainPage::logConsoleProgram(const QString& program, const QString& info)
 {
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);

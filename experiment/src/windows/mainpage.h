@@ -46,8 +46,10 @@ public slots:
     void longTaskStartedSlot();
     void longTaskFinishedSlot();
 
-    void refreshLog(QString info);
-    void refreshLogProgram(QString program,QString info);
+public:
+    void logConsole(const QString& info);
+    void logConsoleProgram(const QString &program, const QString &info);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:
