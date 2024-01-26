@@ -2,7 +2,6 @@
 #include "windows/mainpage.h"
 #include "windows/choiceguide.h"
 #include "windows/dependencyinstaller.h"
-#include "windows/passworddialog.h"
 #include "widgets/choicewidget.h"
 #include "widgets/consoledock.h"
 #include "taskmanager.h"

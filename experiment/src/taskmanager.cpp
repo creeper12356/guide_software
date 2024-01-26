@@ -1,6 +1,5 @@
 #include "taskmanager.h"
-#include <unistd.h>
-#include <signal.h>
+
 TaskManager::TaskManager(QObject *parent) : QObject(parent)
 {
 }
