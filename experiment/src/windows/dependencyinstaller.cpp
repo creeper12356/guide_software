@@ -1,7 +1,7 @@
 #include "windows/dependencyinstaller.h"
 #include "core.h"
 #include "ui_dependencyinstaller.h"
-DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *&loop, QInputDialog *&pd, QWidget *parent)
+DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *loop, QInputDialog *&pd, QWidget *parent)
    :QDialog(parent),
     core(c),
     eventLoop(loop),
@@ -152,7 +152,7 @@ void DependencyInstaller::setAccepted()
 {
     isAccepted = true;
 }
-AptInstaller::AptInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
+AptInstaller::AptInstaller(Core *core, QEventLoop *eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
     :DependencyInstaller(core,eventLoop,pwdDialog,parent)
 {
     initCmds();
@@ -179,7 +179,7 @@ void AptInstaller::initCmds()
             "2> /dev/null";
 }
 
-PyLibInstaller::PyLibInstaller(Core *core, QEventLoop *&eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
+PyLibInstaller::PyLibInstaller(Core *core, QEventLoop *eventLoop, QInputDialog *&pwdDialog, QWidget *parent)
     :DependencyInstaller(core,eventLoop,pwdDialog,parent)
 {
     initCmds();

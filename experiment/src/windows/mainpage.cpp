@@ -90,6 +90,12 @@ void MainPage::initToolBar()
     toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(Qt::TopToolBarArea,toolBar);
     toolBar->setIconSize(QSize(40,40));
+    connect(ui->action_sim,&QAction::triggered,[this](){
+       ui->action_sim->setEnabled(false);
+    });
+    connect(ui->action_temp,&QAction::triggered,[this](){
+        ui->action_temp->setEnabled(false);
+    });
     toolBar->addAction(ui->action_conf);
     toolBar->addAction(ui->action_clean);
     toolBar->addAction(ui->action_gen);
@@ -180,17 +186,17 @@ void MainPage::on_action_exit_triggered()
 
 void MainPage::scriptCleanedSlot()
 {
-    refreshLog("清理脚本完成。");
+    logConsole("清理脚本完成。");
 }
 
 void MainPage::scriptGeneratedSlot()
 {
-    refreshLog("脚本已成功生成。");
+    logConsole("脚本已成功生成。");
 }
 
 void MainPage::performanceSimulationFinishedSlot()
 {
-    refreshLog("性能仿真结束。");
+    logConsole("性能仿真结束。");
 }
 
 void MainPage::longTaskStartedSlot()
@@ -211,7 +217,7 @@ void MainPage::longTaskFinishedSlot()
     ui->action_terminate->setDisabled(true);
 }
 
-void MainPage::refreshLog(QString info)
+void MainPage::logConsole(const QString &info)
 {
     if(info.isEmpty()){
         //若信息为空则清空日志
@@ -221,7 +227,7 @@ void MainPage::refreshLog(QString info)
     getLogBrowser()->append(info);
 }
 
-void MainPage::refreshLogProgram(QString program, QString info)
+void MainPage::logConsoleProgram(const QString& program, const QString& info)
 {
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);
@@ -248,3 +254,7 @@ void MainPage::on_action_aboutqt_triggered()
 {
     QMessageBox::aboutQt(this,"关于Qt");
 }
+
+
+
+

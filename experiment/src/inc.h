@@ -70,7 +70,8 @@ class ChoiceGuide;
 class ChoiceWidget;
 class ImageDisplay;
 class ConsoleDock;
-
+class TaskProcess;
+class TaskEventLoop;
 //用户选择的结构体
 struct Choice{
     QString architecture = "";

@@ -4,20 +4,22 @@
 #include "windows/dependencyinstaller.h"
 #include "widgets/choicewidget.h"
 #include "widgets/consoledock.h"
-
+#include "taskmanager.h"
 #include "ui_mainpage.h"
 #include "ui_dependencyinstaller.h"
 #include "ui_choiceguide.h"
 
+#include <signal.h>
+#include <unistd.h>
 Core::Core(QApplication* a):
     QObject(nullptr),
     app(a)
 {
     //初始化进程和事件循环
-    eventLoop = new QEventLoop(this);
-    pub_proc = new QProcess(this);
+    eventLoop = new TaskEventLoop(this);
+    pub_proc = new TaskProcess(this);
     pub_proc->setProgram("bash");
-    pri_proc = new QProcess(this);
+    pri_proc = new TaskProcess(this);
     pri_proc->setProgram("bash");
 
     _userChoice = new Choice;
@@ -79,7 +81,7 @@ void Core::initConnections()
     //事件循环相关
     connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
     connect(pwdDialog,&QInputDialog::finished,
-            eventLoop,&QEventLoop::quit);
+            eventLoop,&TaskEventLoop::quit);
 
     //配置相关
     connect(mainPage->getUi()->action_conf,&QAction::triggered,
@@ -113,9 +115,6 @@ void Core::initConnections()
     });
     connect(mainPage->getUi()->action_terminate,
             &QAction::triggered,this,&Core::terminate);
-
-    connect(this,&Core::log,mainPage,&MainPage::refreshLog);
-    connect(this,&Core::logProgram,mainPage,&MainPage::refreshLogProgram);
 
     connect(this,&Core::longTaskStarted,mainPage,&MainPage::longTaskStartedSlot);
     connect(this,&Core::longTaskFinished,mainPage,&MainPage::longTaskFinishedSlot);
@@ -187,6 +186,20 @@ void Core::reportError(QString errMsg)
     app->quit();
 }
 
+void Core::logConsole(const QString &info)
+{
+    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
+        mainPage->logConsole(info);
+    }
+}
+
+void Core::logConsoleProgram(const QString &program, const QString &info)
+{
+    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
+        mainPage->logConsoleProgram(program , info);
+    }
+}
+
 void Core::cleanScript()
 {
     //进入脚本文件夹
@@ -247,36 +260,33 @@ void Core::simulatePerformance()
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
     QString simulateCmd;
-    try{
-        for(auto program: _userChoice->programs){
-            //文件名中测试集均为小写
-            emit logProgram(program,"开始性能仿真...");
-            simulateCmd = simulateCmdFormat.arg(
-                        program,
-                        QString::number(_userChoice->threadNum),
-                        _userChoice->test.toLower()
-                        );
-            qDebug() << simulateCmd;
-            //运行仿真，耗时较长
-            noBlockWait(pub_proc,
-                        simulateCmd,
-                        eventLoop);
-            if(stopFlag){
-                throw UserAbort;
-            }
-            //将输出文件拷贝到对应目标路径
-            blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
-            emit logProgram(program,"[SUCCESS]性能仿真完成.");
+    for(auto program: _userChoice->programs){
+        //文件名中测试集均为小写
+        if(pub_proc->isEnabled()){
+            logConsoleProgram(program,"开始性能仿真...");
         }
-    }
-    catch(Exception e){
-        //abort
-        emit log("终止。");
-        QDir::setCurrent("..");
-        return ;
+        simulateCmd = simulateCmdFormat.arg(
+                    program,
+                    QString::number(_userChoice->threadNum),
+                    _userChoice->test.toLower()
+                    );
+//      qDebug() << simulateCmd;
+        //运行仿真，耗时较长
+        noBlockWait(pub_proc,
+                    simulateCmd,
+                    eventLoop);
+        //将输出文件拷贝到对应目标路径
+        blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
+        if(pub_proc->isEnabled()){
+            logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
+        }
     }
 
     QDir::setCurrent("..");
+    pub_proc->setEnabled(true);
+    pri_proc->setEnabled(true);
+    eventLoop->setEnabled(true);
+
     emit simulatePerformanceFinished();
     emit longTaskFinished();
 }
@@ -284,9 +294,8 @@ void Core::simulatePerformance()
 void Core::genHeatMap()
 {
     emit longTaskStarted();
-    stopFlag = false;
-    emit log("开始生成温度图...");
-    emit log("检查性能仿真输出...");
+    logConsole("开始生成温度图...");
+    logConsole("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
         noBlockWait(pub_proc,"rm McPAT_input/* -rf",eventLoop);
@@ -298,14 +307,15 @@ void Core::genHeatMap()
     //仿真结果的所有文件夹列表
     QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     if(resultPrograms.empty()){
-        emit log("[FAIL]找不到可用的程序，请检查目录gem5_output。");
+        logConsole("[FAIL]找不到可用的程序，请检查目录gem5_output。");
     }
     //检查仿真是否成功
+    //may buggy here
 //    for(auto& program: resultPrograms){
 //        if(QDir(program).entryList(QDir::Files).count() != 5){
 ////            backend buggy here.
 ////            文件数不为５，仿真失败
-//            emit logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
+//            logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
 //            resultPrograms.removeOne(program);
 //        }
 //    }
@@ -313,49 +323,67 @@ void Core::genHeatMap()
     //准备温度图文件夹
     blockWait(pri_proc,"mkdir HeatMap ; rm HeatMap/* -rf");
 
-
-    try{
-        //处理性能数据
-        for(auto& program: resultPrograms){
-            emit log(program + ": 分割性能仿真输出...");
-            if(!splitGem5Output(program)){
-                emit logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
-                continue;
-            }
-            emit logProgram(program,"运行McPAT模块...");
-            if(!runMcpat(program)){
-                throw UserAbort;
-            }
-            emit log("完成!");
-            emit logProgram(program,"生成ptrace文件...");
-            writePtrace(program);
-            emit logProgram(program,"运行Hotspot模块...");
-            if(!runHotspot(program)){
-                throw UserAbort;
-            }
-            emit log("完成!");
-            emit logProgram(program,"生成温度图...");
-            drawHeatMap(program);
-            emit logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+    //处理性能数据
+    for(auto& program: resultPrograms){
+        logConsole(program + ": 分割性能仿真输出...");
+        if(!splitGem5Output(program)){
+            logConsoleProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
+            continue;
         }
-        //删除所有中间文件夹
-        blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
-        stopFlag = true;
-        emit longTaskFinished();
+        logConsoleProgram(program,"运行McPAT模块...");
+        runMcpat(program);
+        logConsole("完成!");
+        logConsoleProgram(program,"生成ptrace文件...");
+        writePtrace(program);
+        logConsoleProgram(program,"运行Hotspot模块...");
+        runHotspot(program);
+        logConsole("完成!");
+        logConsoleProgram(program,"生成温度图...");
+        drawHeatMap(program);
+        logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
-    catch(Exception e){
-        emit log("终止。");
-        blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
-    }
+
+    pub_proc->setEnabled(true);
+    pri_proc->setEnabled(true);
+    eventLoop->setEnabled(true);
+
+    //后处理
+    //删除所有中间文件夹
+    blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
+    emit longTaskFinished();
 }
 
 void Core::terminate()
 {
-    qDebug() << "kill.";
-    stopFlag = true;
-    pub_proc->kill();
+    logConsole("终止。");
+    pub_proc->setEnabled(false);
+    pri_proc->setEnabled(false);
+    eventLoop->setEnabled(false);
+
+//ref: https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
+    //回收bash的子进程
+    QProcess get_childs;
+    QStringList get_childs_cmd;
+    auto pid = pub_proc->pid();
+    if(pid){
+        //pid != 0 表示当前有进程正在运行
+        get_childs_cmd << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
+        get_childs.start("ps", get_childs_cmd);
+        get_childs.waitForFinished(5000);
+        QString childIds = get_childs.readAllStandardOutput();
+        qDebug() << "childs: " << childIds;
+        childIds.replace('\n', ' ');
+        if(!childIds.trimmed().isEmpty()){
+            QProcess::execute("kill " + childIds);
+        }
+        else{
+            qDebug() << "no child to kill";
+        }
+        pub_proc->kill();
+        pub_proc->waitForFinished(-1);
+    }
     pri_proc->kill();
-    emit longTaskFinished();
+    pri_proc->waitForFinished(-1);
 }
 
 bool Core::splitGem5Output(const QString &program)
@@ -384,10 +412,9 @@ bool Core::splitGem5Output(const QString &program)
         //TODO: 删除所在文件夹
         return false;
     }
-    return !stopFlag;
 }
 
-bool Core::runMcpat(const QString &program)
+void Core::runMcpat(const QString &program)
 {
     QProcess pr(this);
     pr.setProgram("bash");
@@ -407,10 +434,9 @@ bool Core::runMcpat(const QString &program)
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
     noBlockWait(pub_proc,mcpatCmd,eventLoop);
-    return !stopFlag;
 }
 
-bool Core::writePtrace(const QString &program)
+void Core::writePtrace(const QString &program)
 {
     //准备输出文件夹
     QString mkdirCmd = "mkdir HotSpot_input";
@@ -422,10 +448,9 @@ bool Core::writePtrace(const QString &program)
                              "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
     blockWait(pub_proc,writePtraceCmd);
-    return !stopFlag;
 }
 
-bool Core::runHotspot(const QString &program)
+void Core::runHotspot(const QString &program)
 {
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
@@ -443,10 +468,9 @@ bool Core::runHotspot(const QString &program)
     hotspotCmd = hotspotCmd.arg(program);
     noBlockWait(pub_proc,hotspotCmd,eventLoop);
     QDir::setCurrent("..");
-    return !stopFlag;
 }
 
-bool Core::drawHeatMap(const QString &program)
+void Core::drawHeatMap(const QString &program)
 {
     //TODO: 检查输出文件夹./HeatMap
 
@@ -458,7 +482,6 @@ bool Core::drawHeatMap(const QString &program)
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
     blockWait(pub_proc,heatMapCmd);
-    return !stopFlag;
 }
 
 void Core::readConfig()

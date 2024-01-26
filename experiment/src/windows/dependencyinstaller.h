@@ -19,7 +19,7 @@ protected:
 private:
     Core* core = nullptr;
     //指向Core的eventLoop成员，用于处理GUI事件，防止GUI冻结
-    QEventLoop*& eventLoop;
+    QEventLoop* eventLoop;
     //密码输入对话框
     QInputDialog*& pwdDialog;
     //运行bash的进程
@@ -30,7 +30,7 @@ private:
     bool isAccepted = false;
 
 public:
-    DependencyInstaller(Core* core,QEventLoop*& eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
+    DependencyInstaller(Core* core,QEventLoop* eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
     //getters
     Ui::DependencyInstaller* getUi(){return ui;}
@@ -65,7 +65,7 @@ class AptInstaller: public DependencyInstaller
 {
 public:
     AptInstaller(Core* core,
-                 QEventLoop*& eventLoop,
+                 QEventLoop* eventLoop,
                  QInputDialog*& pwdDialog,
                  QWidget* parent = nullptr);
 protected:
@@ -75,7 +75,7 @@ protected:
 class PyLibInstaller: public DependencyInstaller{
 public:
     PyLibInstaller(Core* core,
-                   QEventLoop*& eventLoop,
+                   QEventLoop* eventLoop,
                    QInputDialog*& pwdDialog,
                    QWidget *parent = nullptr);
 protected:

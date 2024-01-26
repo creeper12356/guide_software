@@ -7,12 +7,12 @@ class Core:public QObject
     Q_OBJECT
 private:
     QApplication* app = nullptr;
-    QEventLoop* eventLoop = nullptr;
+    TaskEventLoop* eventLoop = nullptr;
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
     //pri_proc为私有进程，不打印输出，只更新cache
-    QProcess* pub_proc = nullptr;
-    QProcess* pri_proc = nullptr;
+    TaskProcess* pub_proc = nullptr;
+    TaskProcess* pri_proc = nullptr;
     //缓冲区,记录上一次readAll操作读到的进程输出
     QByteArray cache;
 
@@ -26,8 +26,6 @@ private:
 
     //用户的配置选择
     Choice* _userChoice = nullptr;
-    //标记耗时任务是否停止
-    bool stopFlag = true;
 
 public:
     Core(QApplication* app);
@@ -71,15 +69,17 @@ private:
     //处理gem5输出的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
     //运行mcpat模块，处理program对应的xml文件
-    bool runMcpat(const QString &program);
+    void runMcpat(const QString &program);
     //将功耗数据转换为ptrace文件
-    bool writePtrace(const QString& program);
+    void writePtrace(const QString& program);
     //运行hotSpot模块,生成grid.steady文件
-    bool runHotspot(const QString& program);
+    void runHotspot(const QString& program);
     //根据steady文件画温度图
-    bool drawHeatMap(const QString& program);
+    void drawHeatMap(const QString& program);
     //TODO : 报错
     void reportError(QString errMsg);
+    void logConsole(const QString& info);
+    void logConsoleProgram(const QString& program, const QString& info);
 signals:
     //任务完成的信号
     //清理脚本成功的信号
@@ -94,8 +94,8 @@ signals:
     void longTaskFinished();
 
     //日志信号
-    void logProgram(QString program,QString info);
-    void log(QString info);
+//    void logProgram(QString program,QString info);
+//    void log(QString info);
 };
 
 #endif // CORE_H

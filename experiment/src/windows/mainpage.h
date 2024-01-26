@@ -35,9 +35,7 @@ private slots:
     void on_action_about_triggered();
     void on_action_exit_triggered();
     void on_action_maximize_triggered();
-
     void on_action_show_heatmap_triggered();
-
     void on_action_aboutqt_triggered();
 
 public slots:
@@ -48,8 +46,10 @@ public slots:
     void longTaskStartedSlot();
     void longTaskFinishedSlot();
 
-    void refreshLog(QString info);
-    void refreshLogProgram(QString program,QString info);
+public:
+    void logConsole(const QString& info);
+    void logConsoleProgram(const QString &program, const QString &info);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:
