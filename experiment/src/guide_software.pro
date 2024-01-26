@@ -25,7 +25,8 @@ SOURCES += \
     core.cpp \
     main.cpp \
     widgets/consoledock.cpp \
-    taskmanager.cpp
+    taskmanager.cpp \
+    windows/passworddialog.cpp
 
 HEADERS += \
     windows/aboutdialog.h \
@@ -37,7 +38,8 @@ HEADERS += \
     core.h \
     inc.h \
     widgets/consoledock.h \
-    taskmanager.h
+    taskmanager.h \
+    windows/passworddialog.h
 
 FORMS += \
     windows/aboutdialog.ui \

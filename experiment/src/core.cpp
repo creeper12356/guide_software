@@ -2,6 +2,7 @@
 #include "windows/mainpage.h"
 #include "windows/choiceguide.h"
 #include "windows/dependencyinstaller.h"
+#include "windows/passworddialog.h"
 #include "widgets/choicewidget.h"
 #include "widgets/consoledock.h"
 #include "taskmanager.h"
@@ -13,35 +14,38 @@
 #include <unistd.h>
 Core::Core(QApplication* a):
     QObject(nullptr),
-    app(a)
+    mApp(a)
 {
     //初始化进程和事件循环
-    eventLoop = new TaskEventLoop(this);
-    pub_proc = new TaskProcess(this);
-    pub_proc->setProgram("bash");
-    pri_proc = new TaskProcess(this);
-    pri_proc->setProgram("bash");
+    mEventLoop = new TaskEventLoop(this);
+    mPubProc = new TaskProcess(this);
+    mPubProc->setProgram("bash");
+    mPriProc = new TaskProcess(this);
+    mPriProc->setProgram("bash");
 
-    _userChoice = new Choice;
+    mUserChoice = new Choice;
     //读取文件配置
-    readConfig();
+    if(!readConfig("config/config.json")){
+        qWarning("读取配置文件失败。");
+    }
     //初始化界面
-    initPwdDialog();
-    mainPage = new MainPage(this);
-    mainPage->getChoiceWidget()->refreshUserChoice(_userChoice);
-    installer = new AptInstaller(this,eventLoop,pwdDialog);
-    py_installer = new PyLibInstaller(this,eventLoop,pwdDialog);
-    guide = new ChoiceGuide(this);
+    mMainPage = new MainPage(this);
+    mMainPage->getChoiceWidget()->refreshUserChoice(mUserChoice);
+    mAptInstaller = new AptInstaller(this,mEventLoop,mPasswdDialog);
+    mPyLibInstaller = new PyLibInstaller(this,mEventLoop,mPasswdDialog);
+    mGuide = new ChoiceGuide(this);
+    mPasswdDialog = new PasswordDialog;
+
 
     initConnections();
 
-    if(installer->checkAndInstall() && py_installer->checkAndInstall()){
-        mainPage->show();
+    if(mAptInstaller->checkAndInstall() && mPyLibInstaller->checkAndInstall()){
+        mMainPage->show();
     }
     else{
         //TODO: improve logical parts
         qDebug() << "about to quit.";
-        app->quit();
+        mApp->quit();
     }
 }
 
@@ -50,79 +54,79 @@ Core::~Core()
     qDebug() << "~Core()";
     //写入文件配置
     writeConfig();
-    delete _userChoice;
-    delete installer;
-    delete py_installer;
-    delete mainPage;
-    delete pwdDialog;
-    delete guide;
+    delete mUserChoice;
+    delete mAptInstaller;
+    delete mPyLibInstaller;
+    delete mMainPage;
+    delete mPasswdDialog;
+    delete mGuide;
 }
 
 bool Core::isProcessRunning() const
 {
-    return pub_proc->state() == QProcess::Running
-            || pri_proc->state() == QProcess::Running;
+    return mPubProc->state() == QProcess::Running
+            || mPriProc->state() == QProcess::Running;
 }
 void Core::initConnections()
 {
     //退出逻辑
     //主页面关闭时，软件关闭
-    connect(mainPage,&MainPage::closed,app,&QApplication::quit,Qt::QueuedConnection);
+    connect(mMainPage,&MainPage::closed,mApp,&QApplication::quit,Qt::QueuedConnection);
     //用户拒绝安装前置软件包，退出软件
-    connect(installer->getUi()->button_box,&QDialogButtonBox::rejected,
-            app,&QApplication::quit,Qt::QueuedConnection);
-    connect(py_installer->getUi()->button_box,&QDialogButtonBox::rejected,
-            app,&QApplication::quit,Qt::QueuedConnection);
+    connect(mAptInstaller->getUi()->button_box,&QDialogButtonBox::rejected,
+            mApp,&QApplication::quit,Qt::QueuedConnection);
+    connect(mPyLibInstaller->getUi()->button_box,&QDialogButtonBox::rejected,
+            mApp,&QApplication::quit,Qt::QueuedConnection);
 
         //report installer error
 //    connect(installer,&DependencyInstaller::error,
 //            this,&Core::reportError);
 
     //事件循环相关
-    connect(pub_proc,SIGNAL(finished(int)),eventLoop,SLOT(quit()));
-    connect(pwdDialog,&QInputDialog::finished,
-            eventLoop,&TaskEventLoop::quit);
+    connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
+    connect(mPasswdDialog,&QInputDialog::finished,
+            mEventLoop,&TaskEventLoop::quit);
 
     //配置相关
-    connect(mainPage->getUi()->action_conf,&QAction::triggered,
-            guide,&ChoiceGuide::show);
-    connect(guide,&ChoiceGuide::configureFinished,
+    connect(mMainPage->getUi()->action_conf,&QAction::triggered,
+            mGuide,&ChoiceGuide::show);
+    connect(mGuide,&ChoiceGuide::configureFinished,
             this,&Core::copyUserChoice);
-    connect(guide,&ChoiceGuide::configureFinished,
-            mainPage->getChoiceWidget(),&ChoiceWidget::refreshUserChoice);
+    connect(mGuide,&ChoiceGuide::configureFinished,
+            mMainPage->getChoiceWidget(),&ChoiceWidget::refreshUserChoice);
 
     //清理脚本相关
-    connect(mainPage->getUi()->action_clean,&QAction::triggered,
+    connect(mMainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);
-    connect(this,&Core::cleanScriptFinished,mainPage,&MainPage::scriptCleanedSlot);
+    connect(this,&Core::cleanScriptFinished,mMainPage,&MainPage::scriptCleanedSlot);
     //生成脚本相关
-    connect(mainPage->getUi()->action_gen,&QAction::triggered,
+    connect(mMainPage->getUi()->action_gen,&QAction::triggered,
             this,&Core::genScript);
-    connect(this,&Core::genScriptFinished,mainPage,&MainPage::scriptGeneratedSlot);
+    connect(this,&Core::genScriptFinished,mMainPage,&MainPage::scriptGeneratedSlot);
     //性能仿真相关
-    connect(mainPage->getUi()->action_sim,&QAction::triggered,
+    connect(mMainPage->getUi()->action_sim,&QAction::triggered,
             this,&Core::simulatePerformance);
     connect(this,&Core::simulatePerformanceFinished,
-            mainPage,&MainPage::performanceSimulationFinishedSlot);
+            mMainPage,&MainPage::performanceSimulationFinishedSlot);
     //生成温度图相关
-    connect(mainPage->getUi()->action_temp,&QAction::triggered,
+    connect(mMainPage->getUi()->action_temp,&QAction::triggered,
             this,&Core::genHeatMap);
     //终端相关
-    mainPage->getConsoleDock()->connectProcess(pub_proc,&cache);
+    mMainPage->getConsoleDock()->connectProcess(mPubProc,&cache);
 
-    connect(pri_proc,&QProcess::readyRead,this,[this](){
-        cache = pri_proc->readAll();
+    connect(mPriProc,&QProcess::readyRead,this,[this](){
+        cache = mPriProc->readAll();
     });
-    connect(mainPage->getUi()->action_terminate,
+    connect(mMainPage->getUi()->action_terminate,
             &QAction::triggered,this,&Core::terminate);
 
-    connect(this,&Core::longTaskStarted,mainPage,&MainPage::longTaskStartedSlot);
-    connect(this,&Core::longTaskFinished,mainPage,&MainPage::longTaskFinishedSlot);
+    connect(this,&Core::longTaskStarted,mMainPage,&MainPage::longTaskStartedSlot);
+    connect(this,&Core::longTaskFinished,mMainPage,&MainPage::longTaskFinishedSlot);
 }
 
 bool Core::checkConfigured()
 {
-    return !_userChoice->programs.empty();
+    return !mUserChoice->programs.empty();
 }
 
 bool Core::checkGenScript()
@@ -131,8 +135,8 @@ bool Core::checkGenScript()
     QString scriptFormat("%1_%2c_%3.rcS");
     QString script;
     bool res = true;
-    for(auto& program:_userChoice->programs){
-        script = scriptFormat.arg(program,QString::number(_userChoice->threadNum),_userChoice->test.toLower());
+    for(auto& program:mUserChoice->programs){
+        script = scriptFormat.arg(program,QString::number(mUserChoice->threadNum),mUserChoice->test.toLower());
         if(!QDir::current().exists(script)){
             res = false;
             break;
@@ -146,16 +150,16 @@ void Core::writeConfig()
 {
     QJsonObject config;
     QJsonObject userChoice;
-    userChoice.insert("architecture",_userChoice->architecture);
-    userChoice.insert("set",_userChoice->set);
+    userChoice.insert("architecture",mUserChoice->architecture);
+    userChoice.insert("set",mUserChoice->set);
     QJsonArray programs;
     //copy programs
-    for(auto& program:_userChoice->programs){
+    for(auto& program:mUserChoice->programs){
         programs.append(program);
     }
     userChoice.insert("programs",programs);
-    userChoice.insert("test",_userChoice->test);
-    userChoice.insert("threadNum",_userChoice->threadNum);
+    userChoice.insert("test",mUserChoice->test);
+    userChoice.insert("threadNum",mUserChoice->threadNum);
     config.insert("userChoice",userChoice);
 
     QFile writer("config/config.json");
@@ -166,15 +170,7 @@ void Core::writeConfig()
 
 void Core::copyUserChoice(const Choice *choice)
 {
-    *_userChoice = *choice;
-}
-
-void Core::initPwdDialog()
-{
-    pwdDialog = new QInputDialog();
-    pwdDialog->setLabelText("我们需要您提供用户的密码：");
-    pwdDialog->setTextEchoMode(QLineEdit::Password);
-    pwdDialog->setModal(true);
+    *mUserChoice = *choice;
 }
 
 void Core::reportError(QString errMsg)
@@ -183,20 +179,20 @@ void Core::reportError(QString errMsg)
     /*
      * the software will crash.
      */
-    app->quit();
+    mApp->quit();
 }
 
 void Core::logConsole(const QString &info)
 {
-    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
-        mainPage->logConsole(info);
+    if(mPubProc->isEnabled() && mPriProc->isEnabled()){
+        mMainPage->logConsole(info);
     }
 }
 
 void Core::logConsoleProgram(const QString &program, const QString &info)
 {
-    if(pub_proc->isEnabled() && pri_proc->isEnabled()){
-        mainPage->logConsoleProgram(program , info);
+    if(mPubProc->isEnabled() && mPriProc->isEnabled()){
+        mMainPage->logConsoleProgram(program , info);
     }
 }
 
@@ -205,7 +201,7 @@ void Core::cleanScript()
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
-    blockWait(pub_proc,"rm ./*.rcS 2> /dev/null");
+    blockWait(mPubProc,"rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
@@ -214,18 +210,18 @@ void Core::genScript()
 {
     //检查前置条件
     if(!checkConfigured()){
-        QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
+        QMessageBox::warning(mMainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
-    blockWait(pub_proc,"rm ./*.rcS 2>/dev/null");
-    for(auto program : _userChoice->programs){
-        noBlockWait(pub_proc,
-                    writeScriptCmd.arg(program,QString::number(_userChoice->threadNum)),
-                    eventLoop);
+    blockWait(mPubProc,"rm ./*.rcS 2>/dev/null");
+    for(auto program : mUserChoice->programs){
+        noBlockWait(mPubProc,
+                    writeScriptCmd.arg(program,QString::number(mUserChoice->threadNum)),
+                    mEventLoop);
     }
     QDir::setCurrent("..");
     emit genScriptFinished();
@@ -235,19 +231,19 @@ void Core::simulatePerformance()
 {
     //检查前置条件
     if(!checkConfigured()){
-        QMessageBox::warning(mainPage,"警告","请先配置，选择基准程序和测试集。");
+        QMessageBox::warning(mMainPage,"警告","请先配置，选择基准程序和测试集。");
         return ;
     }
     if(!checkGenScript()){
-        QMessageBox::warning(mainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
+        QMessageBox::warning(mMainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
         return ;
     }
     emit longTaskStarted();
     //清空目录
     QDir::setCurrent("gem5_output");
-    blockWait(pri_proc,"rm ./* -rf");
+    blockWait(mPriProc,"rm ./* -rf");
     //新建文件夹
-    for(auto program: _userChoice->programs){
+    for(auto program: mUserChoice->programs){
         QDir::current().mkdir(program);
     }
 
@@ -260,32 +256,32 @@ void Core::simulatePerformance()
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
     QString simulateCmd;
-    for(auto program: _userChoice->programs){
+    for(auto program: mUserChoice->programs){
         //文件名中测试集均为小写
-        if(pub_proc->isEnabled()){
+        if(mPubProc->isEnabled()){
             logConsoleProgram(program,"开始性能仿真...");
         }
         simulateCmd = simulateCmdFormat.arg(
                     program,
-                    QString::number(_userChoice->threadNum),
-                    _userChoice->test.toLower()
+                    QString::number(mUserChoice->threadNum),
+                    mUserChoice->test.toLower()
                     );
 //      qDebug() << simulateCmd;
         //运行仿真，耗时较长
-        noBlockWait(pub_proc,
+        noBlockWait(mPubProc,
                     simulateCmd,
-                    eventLoop);
+                    mEventLoop);
         //将输出文件拷贝到对应目标路径
-        blockWait(pri_proc,"cp m5out/* ../gem5_output/" + program);
-        if(pub_proc->isEnabled()){
+        blockWait(mPriProc,"cp m5out/* ../gem5_output/" + program);
+        if(mPubProc->isEnabled()){
             logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }
 
     QDir::setCurrent("..");
-    pub_proc->setEnabled(true);
-    pri_proc->setEnabled(true);
-    eventLoop->setEnabled(true);
+    mPubProc->setEnabled(true);
+    mPriProc->setEnabled(true);
+    mEventLoop->setEnabled(true);
 
     emit simulatePerformanceFinished();
     emit longTaskFinished();
@@ -298,7 +294,7 @@ void Core::genHeatMap()
     logConsole("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
-        noBlockWait(pub_proc,"rm McPAT_input/* -rf",eventLoop);
+        noBlockWait(mPubProc,"rm McPAT_input/* -rf",mEventLoop);
     }
     else {
         QDir::current().mkdir("McPAT_input");
@@ -321,7 +317,7 @@ void Core::genHeatMap()
 //    }
     QDir::setCurrent("..");
     //准备温度图文件夹
-    blockWait(pri_proc,"mkdir HeatMap ; rm HeatMap/* -rf");
+    blockWait(mPriProc,"mkdir HeatMap ; rm HeatMap/* -rf");
 
     //处理性能数据
     for(auto& program: resultPrograms){
@@ -343,28 +339,28 @@ void Core::genHeatMap()
         logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
 
-    pub_proc->setEnabled(true);
-    pri_proc->setEnabled(true);
-    eventLoop->setEnabled(true);
+    mPubProc->setEnabled(true);
+    mPriProc->setEnabled(true);
+    mEventLoop->setEnabled(true);
 
     //后处理
     //删除所有中间文件夹
-    blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
+    blockWait(mPriProc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
     emit longTaskFinished();
 }
 
 void Core::terminate()
 {
     logConsole("终止。");
-    pub_proc->setEnabled(false);
-    pri_proc->setEnabled(false);
-    eventLoop->setEnabled(false);
+    mPubProc->setEnabled(false);
+    mPriProc->setEnabled(false);
+    mEventLoop->setEnabled(false);
 
 //ref: https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
     //回收bash的子进程
     QProcess get_childs;
     QStringList get_childs_cmd;
-    auto pid = pub_proc->pid();
+    auto pid = mPubProc->pid();
     if(pid){
         //pid != 0 表示当前有进程正在运行
         get_childs_cmd << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
@@ -379,11 +375,11 @@ void Core::terminate()
         else{
             qDebug() << "no child to kill";
         }
-        pub_proc->kill();
-        pub_proc->waitForFinished(-1);
+        mPubProc->kill();
+        mPubProc->waitForFinished(-1);
     }
-    pri_proc->kill();
-    pri_proc->waitForFinished(-1);
+    mPriProc->kill();
+    mPriProc->waitForFinished(-1);
 }
 
 bool Core::splitGem5Output(const QString &program)
@@ -391,17 +387,17 @@ bool Core::splitGem5Output(const QString &program)
     //准备输出文件夹
     QString mkdirCmd = "mkdir -p McPAT_input/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(pri_proc,mkdirCmd);
+    blockWait(mPriProc,mkdirCmd);
 
     //分割stats文件
-    blockWait(pub_proc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
+    blockWait(mPubProc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
     if(cache == "True\n"){
         //分割成功
         //in folder McPAT_input
         qDebug() << "split success";
         //在McPAT_input中创建文件夹，
         //将分割好的数据移动到该文件夹
-        blockWait(pri_proc,QString("cd McPAT_input ; "
+        blockWait(mPriProc,QString("cd McPAT_input ; "
                                    "mkdir %1 ; "
                                    "mv ./*.txt %1/ ; "
                                    "cd ..").arg(program));
@@ -427,34 +423,34 @@ void Core::runMcpat(const QString &program)
     xmlFile = xmlFile.trimmed();
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(pri_proc,mkdirCmd);
+    blockWait(mPriProc,mkdirCmd);
     QString mcpatCmd = "mcpat/mcpat "
                        "-infile %2 "
                        "-print_level 5 "
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
-    noBlockWait(pub_proc,mcpatCmd,eventLoop);
+    noBlockWait(mPubProc,mcpatCmd,mEventLoop);
 }
 
 void Core::writePtrace(const QString &program)
 {
     //准备输出文件夹
     QString mkdirCmd = "mkdir HotSpot_input";
-    blockWait(pri_proc,mkdirCmd);
+    blockWait(mPriProc,mkdirCmd);
     //调用python脚本
     QString writePtraceCmd = "python scripts/writeptrace.py "
                              "utils/ev6.flp "
                              "McPAT_output/%1/3.txt "
                              "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
-    blockWait(pub_proc,writePtraceCmd);
+    blockWait(mPubProc,writePtraceCmd);
 }
 
 void Core::runHotspot(const QString &program)
 {
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(pri_proc,mkdirCmd);
+    blockWait(mPriProc,mkdirCmd);
     QDir::setCurrent("HotSpot-master");
     QString hotspotCmd = "./hotspot "
                          "-c ../utils/example.config "
@@ -466,7 +462,7 @@ void Core::runHotspot(const QString &program)
                          "-model_type grid "
                          "-grid_steady_file ../HotSpot_output/%1/%1.grid.steady ";
     hotspotCmd = hotspotCmd.arg(program);
-    noBlockWait(pub_proc,hotspotCmd,eventLoop);
+    noBlockWait(mPubProc,hotspotCmd,mEventLoop);
     QDir::setCurrent("..");
 }
 
@@ -481,24 +477,26 @@ void Core::drawHeatMap(const QString &program)
                          "%1 "
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
-    blockWait(pub_proc,heatMapCmd);
+    blockWait(mPubProc,heatMapCmd);
 }
 
-void Core::readConfig()
+bool Core::readConfig(const QString& configFileName)
 {
-    QFile reader("config/config.json");
+    QFile reader(configFileName);
     reader.open(QIODevice::ReadOnly);
     if(!reader.isOpen()){
-        qDebug() << "Exception: file not open";
+        return false;
     }
     QJsonObject config = QJsonDocument::fromJson(reader.readAll()).object();
     reader.close();
-    _userChoice->architecture = config["userChoice"].toObject()["architecture"].toString();
-    _userChoice->set = config["userChoice"].toObject()["set"].toString();
-    //copy programs
+
+   //读入数据
+    mUserChoice->architecture = config["userChoice"].toObject()["architecture"].toString();
+    mUserChoice->set = config["userChoice"].toObject()["set"].toString();
     for(auto program:config["userChoice"].toObject()["programs"].toArray()){
-        _userChoice->programs.append(program.toString());
+        mUserChoice->programs.append(program.toString());
     }
-    _userChoice->test = config["userChoice"].toObject()["test"].toString();
-    _userChoice->threadNum = config["userChoice"].toObject()["threadNum"].toInt();
+    mUserChoice->test = config["userChoice"].toObject()["test"].toString();
+    mUserChoice->threadNum = config["userChoice"].toObject()["threadNum"].toInt();
+    return true;
 }

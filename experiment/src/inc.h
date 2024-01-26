@@ -1,4 +1,3 @@
-#pragma once
 #ifndef INC_H
 #define INC_H
 //包含该项目所有Qt标准库，宏定义，类声明，枚举声明，命名空间
@@ -65,7 +64,9 @@
 class Core;
 class MainPage;
 class DependencyInstaller;
+class AptInstaller;
 class PyLibInstaller;
+class PasswordDialog;
 class ChoiceGuide;
 class ChoiceWidget;
 class ImageDisplay;

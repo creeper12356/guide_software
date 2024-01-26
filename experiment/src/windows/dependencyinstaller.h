@@ -1,4 +1,3 @@
-#pragma once
 #ifndef DEPENDENCYINSTALLER_H
 #define DEPENDENCYINSTALLER_H
 #include "inc.h"
@@ -21,7 +20,7 @@ private:
     //指向Core的eventLoop成员，用于处理GUI事件，防止GUI冻结
     QEventLoop* eventLoop;
     //密码输入对话框
-    QInputDialog*& pwdDialog;
+    PasswordDialog*& pwdDialog;
     //运行bash的进程
     QProcess* proc = nullptr;
     //未安装依赖列表
@@ -30,7 +29,10 @@ private:
     bool isAccepted = false;
 
 public:
-    DependencyInstaller(Core* core,QEventLoop* eventLoop,QInputDialog*& pwdDialog,QWidget *parent = nullptr);
+    DependencyInstaller(Core* core,
+                        QEventLoop* eventLoop,
+                        PasswordDialog*& pwdDialog,
+                        QWidget *parent = nullptr);
     virtual ~DependencyInstaller();
     //getters
     Ui::DependencyInstaller* getUi(){return ui;}
@@ -66,7 +68,7 @@ class AptInstaller: public DependencyInstaller
 public:
     AptInstaller(Core* core,
                  QEventLoop* eventLoop,
-                 QInputDialog*& pwdDialog,
+                 PasswordDialog*& pwdDialog,
                  QWidget* parent = nullptr);
 protected:
     void initCmds() override;
@@ -76,7 +78,7 @@ class PyLibInstaller: public DependencyInstaller{
 public:
     PyLibInstaller(Core* core,
                    QEventLoop* eventLoop,
-                   QInputDialog*& pwdDialog,
+                   PasswordDialog*& pwdDialog,
                    QWidget *parent = nullptr);
 protected:
     void initCmds() override;

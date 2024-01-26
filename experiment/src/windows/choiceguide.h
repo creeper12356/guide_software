@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CHOICEGUIDE_H
 #define CHOICEGUIDE_H
 #include "inc.h"
