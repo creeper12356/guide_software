@@ -342,18 +342,20 @@ void Core::genHeatMap()
         drawHeatMap(program);
         logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
     }
-    //删除所有中间文件夹
-    blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
 
     pub_proc->setEnabled(true);
     pri_proc->setEnabled(true);
     eventLoop->setEnabled(true);
+
+    //后处理
+    //删除所有中间文件夹
+    blockWait(pri_proc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
     emit longTaskFinished();
 }
 
 void Core::terminate()
 {
-    qDebug() << "kill.";
+    logConsole("终止。");
     pub_proc->setEnabled(false);
     pri_proc->setEnabled(false);
     eventLoop->setEnabled(false);
@@ -364,6 +366,7 @@ void Core::terminate()
     QStringList get_childs_cmd;
     auto pid = pub_proc->pid();
     if(pid){
+        //pid != 0 表示当前有进程正在运行
         get_childs_cmd << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
         get_childs.start("ps", get_childs_cmd);
         get_childs.waitForFinished(5000);
