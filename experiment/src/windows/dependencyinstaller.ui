@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>检测到您的电脑上没有安装下列前置软件包:</string>
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -64,7 +64,7 @@
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>120</x>
      <y>250</y>
      <width>166</width>
      <height>25</height>

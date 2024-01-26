@@ -1,91 +1,102 @@
 #include "windows/dependencyinstaller.h"
-#include "passworddialog.h"
+#include "windows/passworddialog.h"
 #include "core.h"
 #include "ui_dependencyinstaller.h"
-DependencyInstaller::DependencyInstaller(Core *c, QEventLoop *loop, PasswordDialog *&pd, QWidget *parent)
-   :QDialog(parent),
-    core(c),
-    eventLoop(loop),
-    pwdDialog(pd),
-    ui(new Ui::DependencyInstaller)
+
+DependencyInstaller::DependencyInstaller(Core *c)
+   : QDialog(nullptr)
+   , core(c)
+   , ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
-    //默认显示检查GUI
-    this->switchCheckGUI();
 
-    proc = new QProcess(this);
-    proc->setProgram("bash");
+    mProcess = new QProcess(this);
+    mProcess->setProgram("bash");
 
-    connect(proc,SIGNAL(finished(int)),
-            eventLoop,SLOT(quit()));
+    mPasswordDialog = new PasswordDialog(nullptr);
+    mEventLoop = new QEventLoop(this);
+
     connect(this,&DependencyInstaller::installProcess,
             ui->progress_bar,&QProgressBar::setValue);
 
-    //用户点击button box后，事件循环终止
-    connect(ui->button_box,&QDialogButtonBox::clicked,
-           eventLoop,&QEventLoop::quit);
+    connect(mProcess,SIGNAL(finished(int)),
+            mEventLoop,SLOT(quit()));
+
+    connect(mPasswordDialog,&PasswordDialog::finished,mEventLoop,&QEventLoop::quit);
+
+    //Qt机制，信号发出时，按照槽函数的连接顺序执行槽，用户点击“Yes”时，
+    //先调用setAccepted，再退出事件循环
     connect(ui->button_box,&QDialogButtonBox::accepted,
             this,&DependencyInstaller::setAccepted);
+    connect(ui->button_box,&QDialogButtonBox::accepted,
+            mEventLoop,&QEventLoop::quit);
+
+    //用户点击“No”
+    connect(ui->button_box,&QDialogButtonBox::rejected,
+            mEventLoop,&QEventLoop::quit);
+    connect(ui->button_box,&QDialogButtonBox::rejected,
+            this, &DependencyInstaller::reject);
 }
 
 DependencyInstaller::~DependencyInstaller()
 {
+    delete mPasswordDialog;
     delete ui;
 }
 bool DependencyInstaller::checkDependencies()
 {
-    if(proc->state() != QProcess::NotRunning){
-        qDebug() << "The process is busy now.";
+    if(mProcess->state() != QProcess::NotRunning){
+        qWarning() << "The process is busy now.";
         return true;
     }
 
-    proc->setArguments(QStringList() << "-c" << getNotInstalledCmd);
-    proc->start();
-    eventLoop->exec();
-    pkgList.clear();
+    mProcess->setArguments(QStringList() << "-c" << getNotInstalledCommand());
+    mProcess->start();
+    mEventLoop->exec();
+    mDependencyList.clear();
 
-    QTextStream stream(proc);
+    QTextStream stream(mProcess);
     while(!stream.atEnd()){
-        pkgList.append(stream.readLine());
+        mDependencyList.append(stream.readLine());
     }
 
-    if(!pkgList.empty()){
+    if(!mDependencyList.empty()){
         //存在未满足依赖
-        showUnmetDependencies(pkgList);
+        showUnmetDependencies(mDependencyList);
     }
-    proc->close();
-    return pkgList.empty();
+    mProcess->close();
+    return mDependencyList.empty();
 }
 void DependencyInstaller::installDependencies(QString pwd)
 {
-    if(!isPasswdNeeded){
+    if(!isSuperUser()){
         pwd = "";
     }
-    if(proc->state() != QProcess::NotRunning){
-        qDebug() << "The process is busy now.";
+    if(mProcess->state() != QProcess::NotRunning){
+        qWarning() << "The process is busy now.";
         return ;
     }
     qDebug() << "start installing...";
     //update
-    if(!updateCmd.isEmpty()){
-        proc->setArguments(QStringList() << "-c" << updateCmd.arg(pwd));
-        proc->start();
-        eventLoop->exec();
+    if(!updateCommand().isEmpty()){
+        mProcess->setArguments(QStringList() << "-c" << updateCommand().arg(pwd));
+        mProcess->start();
+        mEventLoop->exec();
         qDebug() << "update finished.";
     }
-    int pkgCount = pkgList.count();
+    int pkgCount = mDependencyList.count();
     int installCount = 0;
-    for(auto pkgName:pkgList){
-        proc->setArguments(QStringList() << "-c" << installCmd.arg(pwd,pkgName));
-        proc->start();
-        eventLoop->exec();
+    for(auto pkgName:mDependencyList){
+        mProcess->setArguments(QStringList() << "-c" << installCommand().arg(pwd,pkgName));
+        mProcess->start();
+        mEventLoop->exec();
         ++installCount;
         emit installProcess(100.0 * installCount / pkgCount);
         qDebug() << pkgName + " installed! ";
     }
-    qDebug() << "successfully installed " << pkgList;
-    proc->close();
-    pkgList.clear();
+    qDebug() << "successfully installed " << mDependencyList;
+    mProcess->close();
+    mDependencyList.clear();
 }
 
 bool DependencyInstaller::checkAndInstall()
@@ -95,25 +106,26 @@ bool DependencyInstaller::checkAndInstall()
     }
     while(true){
         //pre-set flags
-        isAccepted = false;
+        mAccepted = false;
 
         this->show();
-        eventLoop->exec();
-        if(!isAccepted){
+        mEventLoop->exec();
+        if(!mAccepted){
+            qDebug() << "rejected.";
             return false;
         }
         //用户接受安装
 
-        if(isPasswdNeeded){
+        if(isSuperUser()){
             //等待用户输入密码
-            pwdDialog->show();
-            eventLoop->exec();
-            if(pwdDialog->result() == QDialog::Rejected){
+            mPasswordDialog->show();
+            mEventLoop->exec();
+            if(mPasswordDialog->result() == QDialog::Rejected){
                 continue;
             }
         }
         this->switchInstallGUI();
-        installDependencies(pwdDialog->textValue());
+        installDependencies(mPasswordDialog->textValue());
 
         //再次检查依赖是否安装
         if(checkDependencies()){
@@ -122,9 +134,10 @@ bool DependencyInstaller::checkAndInstall()
         }
     }
 }
+
 void DependencyInstaller::switchCheckGUI()
 {
-    ui->hint_label->setText("检测到您的电脑上没有安装下列前置软件包:");
+    ui->hint_label->setText(hintText());
     ui->pkg_list->show();
     ui->q_label->show();
     ui->button_box->show();
@@ -151,54 +164,81 @@ void DependencyInstaller::showUnmetDependencies(const QStringList& list)
 
 void DependencyInstaller::setAccepted()
 {
-    isAccepted = true;
+    mAccepted = true;
 }
-AptInstaller::AptInstaller(Core *core, QEventLoop *eventLoop, PasswordDialog *&pwdDialog, QWidget *parent)
-    :DependencyInstaller(core,eventLoop,pwdDialog,parent)
+AptInstaller::AptInstaller(Core *core)
+    : DependencyInstaller(core)
 {
-    initCmds();
-    isPasswdNeeded = true;
 }
 
-void AptInstaller::initCmds()
+QString AptInstaller::updateCommand()
 {
-    updateCmd =
-            "echo %1 | sudo -S apt update";
-    getNotInstalledCmd =
-            "xargs apt list --installed < config/requirements.txt "
-            "| tail -n +2 "
-            "| cut -f 1 -d / "
-            "| sort "
-            "> config/installed.txt "
-            "&& "
-            "comm config/installed.txt config/requirements.txt -13 "
-            "&& "
-            "rm config/installed.txt ";
-   installCmd =
-            "echo %1"
-            " | sudo -S apt install %2 -y "
-            "2> /dev/null";
+    return "echo %1 | sudo -S apt update";
 }
 
-PyLibInstaller::PyLibInstaller(Core *core, QEventLoop *eventLoop, PasswordDialog *&pwdDialog, QWidget *parent)
-    :DependencyInstaller(core,eventLoop,pwdDialog,parent)
+QString AptInstaller::getNotInstalledCommand()
 {
-    initCmds();
-    isPasswdNeeded = false;
-    this->getUi()->hint_label->setText(
-               "检测到您的电脑上没有安装下列Python库:");
+    return "xargs apt list --installed < config/requirements.txt "
+           "| tail -n +2 "
+           "| cut -f 1 -d / "
+           "| sort "
+           "> config/installed.txt "
+           "&& "
+           "comm config/installed.txt config/requirements.txt -13 "
+           "&& "
+           "rm config/installed.txt ";
 }
 
-void PyLibInstaller::initCmds()
+QString AptInstaller::installCommand()
 {
-    updateCmd = "";
-    getNotInstalledCmd =
-            "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > config/py_installed.txt "
-            "&& "
-            "comm config/py_installed.txt config/py_requirements.txt -13 "
-            "&& "
-            "rm config/py_installed.txt ";
-    installCmd =
-            "%1pip install %2 "
-            "2> /dev/null";
+    return "echo %1"
+           " | sudo -S apt install %2 -y "
+           "2> /dev/null";
+}
+
+bool AptInstaller::isSuperUser()
+{
+    return true;
+}
+
+QString AptInstaller::hintText()
+{
+    return "检测到您的电脑上没有安装下列前置软件包:";
+}
+
+
+
+PyLibInstaller::PyLibInstaller(Core *core)
+    : DependencyInstaller(core)
+{
+}
+
+QString PyLibInstaller::updateCommand()
+{
+    return "";
+}
+
+QString PyLibInstaller::getNotInstalledCommand()
+{
+    return "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > config/py_installed.txt "
+           "&& "
+           "comm config/py_installed.txt config/py_requirements.txt -13 "
+           "&& "
+           "rm config/py_installed.txt ";
+}
+
+QString PyLibInstaller::installCommand()
+{
+    return "%1pip install %2 "
+           "2> /dev/null";
+}
+
+bool PyLibInstaller::isSuperUser()
+{
+    return false;
+}
+
+QString PyLibInstaller::hintText()
+{
+    return "检测到您的电脑上没有安装下列Python库:";
 }

@@ -81,6 +81,9 @@ signals:
     void longTaskStarted();
     void longTaskFinished();
 
+    //退出信号，使用异步通信
+    void quit();
+
 private:
     QApplication* mApp = nullptr;
     TaskEventLoop* mEventLoop = nullptr;
@@ -97,8 +100,6 @@ private:
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;
     ChoiceGuide* mGuide = nullptr;
-    //密码对话框，由所有可能询问密码的窗体共享
-    PasswordDialog* mPasswdDialog = nullptr;
 
     //用户的配置选择
     Choice* mUserChoice = nullptr;

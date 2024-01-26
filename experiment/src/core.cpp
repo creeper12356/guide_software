@@ -10,8 +10,6 @@
 #include "ui_dependencyinstaller.h"
 #include "ui_choiceguide.h"
 
-#include <signal.h>
-#include <unistd.h>
 Core::Core(QApplication* a):
     QObject(nullptr),
     mApp(a)
@@ -31,10 +29,9 @@ Core::Core(QApplication* a):
     //初始化界面
     mMainPage = new MainPage(this);
     mMainPage->getChoiceWidget()->refreshUserChoice(mUserChoice);
-    mAptInstaller = new AptInstaller(this,mEventLoop,mPasswdDialog);
-    mPyLibInstaller = new PyLibInstaller(this,mEventLoop,mPasswdDialog);
+    mAptInstaller = new AptInstaller(this);
+    mPyLibInstaller = new PyLibInstaller(this);
     mGuide = new ChoiceGuide(this);
-    mPasswdDialog = new PasswordDialog;
 
 
     initConnections();
@@ -43,9 +40,7 @@ Core::Core(QApplication* a):
         mMainPage->show();
     }
     else{
-        //TODO: improve logical parts
-        qDebug() << "about to quit.";
-        mApp->quit();
+        emit quit();
     }
 }
 
@@ -58,7 +53,6 @@ Core::~Core()
     delete mAptInstaller;
     delete mPyLibInstaller;
     delete mMainPage;
-    delete mPasswdDialog;
     delete mGuide;
 }
 
@@ -72,20 +66,10 @@ void Core::initConnections()
     //退出逻辑
     //主页面关闭时，软件关闭
     connect(mMainPage,&MainPage::closed,mApp,&QApplication::quit,Qt::QueuedConnection);
-    //用户拒绝安装前置软件包，退出软件
-    connect(mAptInstaller->getUi()->button_box,&QDialogButtonBox::rejected,
-            mApp,&QApplication::quit,Qt::QueuedConnection);
-    connect(mPyLibInstaller->getUi()->button_box,&QDialogButtonBox::rejected,
-            mApp,&QApplication::quit,Qt::QueuedConnection);
-
-        //report installer error
-//    connect(installer,&DependencyInstaller::error,
-//            this,&Core::reportError);
+    connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
 
     //事件循环相关
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
-    connect(mPasswdDialog,&QInputDialog::finished,
-            mEventLoop,&TaskEventLoop::quit);
 
     //配置相关
     connect(mMainPage->getUi()->action_conf,&QAction::triggered,
