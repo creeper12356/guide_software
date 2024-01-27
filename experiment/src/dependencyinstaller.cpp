@@ -1,11 +1,9 @@
-#include "windows/dependencyinstaller.h"
-#include "windows/passworddialog.h"
-#include "core.h"
+#include "dependencyinstaller.h"
+#include "passworddialog.h"
 #include "ui_dependencyinstaller.h"
 
-DependencyInstaller::DependencyInstaller(Core *c)
+DependencyInstaller::DependencyInstaller()
    : QDialog(nullptr)
-   , core(c)
    , ui(new Ui::DependencyInstaller)
 {
     ui->setupUi(this);
@@ -166,8 +164,8 @@ void DependencyInstaller::setAccepted()
 {
     mAccepted = true;
 }
-AptInstaller::AptInstaller(Core *core)
-    : DependencyInstaller(core)
+AptInstaller::AptInstaller()
+    : DependencyInstaller()
 {
 }
 
@@ -208,8 +206,8 @@ QString AptInstaller::hintText()
 
 
 
-PyLibInstaller::PyLibInstaller(Core *core)
-    : DependencyInstaller(core)
+PyLibInstaller::PyLibInstaller()
+    : DependencyInstaller()
 {
 }
 

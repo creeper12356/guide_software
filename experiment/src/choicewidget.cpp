@@ -1,4 +1,4 @@
-#include "widgets/choicewidget.h"
+#include "choicewidget.h"
 #include "ui_choicewidget.h"
 
 #include "choice.h"

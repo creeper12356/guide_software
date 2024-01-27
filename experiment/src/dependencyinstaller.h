@@ -15,7 +15,7 @@ class DependencyInstaller : public QDialog
     Q_OBJECT
 
 public:
-    DependencyInstaller(Core* c);
+    DependencyInstaller();
     virtual ~DependencyInstaller();
 
     /*!
@@ -93,7 +93,7 @@ private:
 class AptInstaller: public DependencyInstaller
 {
 public:
-    AptInstaller(Core* core);
+    AptInstaller();
 protected:
     QString updateCommand() override;
     QString getNotInstalledCommand() override;
@@ -105,7 +105,7 @@ protected:
 //基于pip的python包安装程序
 class PyLibInstaller: public DependencyInstaller{
 public:
-    PyLibInstaller(Core* core);
+    PyLibInstaller();
 protected:
     QString updateCommand() override;
     QString getNotInstalledCommand() override;

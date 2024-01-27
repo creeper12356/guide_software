@@ -16,39 +16,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    windows/aboutdialog.cpp \
-    windows/choiceguide.cpp \
-    windows/dependencyinstaller.cpp \
-    windows/mainpage.cpp \
-    widgets/choicewidget.cpp \
-    widgets/imagedisplay.cpp \
+    aboutdialog.cpp \
+    choiceguide.cpp \
+    dependencyinstaller.cpp \
+    mainpage.cpp \
+    choicewidget.cpp \
+    imagedisplay.cpp \
     core.cpp \
     main.cpp \
-    widgets/consoledock.cpp \
+    consoledock.cpp \
     taskmanager.cpp \
-    windows/passworddialog.cpp \
+    passworddialog.cpp \
     choice.cpp
 
 HEADERS += \
-    windows/aboutdialog.h \
-    windows/choiceguide.h \
-    windows/dependencyinstaller.h \
-    windows/mainpage.h \
-    widgets/choicewidget.h \
-    widgets/imagedisplay.h \
+    aboutdialog.h \
+    choiceguide.h \
+    dependencyinstaller.h \
+    mainpage.h \
+    choicewidget.h \
+    imagedisplay.h \
     core.h \
     inc.h \
-    widgets/consoledock.h \
+    consoledock.h \
     taskmanager.h \
-    windows/passworddialog.h \
+    passworddialog.h \
     choice.h
 
 FORMS += \
-    windows/aboutdialog.ui \
-    windows/choiceguide.ui \
-    windows/dependencyinstaller.ui \
-    windows/mainpage.ui \
-    widgets/choicewidget.ui
+    aboutdialog.ui \
+    choiceguide.ui \
+    dependencyinstaller.ui \
+    mainpage.ui \
+    choicewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

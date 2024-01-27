@@ -1,10 +1,8 @@
-#include "windows/choiceguide.h"
+#include "choiceguide.h"
 #include "ui_choiceguide.h"
-#include "core.h"
 
-ChoiceGuide::ChoiceGuide(Core *c, QWidget *parent) :
-    QMainWindow(parent),
-    core(c),
+ChoiceGuide::ChoiceGuide() :
+    QMainWindow(nullptr),
     ui(new Ui::ChoiceGuide)
 {
     ui->setupUi(this);

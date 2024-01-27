@@ -28,9 +28,8 @@ private:
     //选择程序集的按钮组
     QButtonGroup* setGroup = nullptr;
 
-    Core* core = nullptr;
 public:
-    ChoiceGuide(Core* core,QWidget *parent = nullptr);
+    ChoiceGuide();
     ~ChoiceGuide();
 public:
     //getters

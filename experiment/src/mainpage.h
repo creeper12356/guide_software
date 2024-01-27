@@ -1,6 +1,7 @@
 #ifndef MAINPAGE_H
 #define MAINPAGE_H
 #include "inc.h"
+
 class Choice;
 namespace Ui {
 class MainPage;
@@ -9,8 +10,6 @@ class MainPage : public QMainWindow
 {
     Q_OBJECT
 private:
-    Core* core = nullptr;
-
     QToolBar* toolBar = nullptr;
 
     ConsoleDock* consoleDock = nullptr;
@@ -21,7 +20,7 @@ private:
 
     ChoiceGuide* mGuide;
 public:
-    MainPage(Core* core,QWidget *parent = nullptr);
+    MainPage();
     ~MainPage();
 public:
     //getters

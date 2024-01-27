@@ -1,10 +1,10 @@
 #include "core.h"
-#include "windows/mainpage.h"
-#include "windows/choiceguide.h"
-#include "windows/dependencyinstaller.h"
-#include "widgets/choicewidget.h"
-#include "widgets/consoledock.h"
+#include "mainpage.h"
+#include "dependencyinstaller.h"
+#include "choicewidget.h"
+#include "consoledock.h"
 #include "taskmanager.h"
+#include "choice.h"
 #include "ui_mainpage.h"
 #include "ui_dependencyinstaller.h"
 #include "ui_choiceguide.h"
@@ -26,10 +26,10 @@ Core::Core(QApplication* a):
         qWarning("读取配置文件失败。");
     }
     //初始化界面
-    mMainPage = new MainPage(this);
+    mMainPage = new MainPage;
     mMainPage->getChoiceWidget()->refreshUserChoice(mUserChoice);
-    mAptInstaller = new AptInstaller(this);
-    mPyLibInstaller = new PyLibInstaller(this);
+    mAptInstaller = new AptInstaller;
+    mPyLibInstaller = new PyLibInstaller;
 
 
     initConnections();

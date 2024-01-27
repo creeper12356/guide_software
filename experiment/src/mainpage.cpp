@@ -1,17 +1,15 @@
-#include "windows/mainpage.h"
-#include "windows/aboutdialog.h"
-#include "windows/choiceguide.h"
-#include "widgets/choicewidget.h"
-#include "widgets/imagedisplay.h"
-#include "widgets/consoledock.h"
+#include "mainpage.h"
+#include "aboutdialog.h"
+#include "choiceguide.h"
+#include "choicewidget.h"
+#include "imagedisplay.h"
+#include "consoledock.h"
 #include "ui_mainpage.h"
-#include "core.h"
-#include "widgets/consoledock.h"
+#include "consoledock.h"
 
 
-MainPage::MainPage(Core *c, QWidget *parent) :
-    QMainWindow(parent),
-    core(c),
+MainPage::MainPage() :
+    QMainWindow(nullptr),
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
@@ -32,7 +30,7 @@ MainPage::MainPage(Core *c, QWidget *parent) :
        heatMap->loadFromFile(QString("HeatMap/%1.png").arg(program));
     });
 
-    mGuide = new ChoiceGuide(core);
+    mGuide = new ChoiceGuide();
     connect(ui->action_conf,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
     connect(mGuide,&ChoiceGuide::configureFinished,
@@ -170,21 +168,22 @@ void MainPage::initDockWidgets()
 
 void MainPage::closeEvent(QCloseEvent *event)
 {
-    if(core->isProcessRunning()){
-        if(QMessageBox::warning(this,"警告",
-                             "有一个进程正在运行，您未完成的工作可能丢失，仍然关闭?",
-                             QMessageBox::Yes|QMessageBox::No)
-                == QMessageBox::Yes){
-            //用户强行关闭进程
-            //kill进程
-            core->terminate();
-        }
-        else{
-            //用户取消强行关闭
-            event->ignore();
-            return ;
-        }
-    }
+    //TODO : here
+//    if(core->isProcessRunning()){
+//        if(QMessageBox::warning(this,"警告",
+//                             "有一个进程正在运行，您未完成的工作可能丢失，仍然关闭?",
+//                             QMessageBox::Yes|QMessageBox::No)
+//                == QMessageBox::Yes){
+//            //用户强行关闭进程
+//            //kill进程
+//            core->terminate();
+//        }
+//        else{
+//            //用户取消强行关闭
+//            event->ignore();
+//            return ;
+//        }
+//    }
 }
 
 void MainPage::aboutTriggererd()

@@ -1,4 +1,4 @@
-#include "widgets/imagedisplay.h"
+#include "imagedisplay.h"
 
 ImageDisplay::ImageDisplay(QWidget *parent) : QWidget(parent)
 {
