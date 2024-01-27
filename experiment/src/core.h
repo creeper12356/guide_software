@@ -5,7 +5,7 @@
 /*!
  * \brief 客户端内核
  */
-class Core:public QObject
+class Core: public QObject
 {
     Q_OBJECT
 
@@ -36,8 +36,6 @@ public:
 public:
     //配置完成后，复制用户选择
     void copyUserChoice(const Choice* mUserChoice);
-     //返回是否有进程正在运行
-    bool isProcessRunning() const;
 
 public slots:
     //清理脚本
@@ -87,6 +85,7 @@ signals:
 private:
     QApplication* mApp = nullptr;
     TaskEventLoop* mEventLoop = nullptr;
+    AppModel* mAppModel = nullptr;
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
     //pri_proc为私有进程，不打印输出，只更新cache

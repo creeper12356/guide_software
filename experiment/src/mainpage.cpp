@@ -33,11 +33,6 @@ MainPage::MainPage() :
     mGuide = new ChoiceGuide();
     connect(ui->action_conf,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-    connect(mGuide,&ChoiceGuide::configureFinished,
-            choiceWidget,&ChoiceWidget::refreshUserChoice);
-    connect(mGuide,&ChoiceGuide::configureFinished,
-            this,&MainPage::configureFinished);
-
     heatMap->resize(choiceWidget->size());
 
     splitter->addWidget(choiceWidget);
@@ -59,6 +54,9 @@ MainPage::MainPage() :
         geometryRestorer.close();
     }
 
+    connect(ui->action_conf,&QAction::triggered,this,&MainPage::configureTriggered);
+
+    connect(ui->action_maximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
     connect(ui->action_about,&QAction::triggered,this,&MainPage::aboutTriggererd);
     connect(ui->action_aboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
 }
@@ -166,8 +164,19 @@ void MainPage::initDockWidgets()
     ui->statusbar->addWidget(logToggleButton);
 }
 
+void MainPage::configureTriggered()
+{
+    QEventLoop eventLoop;
+    connect(mGuide,&ChoiceGuide::configureFinished,&eventLoop,&QEventLoop::quit);
+    mGuide->show();
+    eventLoop.exec();
+    choiceWidget->refreshUserChoice(mGuide->userChoice());
+    emit configureFinished(mGuide->userChoice());
+}
+
 void MainPage::closeEvent(QCloseEvent *event)
 {
+    Q_UNUSED(event);
     //TODO : here
 //    if(core->isProcessRunning()){
 //        if(QMessageBox::warning(this,"警告",
@@ -247,14 +256,10 @@ void MainPage::logConsoleProgram(const QString& program, const QString& info)
     getLogBrowser()->append(prefix + info);
 }
 
-void MainPage::on_action_maximize_triggered()
+void MainPage::maximizeTriggered()
 {
-    if(this->isMaximized()){
-        this->showNormal();
-    }
-    else{
-        this->showMaximized();
-    }
+    if(isMaximized()) showNormal();
+    else			  showMaximized();
 }
 
 void MainPage::on_action_show_heatmap_triggered()

@@ -32,8 +32,9 @@ private:
     inline void initToolBar() ;
     inline void initDockWidgets() ;
 private slots:
+    void configureTriggered();
     void on_action_exit_triggered();
-    void on_action_maximize_triggered();
+    void maximizeTriggered();
     void on_action_show_heatmap_triggered();
 
     void aboutTriggererd();

@@ -74,8 +74,7 @@ private slots:
 private:
     Ui::ChoiceGuide *ui;
 signals:
-    //配置完成时，该信号发送给主页面
-    void configureFinished(const Choice* userChoice);
+    void configureFinished();
 };
 
 #endif // CHOICEGUIDE_H

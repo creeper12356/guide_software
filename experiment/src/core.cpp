@@ -1,14 +1,13 @@
 #include "core.h"
 #include "mainpage.h"
 #include "dependencyinstaller.h"
-#include "choicewidget.h"
 #include "consoledock.h"
 #include "taskmanager.h"
 #include "choice.h"
 #include "ui_mainpage.h"
 #include "ui_dependencyinstaller.h"
 #include "ui_choiceguide.h"
-
+#include "appmodel.h"
 Core::Core(QApplication* a):
     QObject(nullptr),
     mApp(a)
@@ -20,6 +19,8 @@ Core::Core(QApplication* a):
     mPriProc = new TaskProcess(this);
     mPriProc->setProgram("bash");
 
+    mAppModel = new AppModel(this);
+
     mUserChoice = new Choice;
     //读取文件配置
     if(!readConfig("config/config.json")){
@@ -27,7 +28,6 @@ Core::Core(QApplication* a):
     }
     //初始化界面
     mMainPage = new MainPage;
-    mMainPage->getChoiceWidget()->refreshUserChoice(mUserChoice);
     mAptInstaller = new AptInstaller;
     mPyLibInstaller = new PyLibInstaller;
 
@@ -53,17 +53,13 @@ Core::~Core()
     delete mMainPage;
 }
 
-bool Core::isProcessRunning() const
-{
-    return mPubProc->state() == QProcess::Running
-            || mPriProc->state() == QProcess::Running;
-}
 void Core::initConnections()
 {
     connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
 
     //事件循环相关
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
+    connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
     //配置相关
     connect(mMainPage,&MainPage::configureFinished,this,&Core::copyUserChoice);

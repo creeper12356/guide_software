@@ -182,7 +182,6 @@ void ChoiceGuide::setChosenSlot(QString name)
 void ChoiceGuide::programChosenSlot()
 {
     _userChoice.programs.clear();
-    int selectedCount = ui->prog_list->selectedItems().size();
     for(auto* item: ui->prog_list->selectedItems()){
         _userChoice.programs.append(item->text());
     }
@@ -236,7 +235,7 @@ void ChoiceGuide::on_cancel_button_clicked()
 
 void ChoiceGuide::on_finish_button_clicked()
 {
-    emit configureFinished(&_userChoice);
+    emit configureFinished();
     this->close();
 }
 

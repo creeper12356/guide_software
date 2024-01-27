@@ -74,6 +74,9 @@ class ImageDisplay;
 class ConsoleDock;
 class TaskProcess;
 class TaskEventLoop;
+
+class AppModel;
+
 enum Exception{
     UserAbort
 };

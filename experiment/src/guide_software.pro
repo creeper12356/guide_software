@@ -27,7 +27,8 @@ SOURCES += \
     consoledock.cpp \
     taskmanager.cpp \
     passworddialog.cpp \
-    choice.cpp
+    choice.cpp \
+    appmodel.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -41,7 +42,8 @@ HEADERS += \
     consoledock.h \
     taskmanager.h \
     passworddialog.h \
-    choice.h
+    choice.h \
+    appmodel.h
 
 FORMS += \
     aboutdialog.ui \
