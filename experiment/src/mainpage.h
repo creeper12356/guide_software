@@ -39,6 +39,9 @@ private slots:
 
     void aboutTriggererd();
     void aboutqtTriggered();
+public slots:
+    //更新用户选择的显示
+    void updateUserChoice(const Choice* userChoice);
 
 public slots:
     void scriptCleanedSlot();

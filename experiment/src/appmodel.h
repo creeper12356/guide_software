@@ -5,11 +5,22 @@ class AppModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit AppModel(QObject *parent = 0);
+    explicit AppModel(MainPage* mainPage);
+    ~AppModel();
 
+    bool readFromFile(const QString& fileName);
+    void writeToFile(const QString& fileName);
+
+public:
+    const Choice* userChoice() const;
+    void setUserChoice(const Choice* userChoice);
+    void setUserChoiceAndNotify(const Choice* userChoice);
 signals:
+    void userChoiceChanged(const Choice* userChoice);
+private:
+    Choice* mUserChoice;
+    MainPage* mMainPage;
 
-public slots:
 };
 
 #endif // APPMODEL_H

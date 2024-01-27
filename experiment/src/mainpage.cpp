@@ -272,3 +272,8 @@ void MainPage::aboutqtTriggered()
 {
     QMessageBox::aboutQt(this,"关于Qt");
 }
+
+void MainPage::updateUserChoice(const Choice *userChoice)
+{
+    choiceWidget->refreshUserChoice(userChoice);
+}

@@ -19,18 +19,13 @@ Core::Core(QApplication* a):
     mPriProc = new TaskProcess(this);
     mPriProc->setProgram("bash");
 
-    mAppModel = new AppModel(this);
 
-    mUserChoice = new Choice;
-    //读取文件配置
-    if(!readConfig("config/config.json")){
-        qWarning("读取配置文件失败。");
-    }
     //初始化界面
     mMainPage = new MainPage;
     mAptInstaller = new AptInstaller;
     mPyLibInstaller = new PyLibInstaller;
 
+    mAppModel = new AppModel(mMainPage);
 
     initConnections();
 
@@ -45,9 +40,7 @@ Core::Core(QApplication* a):
 Core::~Core()
 {
     qDebug() << "~Core()";
-    //写入文件配置
-    writeConfig();
-    delete mUserChoice;
+    delete mAppModel;
     delete mAptInstaller;
     delete mPyLibInstaller;
     delete mMainPage;
@@ -62,7 +55,8 @@ void Core::initConnections()
     connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
     //配置相关
-    connect(mMainPage,&MainPage::configureFinished,this,&Core::copyUserChoice);
+    connect(mMainPage,&MainPage::configureFinished,mAppModel,&AppModel::setUserChoice);
+
     //清理脚本相关
     connect(mMainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);
@@ -94,7 +88,7 @@ void Core::initConnections()
 
 bool Core::checkConfigured()
 {
-    return !mUserChoice->programs.empty();
+    return mAppModel->userChoice()->isConfigured();
 }
 
 bool Core::checkGenScript()
@@ -103,8 +97,9 @@ bool Core::checkGenScript()
     QString scriptFormat("%1_%2c_%3.rcS");
     QString script;
     bool res = true;
-    for(auto& program:mUserChoice->programs){
-        script = scriptFormat.arg(program,QString::number(mUserChoice->threadNum),mUserChoice->test.toLower());
+    for(auto& program: mAppModel->userChoice()->programs){
+        script = scriptFormat.arg(program,QString::number(mAppModel->userChoice()->threadNum),
+                                  mAppModel->userChoice()->test.toLower());
         if(!QDir::current().exists(script)){
             res = false;
             break;
@@ -112,33 +107,6 @@ bool Core::checkGenScript()
     }
     QDir::setCurrent("..");
     return res;
-}
-
-void Core::writeConfig()
-{
-    QJsonObject config;
-    QJsonObject userChoice;
-    userChoice.insert("architecture",mUserChoice->architecture);
-    userChoice.insert("set",mUserChoice->set);
-    QJsonArray programs;
-    //copy programs
-    for(auto& program:mUserChoice->programs){
-        programs.append(program);
-    }
-    userChoice.insert("programs",programs);
-    userChoice.insert("test",mUserChoice->test);
-    userChoice.insert("threadNum",mUserChoice->threadNum);
-    config.insert("userChoice",userChoice);
-
-    QFile writer("config/config.json");
-    writer.open(QIODevice::WriteOnly);
-    writer.write(QJsonDocument(config).toJson());
-    writer.close();
-}
-
-void Core::copyUserChoice(const Choice *choice)
-{
-    *mUserChoice = *choice;
 }
 
 void Core::reportError(QString errMsg)
@@ -186,9 +154,9 @@ void Core::genScript()
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
     blockWait(mPubProc,"rm ./*.rcS 2>/dev/null");
-    for(auto program : mUserChoice->programs){
+    for(auto program : mAppModel->userChoice()->programs){
         noBlockWait(mPubProc,
-                    writeScriptCmd.arg(program,QString::number(mUserChoice->threadNum)),
+                    writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)),
                     mEventLoop);
     }
     QDir::setCurrent("..");
@@ -211,7 +179,7 @@ void Core::simulatePerformance()
     QDir::setCurrent("gem5_output");
     blockWait(mPriProc,"rm ./* -rf");
     //新建文件夹
-    for(auto program: mUserChoice->programs){
+    for(auto program: mAppModel->userChoice()->programs){
         QDir::current().mkdir(program);
     }
 
@@ -224,15 +192,15 @@ void Core::simulatePerformance()
             "--kernel=x86_64-vmlinux-2.6.28.4-smp --caches "
             "--l2cache --cpu-type 'DerivO3CPU' --maxtime=10";
     QString simulateCmd;
-    for(auto program: mUserChoice->programs){
+    for(auto program: mAppModel->userChoice()->programs){
         //文件名中测试集均为小写
         if(mPubProc->isEnabled()){
             logConsoleProgram(program,"开始性能仿真...");
         }
         simulateCmd = simulateCmdFormat.arg(
                     program,
-                    QString::number(mUserChoice->threadNum),
-                    mUserChoice->test.toLower()
+                    QString::number(mAppModel->userChoice()->threadNum),
+                    mAppModel->userChoice()->test.toLower()
                     );
 //      qDebug() << simulateCmd;
         //运行仿真，耗时较长
@@ -448,23 +416,3 @@ void Core::drawHeatMap(const QString &program)
     blockWait(mPubProc,heatMapCmd);
 }
 
-bool Core::readConfig(const QString& configFileName)
-{
-    QFile reader(configFileName);
-    reader.open(QIODevice::ReadOnly);
-    if(!reader.isOpen()){
-        return false;
-    }
-    QJsonObject config = QJsonDocument::fromJson(reader.readAll()).object();
-    reader.close();
-
-   //读入数据
-    mUserChoice->architecture = config["userChoice"].toObject()["architecture"].toString();
-    mUserChoice->set = config["userChoice"].toObject()["set"].toString();
-    for(auto program:config["userChoice"].toObject()["programs"].toArray()){
-        mUserChoice->programs.append(program.toString());
-    }
-    mUserChoice->test = config["userChoice"].toObject()["test"].toString();
-    mUserChoice->threadNum = config["userChoice"].toObject()["threadNum"].toInt();
-    return true;
-}

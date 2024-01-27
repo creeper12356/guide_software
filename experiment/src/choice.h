@@ -9,6 +9,12 @@ public:
     QStringList programs;
     QString test = "";
     int threadNum = 0;
+
+    Choice(){}
+
+    void readFromJsonObject(const QJsonObject& jsonObject);
+    QJsonObject toJsonObject();
+    bool isConfigured() const;
 };
 
 

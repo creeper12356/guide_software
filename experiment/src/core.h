@@ -13,29 +13,16 @@ public:
     Core(QApplication* mApp);
     ~Core();
 
-    /*!
-     * \brief 读取配置，恢复软件状态
-     * \param configFileName 配置文件名，*config.json
-     * \return 配置文件是否被成功打开并读取。
-     */
-    bool readConfig(const QString& configFileName);
 
     /*!
      * \brief 初始化信号槽连接
      */
     void initConnections();
 
-
     //检查用户是否配置成功
     bool checkConfigured();
     //根据用户配置，检查脚本是否成功生成，若用户没有配置，直接返回true
     bool checkGenScript();
-
-    //关闭软件时写入配置
-    void writeConfig();
-public:
-    //配置完成后，复制用户选择
-    void copyUserChoice(const Choice* mUserChoice);
 
 public slots:
     //清理脚本
@@ -99,8 +86,6 @@ private:
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;
 
-    //用户的配置选择
-    Choice* mUserChoice = nullptr;
     //日志信号
 //    void logProgram(QString program,QString info);
 //    void log(QString info);
