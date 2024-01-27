@@ -85,10 +85,6 @@ private:
     MainPage* mMainPage = nullptr;
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;
-
-    //日志信号
-//    void logProgram(QString program,QString info);
-//    void log(QString info);
 };
 
 #endif // CORE_H

@@ -54,9 +54,6 @@ void Core::initConnections()
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
     connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
-    //配置相关
-    connect(mMainPage,&MainPage::configureFinished,mAppModel,&AppModel::setUserChoice);
-
     //清理脚本相关
     connect(mMainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);

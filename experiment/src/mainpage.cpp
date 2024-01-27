@@ -197,7 +197,7 @@ void MainPage::closeEvent(QCloseEvent *event)
 
 void MainPage::aboutTriggererd()
 {
-    AboutDialog aboutDialog(this);
+    AboutDialog aboutDialog;
     aboutDialog.exec();
 }
 

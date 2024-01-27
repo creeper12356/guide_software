@@ -8,6 +8,7 @@ AppModel::AppModel(MainPage *mainPage)
     mUserChoice = new Choice;
     mMainPage = mainPage;
     connect(this,&AppModel::userChoiceChanged,mMainPage,&MainPage::updateUserChoice);
+    connect(mMainPage,&MainPage::configureFinished,this,&AppModel::setUserChoice);
 
     readFromFile("config/config.json");
 }
