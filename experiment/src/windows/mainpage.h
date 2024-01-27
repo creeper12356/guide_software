@@ -18,6 +18,8 @@ private:
 
     ImageDisplay* heatMap = nullptr;
     ChoiceWidget* choiceWidget = nullptr;
+
+    ChoiceGuide* mGuide;
 public:
     MainPage(Core* core,QWidget *parent = nullptr);
     ~MainPage();
@@ -31,11 +33,12 @@ private:
     inline void initToolBar() ;
     inline void initDockWidgets() ;
 private slots:
-    void on_action_about_triggered();
     void on_action_exit_triggered();
     void on_action_maximize_triggered();
     void on_action_show_heatmap_triggered();
-    void on_action_aboutqt_triggered();
+
+    void aboutTriggererd();
+    void aboutqtTriggered();
 
 public slots:
     void scriptCleanedSlot();
@@ -54,7 +57,7 @@ protected:
 private:
     Ui::MainPage *ui;
 signals:
-    void closed();
+    void configureFinished(const Choice* userChoice);
 };
 
 #endif // MAINPAGE_H

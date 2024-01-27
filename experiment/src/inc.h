@@ -67,20 +67,13 @@ class DependencyInstaller;
 class AptInstaller;
 class PyLibInstaller;
 class PasswordDialog;
+class Choice;
 class ChoiceGuide;
 class ChoiceWidget;
 class ImageDisplay;
 class ConsoleDock;
 class TaskProcess;
 class TaskEventLoop;
-//用户选择的结构体
-struct Choice{
-    QString architecture = "";
-    QString set = "";
-    QStringList programs;
-    QString test = "";
-    int threadNum = 0;
-};
 enum Exception{
     UserAbort
 };

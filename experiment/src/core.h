@@ -99,7 +99,6 @@ private:
     MainPage* mMainPage = nullptr;
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;
-    ChoiceGuide* mGuide = nullptr;
 
     //用户的配置选择
     Choice* mUserChoice = nullptr;

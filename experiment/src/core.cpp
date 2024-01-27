@@ -30,7 +30,6 @@ Core::Core(QApplication* a):
     mMainPage->getChoiceWidget()->refreshUserChoice(mUserChoice);
     mAptInstaller = new AptInstaller(this);
     mPyLibInstaller = new PyLibInstaller(this);
-    mGuide = new ChoiceGuide(this);
 
 
     initConnections();
@@ -52,7 +51,6 @@ Core::~Core()
     delete mAptInstaller;
     delete mPyLibInstaller;
     delete mMainPage;
-    delete mGuide;
 }
 
 bool Core::isProcessRunning() const
@@ -62,22 +60,13 @@ bool Core::isProcessRunning() const
 }
 void Core::initConnections()
 {
-    //退出逻辑
-    //主页面关闭时，软件关闭
-    connect(mMainPage,&MainPage::closed,mApp,&QApplication::quit,Qt::QueuedConnection);
     connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
 
     //事件循环相关
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
     //配置相关
-    connect(mMainPage->getUi()->action_conf,&QAction::triggered,
-            mGuide,&ChoiceGuide::show);
-    connect(mGuide,&ChoiceGuide::configureFinished,
-            this,&Core::copyUserChoice);
-    connect(mGuide,&ChoiceGuide::configureFinished,
-            mMainPage->getChoiceWidget(),&ChoiceWidget::refreshUserChoice);
-
+    connect(mMainPage,&MainPage::configureFinished,this,&Core::copyUserChoice);
     //清理脚本相关
     connect(mMainPage->getUi()->action_clean,&QAction::triggered,
             this,&Core::cleanScript);

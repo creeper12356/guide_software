@@ -1,8 +1,7 @@
 #ifndef CHOICEGUIDE_H
 #define CHOICEGUIDE_H
 #include "inc.h"
-
-
+#include "choice.h"
 namespace Ui {
 class ChoiceGuide;
 }

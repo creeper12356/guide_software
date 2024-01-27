@@ -15,6 +15,8 @@ MainPage::MainPage(Core *c, QWidget *parent) :
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
+
+
     initToolBar();
     initDockWidgets();
 
@@ -29,6 +31,14 @@ MainPage::MainPage(Core *c, QWidget *parent) :
             this,[this](const QString& program){
        heatMap->loadFromFile(QString("HeatMap/%1.png").arg(program));
     });
+
+    mGuide = new ChoiceGuide(core);
+    connect(ui->action_conf,&QAction::triggered,mGuide,&ChoiceGuide::show);
+
+    connect(mGuide,&ChoiceGuide::configureFinished,
+            choiceWidget,&ChoiceWidget::refreshUserChoice);
+    connect(mGuide,&ChoiceGuide::configureFinished,
+            this,&MainPage::configureFinished);
 
     heatMap->resize(choiceWidget->size());
 
@@ -50,6 +60,9 @@ MainPage::MainPage(Core *c, QWidget *parent) :
         this->restoreGeometry(geometryRestorer.readAll());
         geometryRestorer.close();
     }
+
+    connect(ui->action_about,&QAction::triggered,this,&MainPage::aboutTriggererd);
+    connect(ui->action_aboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
 }
 
 MainPage::~MainPage()
@@ -64,6 +77,8 @@ MainPage::~MainPage()
     geometrySaver.open(QIODevice::WriteOnly);
     geometrySaver.write(this->saveGeometry());
     geometrySaver.close();
+
+    delete mGuide;
 
     delete ui;
 }
@@ -170,10 +185,9 @@ void MainPage::closeEvent(QCloseEvent *event)
             return ;
         }
     }
-    emit closed();
 }
 
-void MainPage::on_action_about_triggered()
+void MainPage::aboutTriggererd()
 {
     AboutDialog aboutDialog(this);
     aboutDialog.exec();
@@ -250,11 +264,7 @@ void MainPage::on_action_show_heatmap_triggered()
 //    heatMapDock->setVisible(!heatMapDock->isVisible());
 }
 
-void MainPage::on_action_aboutqt_triggered()
+void MainPage::aboutqtTriggered()
 {
     QMessageBox::aboutQt(this,"关于Qt");
 }
-
-
-
-
