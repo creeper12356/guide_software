@@ -21,6 +21,8 @@
 #include <QTextBrowser>
 #include <QPlainTextEdit>
 
+#include <QAction>
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSplitter>

@@ -9,58 +9,65 @@ class MainPage;
 class MainPage : public QMainWindow
 {
     Q_OBJECT
-private:
-    QToolBar* toolBar = nullptr;
-
-    ConsoleDock* consoleDock = nullptr;
-    QDockWidget* logDock = nullptr;
-
-    ImageDisplay* heatMap = nullptr;
-    ChoiceWidget* choiceWidget = nullptr;
-
-    ChoiceGuide* mGuide;
 public:
     MainPage();
     ~MainPage();
+
+    void initToolBar() ;
+    void initDockWidgets() ;
+    void restoreStateAndGeometry();
+    void saveStateAndGeometry();
+
 public:
-    //getters
-    Ui::MainPage* getUi(){return ui;}
-    ConsoleDock* getConsoleDock();
-    ChoiceWidget* getChoiceWidget();
-    QTextBrowser* getLogBrowser();
-private:
-    inline void initToolBar() ;
-    inline void initDockWidgets() ;
-private slots:
-    void configureTriggered();
-    void on_action_exit_triggered();
-    void maximizeTriggered();
-    void on_action_show_heatmap_triggered();
-
-    void aboutTriggererd();
-    void aboutqtTriggered();
-public slots:
-    //更新用户选择的显示
-    void updateUserChoice(const Choice* userChoice);
-
-public slots:
-    void scriptCleanedSlot();
-    void scriptGeneratedSlot();
-    void performanceSimulationFinishedSlot();
-
-    void longTaskStartedSlot();
-    void longTaskFinishedSlot();
+    ConsoleDock* consoleDock();
+    ChoiceWidget* choiceWidget();
+    QTextBrowser* logBrowser();
 
 public:
     void logConsole(const QString& info);
     void logConsoleProgram(const QString &program, const QString &info);
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
+public slots:
+    void updateUserChoice(const Choice* userChoice);
+    void cleanScriptFinishedSlot();
+    void genScriptFinishedSlot();
+    void performanceSimulationFinishedSlot();
+
+    void longTaskStartedSlot();
+    void longTaskFinishedSlot();
+
+private slots:
+    void configureTriggered();
+    void maximizeTriggered();
+    void aboutTriggererd();
+    void aboutqtTriggered();
+
+
+signals:
+    //用户配置完成的信号，发送给core
+    void configureFinished(const Choice* userChoice);
+    void cleanScript();
+    void genScript();
+    void simulatePerformance();
+    void genHeatMap();
+    void terminate();
+    //向core请求退出软件的信号
+    void quit();
+
+private:
+    QToolBar* mToolBar = nullptr;
+
+    ConsoleDock* mConsoleDock = nullptr;
+    QDockWidget* mLogDock = nullptr;
+
+    ImageDisplay* mHeatMapDisplay = nullptr;
+    ChoiceWidget* mChoiceWidget = nullptr;
+
+    ChoiceGuide* mGuide;
 private:
     Ui::MainPage *ui;
-signals:
-    void configureFinished(const Choice* userChoice);
+//protected:
+//    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // MAINPAGE_H

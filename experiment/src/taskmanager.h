@@ -14,6 +14,7 @@ public:
 private:
     bool mEnabled = true;
 };
+
 class TaskEventLoop: public QEventLoop
 {
     Q_OBJECT

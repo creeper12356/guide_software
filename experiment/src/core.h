@@ -13,7 +13,6 @@ public:
     Core(QApplication* mApp);
     ~Core();
 
-
     /*!
      * \brief 初始化信号槽连接
      */
@@ -37,7 +36,6 @@ public slots:
     void terminate();
 
 public:
-
     //处理gem5输出的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
     //运行mcpat模块，处理program对应的xml文件
@@ -48,8 +46,7 @@ public:
     void runHotspot(const QString& program);
     //根据steady文件画温度图
     void drawHeatMap(const QString& program);
-    //TODO : 报错
-    void reportError(QString errMsg);
+
     void logConsole(const QString& info);
     void logConsoleProgram(const QString& program, const QString& info);
 
@@ -66,6 +63,7 @@ signals:
     void longTaskStarted();
     void longTaskFinished();
 
+signals:
     //退出信号，使用异步通信
     void quit();
 
@@ -81,7 +79,6 @@ private:
     //缓冲区,记录上一次readAll操作读到的进程输出
     QByteArray cache;
 
-    //窗口
     MainPage* mMainPage = nullptr;
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;

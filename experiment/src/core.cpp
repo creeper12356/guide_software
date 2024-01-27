@@ -4,10 +4,8 @@
 #include "consoledock.h"
 #include "taskmanager.h"
 #include "choice.h"
-#include "ui_mainpage.h"
-#include "ui_dependencyinstaller.h"
-#include "ui_choiceguide.h"
 #include "appmodel.h"
+
 Core::Core(QApplication* a):
     QObject(nullptr),
     mApp(a)
@@ -55,29 +53,29 @@ void Core::initConnections()
     connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
     //清理脚本相关
-    connect(mMainPage->getUi()->action_clean,&QAction::triggered,
+    connect(mMainPage,&MainPage::cleanScript,
             this,&Core::cleanScript);
-    connect(this,&Core::cleanScriptFinished,mMainPage,&MainPage::scriptCleanedSlot);
+    connect(this,&Core::cleanScriptFinished,mMainPage,&MainPage::cleanScriptFinishedSlot);
     //生成脚本相关
-    connect(mMainPage->getUi()->action_gen,&QAction::triggered,
+    connect(mMainPage,&MainPage::genScript,
             this,&Core::genScript);
-    connect(this,&Core::genScriptFinished,mMainPage,&MainPage::scriptGeneratedSlot);
+    connect(this,&Core::genScriptFinished,mMainPage,&MainPage::genScriptFinishedSlot);
     //性能仿真相关
-    connect(mMainPage->getUi()->action_sim,&QAction::triggered,
+    connect(mMainPage,&MainPage::simulatePerformance,
             this,&Core::simulatePerformance);
     connect(this,&Core::simulatePerformanceFinished,
             mMainPage,&MainPage::performanceSimulationFinishedSlot);
     //生成温度图相关
-    connect(mMainPage->getUi()->action_temp,&QAction::triggered,
+    connect(mMainPage,&MainPage::genHeatMap,
             this,&Core::genHeatMap);
     //终端相关
-    mMainPage->getConsoleDock()->connectProcess(mPubProc,&cache);
+    mMainPage->consoleDock()->connectProcess(mPubProc,&cache);
 
     connect(mPriProc,&QProcess::readyRead,this,[this](){
         cache = mPriProc->readAll();
     });
-    connect(mMainPage->getUi()->action_terminate,
-            &QAction::triggered,this,&Core::terminate);
+    connect(mMainPage,&MainPage::terminate,
+            this,&Core::terminate);
 
     connect(this,&Core::longTaskStarted,mMainPage,&MainPage::longTaskStartedSlot);
     connect(this,&Core::longTaskFinished,mMainPage,&MainPage::longTaskFinishedSlot);

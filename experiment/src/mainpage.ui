@@ -59,7 +59,7 @@
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="action_exit"/>
+    <addaction name="action_quit"/>
    </widget>
    <widget class="QMenu" name="menu_5">
     <property name="title">
@@ -99,7 +99,7 @@
   </action>
   <action name="action_sim">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/per_sim_icon.png</normaloff>:/img/per_sim_icon.png</iconset>
    </property>
    <property name="text">
@@ -113,7 +113,7 @@
   </action>
   <action name="action_temp">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/temp_icon.png</normaloff>:/img/temp_icon.png</iconset>
    </property>
    <property name="text">
@@ -125,7 +125,7 @@
   </action>
   <action name="action_gen">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/gen_icon.png</normaloff>:/img/gen_icon.png</iconset>
    </property>
    <property name="text">
@@ -135,7 +135,7 @@
     <string>生成脚本</string>
    </property>
   </action>
-  <action name="action_exit">
+  <action name="action_quit">
    <property name="text">
     <string>退出</string>
    </property>
@@ -145,7 +145,7 @@
   </action>
   <action name="action_conf">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/conf_icon.png</normaloff>:/img/conf_icon.png</iconset>
    </property>
    <property name="text">
@@ -154,7 +154,7 @@
   </action>
   <action name="action_clean">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/clean_icon.png</normaloff>:/img/clean_icon.png</iconset>
    </property>
    <property name="text">
@@ -166,7 +166,7 @@
   </action>
   <action name="action_terminate">
    <property name="icon">
-    <iconset resource="../../res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/img/terminate_icon.png</normaloff>:/img/terminate_icon.png</iconset>
    </property>
    <property name="text">
@@ -203,7 +203,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../../res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections/>
 </ui>
