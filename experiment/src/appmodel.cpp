@@ -50,6 +50,12 @@ const Choice *AppModel::userChoice() const
     return mUserChoice;
 }
 
+void AppModel::clearUserChoiceAndNotify()
+{
+    mUserChoice->programs.clear();
+    emit userChoiceChanged(mUserChoice);
+}
+
 void AppModel::setUserChoice(const Choice *userChoice)
 {
     *mUserChoice = *userChoice;

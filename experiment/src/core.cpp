@@ -52,6 +52,7 @@ void Core::initConnections()
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
     connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
 
+    connect(mMainPage,&MainPage::clearConfig,this,&Core::clearConfig);
     //清理脚本相关
     connect(mMainPage,&MainPage::cleanScript,
             this,&Core::cleanScript);
@@ -104,13 +105,9 @@ bool Core::checkGenScript()
     return res;
 }
 
-void Core::reportError(QString errMsg)
+void Core::clearConfig()
 {
-    QMessageBox::critical(nullptr,"error",errMsg);
-    /*
-     * the software will crash.
-     */
-    mApp->quit();
+    mAppModel->clearUserChoiceAndNotify();
 }
 
 void Core::logConsole(const QString &info)

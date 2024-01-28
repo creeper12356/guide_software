@@ -7,6 +7,7 @@ ChoiceWidget::ChoiceWidget(QWidget *parent) :
     ui(new Ui::ChoiceWidget)
 {
     ui->setupUi(this);
+    this->layout()->setAlignment(Qt::AlignTop);
     connect(ui->prog_list,&QListWidget::currentTextChanged,
             this,&ChoiceWidget::currentTextChanged);
 }
@@ -23,8 +24,17 @@ QSize ChoiceWidget::sizeHint() const
 
 void ChoiceWidget::refreshUserChoice(const Choice *userChoice)
 {
-    ui->prog_list->clear();
-    ui->prog_list->addItems(userChoice->programs);
-    ui->test_label->setText(userChoice->test);
-    ui->thread_num_label->setText(QString::number(userChoice->threadNum));
+    if(userChoice->isConfigured()){
+        ui->hint_label->hide();
+        ui->detail_widget->show();
+        ui->prog_list->clear();
+        ui->prog_list->addItems(userChoice->programs);
+        ui->test_label->setText(userChoice->test);
+        ui->thread_num_label->setText(QString::number(userChoice->threadNum));
+
+    }
+    else{
+        ui->hint_label->show();
+        ui->detail_widget->hide();
+    }
 }

@@ -36,36 +36,36 @@
     <property name="title">
      <string>帮助</string>
     </property>
-    <addaction name="action_about"/>
-    <addaction name="action_aboutqt"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAboutqt"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>仿真</string>
     </property>
-    <addaction name="action_sim"/>
-    <addaction name="action_3"/>
-    <addaction name="action_temp"/>
+    <addaction name="actionSimulatePerformance"/>
+    <addaction name="actionGenHeatMap"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
      <string>脚本</string>
     </property>
-    <addaction name="action_conf"/>
-    <addaction name="action_clean"/>
-    <addaction name="action_gen"/>
+    <addaction name="actionConfigure"/>
+    <addaction name="actionClearConfig"/>
+    <addaction name="actionCleanScript"/>
+    <addaction name="actionGenScript"/>
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="action_quit"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menu_5">
     <property name="title">
      <string>终端</string>
     </property>
-    <addaction name="action_terminate"/>
+    <addaction name="actionTerminate"/>
    </widget>
    <widget class="QMenu" name="menu_6">
     <property name="title">
@@ -75,9 +75,9 @@
      <property name="title">
       <string>显示</string>
      </property>
-     <addaction name="action_show_heatmap"/>
+     <addaction name="actionShowHeatMap"/>
     </widget>
-    <addaction name="action_maximize"/>
+    <addaction name="actionMaximize"/>
     <addaction name="menu_7"/>
    </widget>
    <addaction name="menu_4"/>
@@ -92,12 +92,12 @@
     <bool>true</bool>
    </property>
   </widget>
-  <action name="action_about">
+  <action name="actionAbout">
    <property name="text">
     <string>关于</string>
    </property>
   </action>
-  <action name="action_sim">
+  <action name="actionSimulatePerformance">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/per_sim_icon.png</normaloff>:/img/per_sim_icon.png</iconset>
@@ -111,7 +111,7 @@
     <string>功耗仿真</string>
    </property>
   </action>
-  <action name="action_temp">
+  <action name="actionGenHeatMap">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/temp_icon.png</normaloff>:/img/temp_icon.png</iconset>
@@ -123,19 +123,19 @@
     <string>生成温度图</string>
    </property>
   </action>
-  <action name="action_gen">
+  <action name="actionGenScript">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/gen_icon.png</normaloff>:/img/gen_icon.png</iconset>
    </property>
    <property name="text">
-    <string>生成</string>
+    <string>生成脚本</string>
    </property>
    <property name="toolTip">
     <string>生成脚本</string>
    </property>
   </action>
-  <action name="action_quit">
+  <action name="actionQuit">
    <property name="text">
     <string>退出</string>
    </property>
@@ -143,7 +143,7 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="action_conf">
+  <action name="actionConfigure">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/conf_icon.png</normaloff>:/img/conf_icon.png</iconset>
@@ -152,19 +152,19 @@
     <string>配置</string>
    </property>
   </action>
-  <action name="action_clean">
+  <action name="actionCleanScript">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/clean_icon.png</normaloff>:/img/clean_icon.png</iconset>
    </property>
    <property name="text">
-    <string>清理</string>
+    <string>清空脚本</string>
    </property>
    <property name="toolTip">
     <string>清理脚本</string>
    </property>
   </action>
-  <action name="action_terminate">
+  <action name="actionTerminate">
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/terminate_icon.png</normaloff>:/img/terminate_icon.png</iconset>
@@ -176,7 +176,7 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_maximize">
+  <action name="actionMaximize">
    <property name="text">
     <string>最大化</string>
    </property>
@@ -184,7 +184,7 @@
     <string>F11</string>
    </property>
   </action>
-  <action name="action_show_heatmap">
+  <action name="actionShowHeatMap">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -195,10 +195,14 @@
     <string>温度图</string>
    </property>
   </action>
-  <action name="action_aboutqt">
+  <action name="actionAboutqt">
    <property name="text">
-    <string>关于Qt
-</string>
+    <string>关于Qt</string>
+   </property>
+  </action>
+  <action name="actionClearConfig">
+   <property name="text">
+    <string>清空配置</string>
    </property>
   </action>
  </widget>

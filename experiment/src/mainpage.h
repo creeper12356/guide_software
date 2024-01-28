@@ -38,6 +38,8 @@ public slots:
 
 private slots:
     void configureTriggered();
+    void simulatePerformanceTriggered();
+    void genHeatMapTriggered();
     void maximizeTriggered();
     void aboutTriggererd();
     void aboutqtTriggered();
@@ -46,6 +48,7 @@ private slots:
 signals:
     //用户配置完成的信号，发送给core
     void configureFinished(const Choice* userChoice);
+    void clearConfig();
     void cleanScript();
     void genScript();
     void simulatePerformance();

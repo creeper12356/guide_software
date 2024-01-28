@@ -27,7 +27,7 @@ MainPage::MainPage() :
     });
 
     mGuide = new ChoiceGuide();
-    connect(ui->action_conf,&QAction::triggered,mGuide,&ChoiceGuide::show);
+    connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
     mHeatMapDisplay = new ImageDisplay(ui->centralwidget);
     mHeatMapDisplay->resize(mChoiceWidget->size());
@@ -42,20 +42,22 @@ MainPage::MainPage() :
     restoreStateAndGeometry();
 
 
-    connect(ui->action_quit,&QAction::triggered,this,&MainPage::quit);
+    connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
 
-    connect(ui->action_conf,&QAction::triggered,this,&MainPage::configureTriggered);
-    connect(ui->action_clean,&QAction::triggered,this,&MainPage::cleanScript);
-    connect(ui->action_gen,&QAction::triggered,this,&MainPage::genScript);
+    connect(ui->actionConfigure,&QAction::triggered,this,&MainPage::configureTriggered);
+    connect(ui->actionClearConfig,&QAction::triggered,this,&MainPage::clearConfig);
+    connect(ui->actionCleanScript,&QAction::triggered,this,&MainPage::cleanScript);
+    connect(ui->actionGenScript,&QAction::triggered,this,&MainPage::genScript);
 
-    connect(ui->action_sim,&QAction::triggered,this,&MainPage::simulatePerformance);
-    connect(ui->action_temp,&QAction::triggered,this,&MainPage::genHeatMap);
+    connect(ui->actionSimulatePerformance,&QAction::triggered,
+            this,&MainPage::simulatePerformanceTriggered);
+    connect(ui->actionGenHeatMap,&QAction::triggered,this,&MainPage::genHeatMapTriggered);
 
-    connect(ui->action_terminate,&QAction::triggered,this,&MainPage::terminate);
+    connect(ui->actionTerminate,&QAction::triggered,this,&MainPage::terminate);
 
-    connect(ui->action_maximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
-    connect(ui->action_about,&QAction::triggered,this,&MainPage::aboutTriggererd);
-    connect(ui->action_aboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
+    connect(ui->actionMaximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
+    connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
+    connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
 }
 
 MainPage::~MainPage()
@@ -88,22 +90,17 @@ void MainPage::initToolBar()
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(Qt::TopToolBarArea,mToolBar);
     mToolBar->setIconSize(QSize(40,40));
-    connect(ui->action_sim,&QAction::triggered,[this](){
-       ui->action_sim->setEnabled(false);
-    });
-    connect(ui->action_temp,&QAction::triggered,[this](){
-        ui->action_temp->setEnabled(false);
-    });
-    mToolBar->addAction(ui->action_conf);
-    mToolBar->addAction(ui->action_clean);
-    mToolBar->addAction(ui->action_gen);
-    mToolBar->addAction(ui->action_sim);
-    mToolBar->addAction(ui->action_temp);
-    mToolBar->addAction(ui->action_terminate);
+
+    mToolBar->addAction(ui->actionConfigure);
+    mToolBar->addAction(ui->actionCleanScript);
+    mToolBar->addAction(ui->actionGenScript);
+    mToolBar->addAction(ui->actionSimulatePerformance);
+    mToolBar->addAction(ui->actionGenHeatMap);
+    mToolBar->addAction(ui->actionTerminate);
 
     auto font = mToolBar->font();
     mToolBar->setFont(font);
-    ui->action_terminate->setDisabled(true);
+    ui->actionTerminate->setDisabled(true);
 }
 
 void MainPage::initDockWidgets()
@@ -187,26 +184,17 @@ void MainPage::configureTriggered()
     emit configureFinished(mGuide->userChoice());
 }
 
-//void MainPage::closeEvent(QCloseEvent *event)
-//{
-//    Q_UNUSED(event);
-    //TODO : here
-//    if(core->isProcessRunning()){
-//        if(QMessageBox::warning(this,"警告",
-//                             "有一个进程正在运行，您未完成的工作可能丢失，仍然关闭?",
-//                             QMessageBox::Yes|QMessageBox::No)
-//                == QMessageBox::Yes){
-//            //用户强行关闭进程
-//            //kill进程
-//            core->terminate();
-//        }
-//        else{
-//            //用户取消强行关闭
-//            event->ignore();
-//            return ;
-//        }
-//    }
-//}
+void MainPage::simulatePerformanceTriggered()
+{
+    ui->actionSimulatePerformance->setEnabled(false);
+    emit simulatePerformance();
+}
+
+void MainPage::genHeatMapTriggered()
+{
+    ui->actionGenHeatMap->setEnabled(false);
+    emit genHeatMap();
+}
 
 void MainPage::aboutTriggererd()
 {
@@ -236,7 +224,7 @@ void MainPage::longTaskStartedSlot()
     for(auto action: mToolBar->actions()){
         action->setDisabled(true);
     }
-    ui->action_terminate->setEnabled(true);
+    ui->actionTerminate->setEnabled(true);
 }
 
 void MainPage::longTaskFinishedSlot()
@@ -244,7 +232,7 @@ void MainPage::longTaskFinishedSlot()
     for(auto action: mToolBar->actions()){
         action->setEnabled(true);
     }
-    ui->action_terminate->setDisabled(true);
+    ui->actionTerminate->setDisabled(true);
 }
 
 void MainPage::logConsole(const QString &info)

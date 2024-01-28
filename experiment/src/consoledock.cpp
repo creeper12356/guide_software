@@ -36,21 +36,7 @@ public:
     using QPlainTextEdit::QPlainTextEdit;
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
 };
-
-void ConsoleOutputWidget::contextMenuEvent(QContextMenuEvent *event)
-{
-//    std::unique_ptr<QMenu> menu { createStandardContextMenu(event->pos()) };
-
-    auto clearIcon = QIcon::fromTheme(QStringLiteral("edit-clear"));
-//    menu->addSeparator();
-//    menu->addAction(clearIcon,
-//                    QCoreApplication::translate("Tiled::ConsoleDock", "Clear Console"),
-//                    this, &QPlainTextEdit::clear);
-
-//    menu->exec(event->globalPos());
-}
 
 
 ConsoleDock::ConsoleDock(QWidget *parent)

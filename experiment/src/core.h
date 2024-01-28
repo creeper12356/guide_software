@@ -24,6 +24,7 @@ public:
     bool checkGenScript();
 
 public slots:
+    void clearConfig();
     //清理脚本
     void cleanScript();
     //根据用户选择，生成脚本
@@ -52,6 +53,7 @@ public:
 
 signals:
     //任务完成的信号
+
     //清理脚本成功的信号
     void cleanScriptFinished();
     //脚本成功生成的信号

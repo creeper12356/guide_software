@@ -13,6 +13,7 @@ public:
 
 public:
     const Choice* userChoice() const;
+    void clearUserChoiceAndNotify();
     void setUserChoice(const Choice* userChoice);
     void setUserChoiceAndNotify(const Choice* userChoice);
 signals:
