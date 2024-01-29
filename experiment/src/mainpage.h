@@ -23,13 +23,14 @@ public:
     ChoiceWidget* choiceWidget();
     QTextBrowser* logBrowser();
 
-public:
-    void logConsole(const QString& info);
-    void logConsoleProgram(const QString &program, const QString &info);
-protected:
-    void closeEvent(QCloseEvent *event);
 public slots:
+
+    /*!
+     * \brief 更新用户选择在界面上
+     * \param userChoice 用户选择
+     */
     void updateUserChoice(const Choice* userChoice);
+
     void cleanScriptFinishedSlot();
     void genScriptFinishedSlot();
     void genScriptFailedSlot(QString warningInfo);
@@ -41,10 +42,6 @@ public slots:
 
     void askQuitSlot();
 
-private:
-    void warning(const QString& info);
-    void critical(const QString& info);
-
 private slots:
     void configureTriggered();
     void simulatePerformanceTriggered();
@@ -52,7 +49,6 @@ private slots:
     void maximizeTriggered();
     void aboutTriggererd();
     void aboutqtTriggered();
-
 
 signals:
     //用户配置完成的信号，发送给core
@@ -66,6 +62,24 @@ signals:
     //向core请求退出软件的信号
     void quit();
     void forceQuit();
+
+public:
+    void logConsole(const QString& info);
+    void logConsoleProgram(const QString &program, const QString &info);
+protected:
+    void closeEvent(QCloseEvent *event);
+
+private:
+    /*!
+     * \brief 显示警告的对话框
+     * \param info 警告内容
+     */
+    void warning(const QString& info);
+    /*!
+     * \brief 显示错误的对话框
+     * \param info 错误内容
+     */
+    void critical(const QString& info);
 
 private:
     QToolBar* mToolBar = nullptr;

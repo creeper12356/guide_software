@@ -47,43 +47,45 @@ Core::~Core()
 void Core::initConnections()
 {
     connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
-
-    //事件循环相关
+    //进程结束后退出事件循环
     connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
     connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
-
+    //清空配置
     connect(mMainPage,&MainPage::clearConfig,this,&Core::clearConfig);
-    //清理脚本相关
+    //清空脚本
     connect(mMainPage,&MainPage::cleanScript,
             this,&Core::cleanScript);
     connect(this,&Core::cleanScriptFinished,mMainPage,&MainPage::cleanScriptFinishedSlot);
-    //生成脚本相关
+    //生成脚本
     connect(mMainPage,&MainPage::genScript,
             this,&Core::genScript);
     connect(this,&Core::genScriptFinished,mMainPage,&MainPage::genScriptFinishedSlot);
     connect(this,&Core::genScriptFailed,mMainPage,&MainPage::genScriptFailedSlot);
-    //性能仿真相关
+    //性能仿真
     connect(mMainPage,&MainPage::simulatePerformance,
             this,&Core::simulatePerformance);
     connect(this,&Core::simulatePerformanceFinished,
             mMainPage,&MainPage::performanceSimulationFinishedSlot);
     connect(this,&Core::simulatePerformanceFailed,
             mMainPage,&MainPage::performanceSimulationFailedSlot);
-    //生成温度图相关
+    //生成温度图
     connect(mMainPage,&MainPage::genHeatMap,
-            this,&Core::genHeatMap);
-    //终端相关
+        this,&Core::genHeatMap);
+    //终止
+    connect(mMainPage,&MainPage::terminate,
+            this,&Core::terminate);
+    //连接终端
     mMainPage->consoleDock()->connectProcess(mPubProc,&cache);
 
     connect(mPriProc,&QProcess::readyRead,this,[this](){
         cache = mPriProc->readAll();
     });
-    connect(mMainPage,&MainPage::terminate,
-            this,&Core::terminate);
 
+    //耗时任务的开始和完成
     connect(this,&Core::longTaskStarted,mMainPage,&MainPage::longTaskStartedSlot);
     connect(this,&Core::longTaskFinished,mMainPage,&MainPage::longTaskFinishedSlot);
 
+    //退出逻辑
     connect(mMainPage,&MainPage::quit,this,&Core::checkQuit);
     connect(this,&Core::askQuit,mMainPage,&MainPage::askQuitSlot);
     connect(mMainPage,&MainPage::forceQuit,this,&Core::forceQuit);

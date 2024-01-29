@@ -18,67 +18,124 @@ public:
      */
     void initConnections();
 
-    //检查用户是否配置成功
+    /*!
+     * \brief 检查用户是否配置成功
+     * \return 用户是否配置成功
+     */
     bool checkConfigured();
-    //根据用户配置，检查脚本是否成功生成，若用户没有配置，直接返回true
+
+    /*!
+     * \brief 检查脚本是否成功生成
+     * \return 如果用户未配置，返回true；如果用户已配置，返回所有的脚本是否成功生成。
+     */
     bool checkGenScript();
 
 public slots:
+    //!清空配置
     void clearConfig();
-    //清理脚本
+    //!清空脚本
     void cleanScript();
-    //根据用户选择，生成脚本
+    //!生成脚本
     void genScript();
-    //性能仿真
+    //!性能仿真
     void simulatePerformance();
-    //生成温度图
+    //!生成温度图
     void genHeatMap();
-    //终止当前任务
+    //!终止
     void terminate();
 
-    //检查是否可以退出，并发出信号
+    /*!
+     * \brief 检查是否可以退出，并发送信号给界面
+     *
+     * 检查是否存在未结束的进程。如果不存在，直接退出；如果存在，发送askQuit信号。
+     * \sa askQuit
+     */
     void checkQuit();
-    //强制退出
+
+    /*!
+     * \brief 强制退出
+     *
+     * 结束所有进程并退出。
+     */
     void forceQuit();
 
 public:
-    //处理gem5输出的性能数据, temporarily useless?
+
+    /*!
+     * \brief 分割gem5输出的性能数据
+     * \param program 基准程序名
+     * \return 是否分割成功
+     */
     bool splitGem5Output(const QString& program);
-    //运行mcpat模块，处理program对应的xml文件
+
+    /*!
+     * \brief 运行McPAT模块
+     * \param program 基准程序名
+     */
     void runMcpat(const QString &program);
-    //将功耗数据转换为ptrace文件
+
+    /*!
+     * \brief 将功耗数据转换为ptrace文件
+     * \param program 基准程序名
+     */
     void writePtrace(const QString& program);
-    //运行hotSpot模块,)生成grid.steady文件
+
+    /*!
+     * \brief 运行HotSpot模块，生成grid.steady文件
+     * \param program 基准程序名
+     */
     void runHotspot(const QString& program);
-    //根据steady文件画温度图
+
+    /*!
+     * \brief 调用脚本绘制温度图
+     * \param program 基准程序名
+     */
     void drawHeatMap(const QString& program);
 
+    /*!
+     * \brief 写入日志
+     * \param info 写入的信息
+     * \sa logConsoleProgram
+     */
     void logConsole(const QString& info);
+
+    /*!
+     * \brief 格式化写入日志
+     *
+     * 等价于写入：程序"{program}":{info}
+     * \param program 基准程序名
+     * \param info 写入信息
+     * \sa logConsole
+     */
     void logConsoleProgram(const QString& program, const QString& info);
 
 signals:
     //任务完成的信号
 
-    //清理脚本成功的信号
+    //!清理脚本成功
     void cleanScriptFinished();
-    //脚本成功生成的信号
+    //!脚本成功生成
     void genScriptFinished();
+    //!脚本生成失败
     void genScriptFailed(QString warningInfo);
-    //性能仿真运行成功信号
+    //!性能仿真成功
     void simulatePerformanceFinished();
+    //!性能仿真失败
     void simulatePerformanceFailed(QString warningInfo);
 
-    //长时间任务开始和结束信号
+    //!耗时任务开始
     void longTaskStarted();
+    //!耗时任务完成
     void longTaskFinished();
 
-signals:
-    //发送给MainPage，确认退出
+    //!询问用户是否退出
     void askQuit();
-    //退出信号，使用异步通信
+
+    //!退出信号，发出该信号将无条件终止软件
     void quit();
 
 private:
+
     QApplication* mApp = nullptr;
     TaskEventLoop* mEventLoop = nullptr;
     AppModel* mAppModel = nullptr;
