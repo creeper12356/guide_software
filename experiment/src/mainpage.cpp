@@ -41,7 +41,6 @@ MainPage::MainPage() :
 
     restoreStateAndGeometry();
 
-
     connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
 
     connect(ui->actionConfigure,&QAction::triggered,this,&MainPage::configureTriggered);
@@ -212,9 +211,20 @@ void MainPage::genScriptFinishedSlot()
     logConsole("脚本已成功生成。");
 }
 
+void MainPage::genScriptFailedSlot(QString warningInfo)
+{
+    warning(warningInfo);
+}
+
 void MainPage::performanceSimulationFinishedSlot()
 {
     logConsole("性能仿真结束。");
+}
+
+void MainPage::performanceSimulationFailedSlot(QString warningInfo)
+{
+    warning(warningInfo);
+    ui->actionSimulatePerformance->setEnabled(true);
 }
 
 void MainPage::longTaskStartedSlot()
@@ -235,6 +245,24 @@ void MainPage::longTaskFinishedSlot()
     ui->actionTerminate->setDisabled(true);
 }
 
+void MainPage::askQuitSlot()
+{
+    auto button = QMessageBox::warning(this,"警告","存在未结束的进程，是否强制退出？",QMessageBox::No | QMessageBox::Yes);
+    if(button == QMessageBox::Yes){
+        emit forceQuit();
+    }
+}
+
+void MainPage::warning(const QString &info)
+{
+    QMessageBox::warning(this,"警告",info);
+}
+
+void MainPage::critical(const QString &info)
+{
+    QMessageBox::critical(this,"错误",info);
+}
+
 void MainPage::logConsole(const QString &info)
 {
     if(info.isEmpty()){
@@ -251,6 +279,13 @@ void MainPage::logConsoleProgram(const QString& program, const QString& info)
     prefix = prefix.arg(program);
     logBrowser()->append(prefix + info);
 }
+
+void MainPage::closeEvent(QCloseEvent *event)
+{
+    ui->actionQuit->trigger();
+    event->ignore();
+}
+
 
 void MainPage::maximizeTriggered()
 {

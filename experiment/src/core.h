@@ -36,6 +36,11 @@ public slots:
     //终止当前任务
     void terminate();
 
+    //检查是否可以退出，并发出信号
+    void checkQuit();
+    //强制退出
+    void forceQuit();
+
 public:
     //处理gem5输出的性能数据, temporarily useless?
     bool splitGem5Output(const QString& program);
@@ -43,7 +48,7 @@ public:
     void runMcpat(const QString &program);
     //将功耗数据转换为ptrace文件
     void writePtrace(const QString& program);
-    //运行hotSpot模块,生成grid.steady文件
+    //运行hotSpot模块,)生成grid.steady文件
     void runHotspot(const QString& program);
     //根据steady文件画温度图
     void drawHeatMap(const QString& program);
@@ -58,14 +63,18 @@ signals:
     void cleanScriptFinished();
     //脚本成功生成的信号
     void genScriptFinished();
+    void genScriptFailed(QString warningInfo);
     //性能仿真运行成功信号
     void simulatePerformanceFinished();
+    void simulatePerformanceFailed(QString warningInfo);
 
     //长时间任务开始和结束信号
     void longTaskStarted();
     void longTaskFinished();
 
 signals:
+    //发送给MainPage，确认退出
+    void askQuit();
     //退出信号，使用异步通信
     void quit();
 

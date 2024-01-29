@@ -26,15 +26,24 @@ public:
 public:
     void logConsole(const QString& info);
     void logConsoleProgram(const QString &program, const QString &info);
-
+protected:
+    void closeEvent(QCloseEvent *event);
 public slots:
     void updateUserChoice(const Choice* userChoice);
     void cleanScriptFinishedSlot();
     void genScriptFinishedSlot();
+    void genScriptFailedSlot(QString warningInfo);
     void performanceSimulationFinishedSlot();
+    void performanceSimulationFailedSlot(QString warningInfo);
 
     void longTaskStartedSlot();
     void longTaskFinishedSlot();
+
+    void askQuitSlot();
+
+private:
+    void warning(const QString& info);
+    void critical(const QString& info);
 
 private slots:
     void configureTriggered();
@@ -56,6 +65,7 @@ signals:
     void terminate();
     //向core请求退出软件的信号
     void quit();
+    void forceQuit();
 
 private:
     QToolBar* mToolBar = nullptr;
@@ -69,8 +79,6 @@ private:
     ChoiceGuide* mGuide;
 private:
     Ui::MainPage *ui;
-//protected:
-//    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // MAINPAGE_H

@@ -61,11 +61,14 @@ void Core::initConnections()
     connect(mMainPage,&MainPage::genScript,
             this,&Core::genScript);
     connect(this,&Core::genScriptFinished,mMainPage,&MainPage::genScriptFinishedSlot);
+    connect(this,&Core::genScriptFailed,mMainPage,&MainPage::genScriptFailedSlot);
     //性能仿真相关
     connect(mMainPage,&MainPage::simulatePerformance,
             this,&Core::simulatePerformance);
     connect(this,&Core::simulatePerformanceFinished,
             mMainPage,&MainPage::performanceSimulationFinishedSlot);
+    connect(this,&Core::simulatePerformanceFailed,
+            mMainPage,&MainPage::performanceSimulationFailedSlot);
     //生成温度图相关
     connect(mMainPage,&MainPage::genHeatMap,
             this,&Core::genHeatMap);
@@ -80,6 +83,10 @@ void Core::initConnections()
 
     connect(this,&Core::longTaskStarted,mMainPage,&MainPage::longTaskStartedSlot);
     connect(this,&Core::longTaskFinished,mMainPage,&MainPage::longTaskFinishedSlot);
+
+    connect(mMainPage,&MainPage::quit,this,&Core::checkQuit);
+    connect(this,&Core::askQuit,mMainPage,&MainPage::askQuitSlot);
+    connect(mMainPage,&MainPage::forceQuit,this,&Core::forceQuit);
 }
 
 bool Core::checkConfigured()
@@ -138,7 +145,7 @@ void Core::genScript()
 {
     //检查前置条件
     if(!checkConfigured()){
-        QMessageBox::warning(mMainPage,"警告","请先配置，选择基准程序和测试集。");
+        emit genScriptFailed("请先配置，选择基准程序和测试集。");
         return ;
     }
     //进入脚本文件夹
@@ -159,13 +166,14 @@ void Core::simulatePerformance()
 {
     //检查前置条件
     if(!checkConfigured()){
-        QMessageBox::warning(mMainPage,"警告","请先配置，选择基准程序和测试集。");
+        emit simulatePerformanceFailed("请先配置，选择基准程序和测试集。");
         return ;
     }
     if(!checkGenScript()){
-        QMessageBox::warning(mMainPage,"警告","因部分脚本缺失无法进行仿真，请先生成脚本。");
+        emit simulatePerformanceFailed("因部分脚本缺失无法进行仿真，请先生成脚本。");
         return ;
     }
+
     emit longTaskStarted();
     //清空目录
     QDir::setCurrent("gem5_output");
@@ -308,6 +316,22 @@ void Core::terminate()
     }
     mPriProc->kill();
     mPriProc->waitForFinished(-1);
+}
+
+void Core::checkQuit()
+{
+    if(mPubProc->state() == QProcess::Running || mPriProc->state() == QProcess::Running){
+        emit askQuit();
+    }
+    else{
+        emit quit();
+    }
+}
+
+void Core::forceQuit()
+{
+    terminate();
+    emit quit();
 }
 
 bool Core::splitGem5Output(const QString &program)
