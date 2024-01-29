@@ -28,7 +28,8 @@ SOURCES += \
     taskmanager.cpp \
     passworddialog.cpp \
     choice.cpp \
-    appmodel.cpp
+    appmodel.cpp \
+    imageviewer.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -43,14 +44,16 @@ HEADERS += \
     taskmanager.h \
     passworddialog.h \
     choice.h \
-    appmodel.h
+    appmodel.h \
+    imageviewer.h
 
 FORMS += \
     aboutdialog.ui \
     choiceguide.ui \
     dependencyinstaller.ui \
     mainpage.ui \
-    choicewidget.ui
+    choicewidget.ui \
+    imageviewer.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
