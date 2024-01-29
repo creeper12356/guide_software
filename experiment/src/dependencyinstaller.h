@@ -83,6 +83,7 @@ private:
     PasswordDialog* mPasswordDialog = nullptr;
     //运行bash的进程
     QProcess* mProcess = nullptr;
+    QByteArray mCache;
     //未安装依赖列表
     QStringList mDependencyList;
 

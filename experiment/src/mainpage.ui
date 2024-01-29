@@ -161,7 +161,7 @@
     <string>清空脚本</string>
    </property>
    <property name="toolTip">
-    <string>清理脚本</string>
+    <string>清空脚本</string>
    </property>
   </action>
   <action name="actionTerminate">

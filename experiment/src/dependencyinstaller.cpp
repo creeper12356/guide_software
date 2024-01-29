@@ -109,7 +109,6 @@ bool DependencyInstaller::checkAndInstall()
         this->show();
         mEventLoop->exec();
         if(!mAccepted){
-            qDebug() << "rejected.";
             return false;
         }
         //用户接受安装
@@ -136,20 +135,14 @@ bool DependencyInstaller::checkAndInstall()
 void DependencyInstaller::switchCheckGUI()
 {
     ui->hint_label->setText(hintText());
-    ui->pkg_list->show();
-    ui->q_label->show();
-    ui->button_box->show();
-    ui->progress_bar->hide();
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
 void DependencyInstaller::switchInstallGUI()
 {
     ui->hint_label->setText("正在安装中，这可能需要一点时间...");
-    ui->pkg_list->hide();
-    ui->q_label->hide();
-    ui->button_box->hide();
     ui->progress_bar->setValue(0);
-    ui->progress_bar->show();
+    ui->stackedWidget->setCurrentIndex(1);
 }
 
 
