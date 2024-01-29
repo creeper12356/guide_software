@@ -1,16 +1,13 @@
 experiment/gem5/
 experiment/build-*
-experiment/scripts/
 experiment/TR-*
 experiment/full*
 experiment/*input/
 experiment/*output/
 experiment/mcpat/
-experiment/cache/
 experiment/HeatMap/
 experiment/HotSpot-master
 experiment/utils
-experiment/xml
 experiment/default.desktop
 experiment/guide_software
 experiment/lib/
@@ -20,6 +17,7 @@ experiment/qt.conf
 experiment/translations/
 experiment/AppRun
 experiment/doc/
+experiment/config/config.json
 experiment/config/state.txt
 experiment/config/geometry.txt
 phase2/
