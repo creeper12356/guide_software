@@ -36,6 +36,7 @@ public slots:
     void genScriptFailedSlot(QString warningInfo);
     void performanceSimulationFinishedSlot();
     void performanceSimulationFailedSlot(QString warningInfo);
+    void genHeatMapFinishedSlot();
 
     void longTaskStartedSlot();
     void longTaskFinishedSlot();

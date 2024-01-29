@@ -71,6 +71,8 @@ void Core::initConnections()
     //生成温度图
     connect(mMainPage,&MainPage::genHeatMap,
         this,&Core::genHeatMap);
+    connect(this,&Core::genHeatMapFinished,
+            mMainPage,&MainPage::genHeatMapFinishedSlot);
     //终止
     connect(mMainPage,&MainPage::terminate,
             this,&Core::terminate);
@@ -259,11 +261,13 @@ void Core::genHeatMap()
 
     //处理性能数据
     for(auto& program: resultPrograms){
-        logConsole(program + ": 分割性能仿真输出...");
+        logConsoleProgram(program,"分割性能数据...");
         if(!splitGem5Output(program)){
             logConsoleProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
             continue;
         }
+        logConsoleProgram(program,"生成xml文件...");
+        genXml(program);
         logConsoleProgram(program,"运行McPAT模块...");
         runMcpat(program);
         logConsole("完成!");
@@ -284,6 +288,7 @@ void Core::genHeatMap()
     //后处理
     //删除所有中间文件夹
     blockWait(mPriProc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
+    emit genHeatMapFinished();
     emit longTaskFinished();
 }
 
@@ -364,17 +369,18 @@ bool Core::splitGem5Output(const QString &program)
     }
 }
 
+void Core::genXml(const QString &program)
+{
+    QString genXmlCmd = "python scripts/generateXML.py McPAT_input/%1/3.txt utils/template.xml McPAT_input/%1/3.xml";
+    blockWait(mPubProc,genXmlCmd.arg(program));
+}
+
 void Core::runMcpat(const QString &program)
 {
-    QProcess pr(this);
-    pr.setProgram("bash");
-    //查找第三段xml文件
-    pr.setArguments(QStringList() << "-c" << "ls xml/" + program + "/*3.xml");
-    pr.start();
-    pr.waitForFinished(-1);
-    QString xmlFile(pr.readAll());
-    //去除末尾\n
-    xmlFile = xmlFile.trimmed();
+    //输入的xml文件
+    QString xmlFile = "McPAT_input/%1/3.xml";
+    xmlFile = xmlFile.arg(program);
+
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
     blockWait(mPriProc,mkdirCmd);

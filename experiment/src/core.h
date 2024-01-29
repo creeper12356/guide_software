@@ -69,6 +69,12 @@ public:
     bool splitGem5Output(const QString& program);
 
     /*!
+     * \brief 将分割后的性能数据转换为xml文件
+     * \param program 基准程序名
+     */
+    void genXml(const QString& program);
+
+    /*!
      * \brief 运行McPAT模块
      * \param program 基准程序名
      */
@@ -112,16 +118,18 @@ public:
 signals:
     //任务完成的信号
 
-    //!清理脚本成功
+    //!清理脚本完成
     void cleanScriptFinished();
-    //!脚本成功生成
+    //!脚本成功完成
     void genScriptFinished();
     //!脚本生成失败
     void genScriptFailed(QString warningInfo);
-    //!性能仿真成功
+    //!性能仿真完成
     void simulatePerformanceFinished();
     //!性能仿真失败
     void simulatePerformanceFailed(QString warningInfo);
+    //!生成温度图完成
+    void genHeatMapFinished();
 
     //!耗时任务开始
     void longTaskStarted();

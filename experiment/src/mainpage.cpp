@@ -227,6 +227,11 @@ void MainPage::performanceSimulationFailedSlot(QString warningInfo)
     ui->actionSimulatePerformance->setEnabled(true);
 }
 
+void MainPage::genHeatMapFinishedSlot()
+{
+    logConsole("生成温度图结束。");
+}
+
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
