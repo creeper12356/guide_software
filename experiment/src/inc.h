@@ -20,6 +20,8 @@
 #include <QLabel>
 #include <QTextBrowser>
 #include <QPlainTextEdit>
+#include <QScrollArea>
+#include <QScrollBar>
 
 #include <QAction>
 

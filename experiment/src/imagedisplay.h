@@ -1,28 +1,45 @@
-#ifndef IMAGEDISPLAY_H
-#define IMAGEDISPLAY_H
 #include "inc.h"
-class ImageLabel: public QLabel
+
+class ImageLabel : public QLabel
 {
-    friend class ImageDisplay;
-private:
-    QImage img;
-    QString fileName;
 public:
-    explicit ImageLabel(QWidget *parent = 0);
-    void loadFromFile(const QString& fileName);
+    ImageLabel(QWidget *parent = nullptr); void loadFromFile(const QString &fileName);
+
 protected:
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    QString fileName;
+    QImage img;
+};
+
+class ImageScrollArea : public QScrollArea
+{
+    Q_OBJECT
+public:
+    ImageScrollArea(QWidget *parent = nullptr);
+
+protected:
+    void wheelEvent(QWheelEvent *event) override;
+
+signals:
+    void scrollValueChanged(int delta);
 };
 
 class ImageDisplay : public QWidget
 {
     Q_OBJECT
-private:
-    ImageLabel* display;
 public:
-    explicit ImageDisplay(QWidget *parent = 0);
+    ImageDisplay(QWidget *parent = nullptr);
     void loadFromFile(const QString& fileName);
-    const QString& getFileName() const;
+
+public slots:
+    void onScrollValueChanged(int delta);
+
+private:
+    ImageScrollArea *mScrollArea;
+    ImageLabel *display;
+
+    // 可以添加一些其他变量和函数，如缩放因子、偏移等
 };
 
-#endif // IMAGEDISPLAY_H
