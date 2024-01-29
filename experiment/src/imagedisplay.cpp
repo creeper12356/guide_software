@@ -8,4 +8,5 @@ ImageDisplay::ImageDisplay(QWidget *parent)
 
 void ImageDisplay::loadFromFile(const QString &fileName)
 {
+    open(fileName);
 }

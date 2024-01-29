@@ -24,24 +24,17 @@ class ImageViewer : public QMainWindow {
   QPixmap image;
   int zoomin{0};
 
- private slots:
-  void open();
+ protected slots:
+  void open(const QString& fileName);
   void zoomIn();
   void zoomOut();
-  void properties();
-  void openContainingFolder();
-  void exit();
   void showImage();
-  void previousImage();
-  void nextImage();
   void about();
-  void trash();
   void fullscreen();
   void rotate();
-  void save();
-  void saveAs(QString);
   void scaleImageToFitWindow();
+protected:
   void mouseDoubleClickEvent(QMouseEvent* e);
   void resizeEvent(QResizeEvent* e);
-  void rename();
+
 };

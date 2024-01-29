@@ -29,7 +29,7 @@ MainPage::MainPage() :
     mGuide = new ChoiceGuide();
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-    mHeatMapDisplay = new ImageDisplay(ui->centralwidget);
+    mHeatMapDisplay = new ImageDisplay(this);
     mHeatMapDisplay->resize(mChoiceWidget->size());
 
     QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
@@ -88,7 +88,7 @@ void MainPage::initToolBar()
     mToolBar->setObjectName("toolBar");
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->addToolBar(Qt::TopToolBarArea,mToolBar);
-    mToolBar->setIconSize(QSize(40,40));
+    mToolBar->setIconSize(QSize(30,30));
 
     mToolBar->addAction(ui->actionConfigure);
     mToolBar->addAction(ui->actionCleanScript);
