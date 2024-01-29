@@ -29,7 +29,8 @@ SOURCES += \
     passworddialog.cpp \
     choice.cpp \
     appmodel.cpp \
-    imageviewer.cpp
+    imageviewer.cpp \
+    customgraphicsview.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -45,7 +46,8 @@ HEADERS += \
     passworddialog.h \
     choice.h \
     appmodel.h \
-    imageviewer.h
+    imageviewer.h \
+    customgraphicsview.h
 
 FORMS += \
     aboutdialog.ui \

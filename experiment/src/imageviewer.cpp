@@ -17,7 +17,6 @@
 ImageViewer::ImageViewer(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::ImageViewer) {
   ui->setupUi(this);
-  resize(560, 420);
 
   QStringList argumentList = QApplication::arguments();
   if (argumentList.size() > 1) {
@@ -25,19 +24,11 @@ ImageViewer::ImageViewer(QWidget* parent)
     showImage();
   }
 
-  // Image menu
-
-  // Edit menu
-  connect(ui->actionRotate, &QAction::triggered, this, &ImageViewer::rotate);
-
-  // View menu
+  //menu
   connect(ui->actionZoom_In, &QAction::triggered, this, &ImageViewer::zoomIn);
   connect(ui->actionZoom_Out, &QAction::triggered, this, &ImageViewer::zoomOut);
   connect(ui->actionFullscreen, &QAction::triggered, this,
           &ImageViewer::fullscreen);
-
-  // Help menu
-  connect(ui->actionAbout, &QAction::triggered, this, &ImageViewer::about);
 
   // Toolbar
   QToolBar* toolBar = new QToolBar(this);
