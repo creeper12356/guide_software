@@ -39,17 +39,20 @@ color: rgb(238, 238, 236);</string>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSave">
+  <action name="actionSaveAs">
    <property name="text">
-    <string>Save</string>
+    <string>另存为</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
+   <property name="toolTip">
+    <string>另存为</string>
    </property>
   </action>
   <action name="actionZoom_In">
    <property name="text">
-    <string>Zoom In</string>
+    <string>放大</string>
+   </property>
+   <property name="toolTip">
+    <string>放大</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+=</string>
@@ -57,7 +60,7 @@ color: rgb(238, 238, 236);</string>
   </action>
   <action name="actionZoom_Out">
    <property name="text">
-    <string>Zoom Out</string>
+    <string>缩小</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
@@ -65,10 +68,10 @@ color: rgb(238, 238, 236);</string>
   </action>
   <action name="actionFullscreen">
    <property name="text">
-    <string>Fullscreen</string>
+    <string>适配</string>
    </property>
-   <property name="shortcut">
-    <string>F</string>
+   <property name="toolTip">
+    <string>适配</string>
    </property>
   </action>
  </widget>

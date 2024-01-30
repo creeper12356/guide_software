@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QToolBar>
 #include <QWheelEvent>
+#include <QMenu>
 
 #include "ui_imageviewer.h"
 
@@ -29,6 +30,7 @@ ImageViewer::ImageViewer(QWidget* parent)
   connect(ui->actionZoom_Out, &QAction::triggered, this, &ImageViewer::zoomOut);
   connect(ui->actionFullscreen, &QAction::triggered, this,
           &ImageViewer::fullscreen);
+  connect(ui->actionSaveAs, &QAction::triggered, this,&ImageViewer::saveAs);
 
   // Toolbar
   QToolBar* toolBar = new QToolBar(this);
@@ -36,6 +38,10 @@ ImageViewer::ImageViewer(QWidget* parent)
   toolBar->addAction(ui->actionZoom_In);
   toolBar->addAction(ui->actionZoom_Out);
   toolBar->addAction(ui->actionFullscreen);
+
+  // Menu
+  menu = new QMenu(this);
+  menu->addAction(ui->actionSaveAs);
 }
 
 ImageViewer::~ImageViewer() { delete ui; }
@@ -116,18 +122,17 @@ void ImageViewer::zoomOut() {
   if (zoomin >= -8)
     ui->graphicsView->scale(1 / 1.2, 1 / 1.2);
   else
-    zoomin++;
+      zoomin++;
 }
 
-void ImageViewer::rotate() {
-  if (!image.isNull()) {
-    image = image.transformed(QTransform().rotate(90));
-    scene->addPixmap(image);
-    scene->setSceneRect(image.rect());
-    ui->graphicsView->setScene(scene);
-  }
+void ImageViewer::saveAs()
+{
+    QString saveFileName = QFileDialog::getSaveFileName(this,"另存为",currentFile,"*.jpg *.png");
+    if(saveFileName.isEmpty()){
+        return ;
+    }
+    image.save(saveFileName);
 }
-
 
 void ImageViewer::fullscreen() {
   showFullScreen();
@@ -148,6 +153,13 @@ void ImageViewer::about() {
 void ImageViewer::resizeEvent(QResizeEvent*) {
   ui->graphicsView->resetMatrix();
   scaleImageToFitWindow();
+}
+
+void ImageViewer::contextMenuEvent(QContextMenuEvent *e)
+{
+    if(!currentFile.isEmpty()){
+        menu->exec(e->globalPos());
+    }
 }
 
 

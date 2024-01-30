@@ -12,6 +12,7 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     void handleZoom(QWheelEvent* event);

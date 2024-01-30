@@ -23,18 +23,20 @@ class ImageViewer : public QMainWindow {
   QGraphicsScene* scene;
   QPixmap image;
   int zoomin{0};
+  QMenu* menu;
 
  protected slots:
   void open(const QString& fileName);
   void zoomIn();
   void zoomOut();
+  void saveAs();
   void showImage();
   void about();
   void fullscreen();
-  void rotate();
   void scaleImageToFitWindow();
 protected:
   void mouseDoubleClickEvent(QMouseEvent* e);
   void resizeEvent(QResizeEvent* e);
+  void contextMenuEvent(QContextMenuEvent* e);
 
 };

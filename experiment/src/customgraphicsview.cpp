@@ -17,6 +17,12 @@ void CustomGraphicsView::wheelEvent(QWheelEvent *event) {
     }
 }
 
+void CustomGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    //事件传递给父部件
+    event->ignore();
+}
+
 void CustomGraphicsView::handleZoom(QWheelEvent *event) {
     int delta = event->angleDelta().y();
     // Perform your custom zoom logic here
