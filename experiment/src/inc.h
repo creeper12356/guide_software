@@ -74,7 +74,6 @@ class PasswordDialog;
 class Choice;
 class ChoiceGuide;
 class ChoiceWidget;
-class ImageDisplay;
 class ImageViewer;
 class ConsoleDock;
 class TaskProcess;

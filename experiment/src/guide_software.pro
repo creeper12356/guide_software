@@ -21,7 +21,6 @@ SOURCES += \
     dependencyinstaller.cpp \
     mainpage.cpp \
     choicewidget.cpp \
-    imagedisplay.cpp \
     core.cpp \
     main.cpp \
     consoledock.cpp \
@@ -38,7 +37,6 @@ HEADERS += \
     dependencyinstaller.h \
     mainpage.h \
     choicewidget.h \
-    imagedisplay.h \
     core.h \
     inc.h \
     consoledock.h \

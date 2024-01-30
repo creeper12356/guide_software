@@ -1,50 +1,38 @@
 #include "imageviewer.h"
+#include "ui_imageviewer.h"
 
-#include <QDateTime>
-#include <QDebug>
-#include <QDesktopServices>
 #include <QFileDialog>
-#include <QFontDialog>
-#include <QInputDialog>
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QTextStream>
 #include <QToolBar>
-#include <QWheelEvent>
 #include <QMenu>
-
-#include "ui_imageviewer.h"
 
 ImageViewer::ImageViewer(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::ImageViewer) {
   ui->setupUi(this);
 
-  QStringList argumentList = QApplication::arguments();
-  if (argumentList.size() > 1) {
-    currentFile = argumentList.at(1);
-    showImage();
-  }
-
-  //menu
+  //初始化菜单
   connect(ui->actionZoom_In, &QAction::triggered, this, &ImageViewer::zoomIn);
   connect(ui->actionZoom_Out, &QAction::triggered, this, &ImageViewer::zoomOut);
   connect(ui->actionFullscreen, &QAction::triggered, this,
           &ImageViewer::fullscreen);
   connect(ui->actionSaveAs, &QAction::triggered, this,&ImageViewer::saveAs);
 
-  // Toolbar
+  menu = new QMenu(this);
+  menu->addAction(ui->actionSaveAs);
+
+  //初始化工具栏
   QToolBar* toolBar = new QToolBar(this);
   addToolBar(Qt::TopToolBarArea,toolBar);
   toolBar->addAction(ui->actionZoom_In);
   toolBar->addAction(ui->actionZoom_Out);
   toolBar->addAction(ui->actionFullscreen);
-
-  // Menu
-  menu = new QMenu(this);
-  menu->addAction(ui->actionSaveAs);
 }
 
-ImageViewer::~ImageViewer() { delete ui; }
+ImageViewer::~ImageViewer()
+{
+    delete ui;
+}
 
 void ImageViewer::open(const QString &fileName)
 {
@@ -127,7 +115,7 @@ void ImageViewer::zoomOut() {
 
 void ImageViewer::saveAs()
 {
-    QString saveFileName = QFileDialog::getSaveFileName(this,"另存为",currentFile,"*.jpg *.png");
+    QString saveFileName = QFileDialog::getSaveFileName(this,"另存为",currentFile,"*.png");
     if(saveFileName.isEmpty()){
         return ;
     }

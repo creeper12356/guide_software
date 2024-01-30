@@ -1,8 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-
-#include "ui_imageviewer.h"
+#include <QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,8 +24,9 @@ class ImageViewer : public QMainWindow {
   int zoomin{0};
   QMenu* menu;
 
- protected slots:
+public:
   void open(const QString& fileName);
+protected slots:
   void zoomIn();
   void zoomOut();
   void saveAs();

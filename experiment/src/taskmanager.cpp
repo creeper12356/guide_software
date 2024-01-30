@@ -45,9 +45,10 @@ void TaskEventLoop::setEnabled(bool flag)
 int TaskEventLoop::exec(QEventLoop::ProcessEventsFlags flags)
 {
     if(mEnabled){
-        QEventLoop::exec(flags);
+        return QEventLoop::exec(flags);
     }
     else{
         qDebug() << "cannot start because event loop is disabled.";
+        return 1;
     }
 }

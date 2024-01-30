@@ -3,10 +3,9 @@
 #include "aboutdialog.h"
 #include "choiceguide.h"
 #include "choicewidget.h"
-#include "imagedisplay.h"
 #include "consoledock.h"
 #include "consoledock.h"
-
+#include "imageviewer.h"
 
 MainPage::MainPage() :
     QMainWindow(nullptr),
@@ -23,14 +22,14 @@ MainPage::MainPage() :
     mChoiceWidget = new ChoiceWidget(ui->centralwidget);
     connect(mChoiceWidget,&ChoiceWidget::currentTextChanged,
             this,[this](const QString& program){
-       mHeatMapDisplay->loadFromFile(QString("HeatMap/%1.png").arg(program));
+       mHeatMapDisplay->open(QString("HeatMap/%1.png").arg(program));
     });
 
     mGuide = new ChoiceGuide();
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-    mHeatMapDisplay = new ImageDisplay(this);
-    mHeatMapDisplay->resize(mChoiceWidget->size());
+    mHeatMapDisplay = new ImageViewer(this);
+//    mHeatMapDisplay->resize(mChoiceWidget->size());
 
     QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
     splitter->addWidget(mChoiceWidget);
@@ -197,8 +196,11 @@ void MainPage::genHeatMapTriggered()
 
 void MainPage::aboutTriggererd()
 {
-    AboutDialog aboutDialog;
-    aboutDialog.exec();
+    QMessageBox::about(this, "关于",
+                     "<center><h2>Guide Software</h2></center><br>"
+                     "热仿真向导软件<br>"
+                     "Source code at <a style=\"color: #8AB8FE\" "
+                     "href='https://github.com/creeper12356/guide_software'>GitHub</a>");
 }
 
 void MainPage::cleanScriptFinishedSlot()

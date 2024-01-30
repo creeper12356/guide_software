@@ -7,7 +7,6 @@ experiment/*output/
 experiment/mcpat/
 experiment/HeatMap/
 experiment/HotSpot-master
-experiment/utils
 experiment/default.desktop
 experiment/guide_software
 experiment/lib/

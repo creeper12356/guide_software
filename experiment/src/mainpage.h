@@ -88,7 +88,7 @@ private:
     ConsoleDock* mConsoleDock = nullptr;
     QDockWidget* mLogDock = nullptr;
 
-    ImageDisplay* mHeatMapDisplay = nullptr;
+    ImageViewer* mHeatMapDisplay = nullptr;
     ChoiceWidget* mChoiceWidget = nullptr;
 
     ChoiceGuide* mGuide;
