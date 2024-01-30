@@ -16,7 +16,7 @@ class ImageViewer : public QMainWindow {
   ImageViewer(QWidget* parent = nullptr);
   ~ImageViewer();
 
- private:
+protected:
   Ui::ImageViewer* ui;
   QString currentFile;
   QGraphicsScene* scene;
@@ -31,8 +31,7 @@ protected slots:
   void zoomOut();
   void saveAs();
   void showImage();
-  void about();
-  void fullscreen();
+  void fitWindow();
   void scaleImageToFitWindow();
 protected:
   void mouseDoubleClickEvent(QMouseEvent* e);

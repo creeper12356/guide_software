@@ -15,7 +15,7 @@ ImageViewer::ImageViewer(QWidget* parent)
   connect(ui->actionZoom_In, &QAction::triggered, this, &ImageViewer::zoomIn);
   connect(ui->actionZoom_Out, &QAction::triggered, this, &ImageViewer::zoomOut);
   connect(ui->actionFullscreen, &QAction::triggered, this,
-          &ImageViewer::fullscreen);
+          &ImageViewer::fitWindow);
   connect(ui->actionSaveAs, &QAction::triggered, this,&ImageViewer::saveAs);
 
   menu = new QMenu(this);
@@ -122,20 +122,12 @@ void ImageViewer::saveAs()
     image.save(saveFileName);
 }
 
-void ImageViewer::fullscreen() {
+void ImageViewer::fitWindow() {
   showFullScreen();
   ui->graphicsView->showFullScreen();
 
   ui->graphicsView->resetMatrix();
   scaleImageToFitWindow();
-}
-
-void ImageViewer::about() {
-  QMessageBox::about(this, "About Coreavor",
-                     "<center><h2>Coreavor</h2></center><br>"
-                     "Simple image viewer<br>"
-                     "Source code at <a style=\"color: #8AB8FE\" "
-                     "href='https://github.com/Mithil467/Coreavor'>GitHub</a>");
 }
 
 void ImageViewer::resizeEvent(QResizeEvent*) {

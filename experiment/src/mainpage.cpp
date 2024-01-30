@@ -5,7 +5,7 @@
 #include "choicewidget.h"
 #include "consoledock.h"
 #include "consoledock.h"
-#include "imageviewer.h"
+#include "heatmapviewer.h"
 
 MainPage::MainPage() :
     QMainWindow(nullptr),
@@ -22,18 +22,18 @@ MainPage::MainPage() :
     mChoiceWidget = new ChoiceWidget(ui->centralwidget);
     connect(mChoiceWidget,&ChoiceWidget::currentTextChanged,
             this,[this](const QString& program){
-       mHeatMapDisplay->open(QString("HeatMap/%1.png").arg(program));
+       mHeatMapViewer->open(QString("HeatMap/%1.png").arg(program));
     });
 
     mGuide = new ChoiceGuide();
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-    mHeatMapDisplay = new ImageViewer(this);
+    mHeatMapViewer = new HeatMapViewer(this);
 //    mHeatMapDisplay->resize(mChoiceWidget->size());
 
     QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
     splitter->addWidget(mChoiceWidget);
-    splitter->addWidget(mHeatMapDisplay);
+    splitter->addWidget(mHeatMapViewer);
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,1);
     centralLayout->addWidget(splitter);

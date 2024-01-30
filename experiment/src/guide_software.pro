@@ -29,7 +29,8 @@ SOURCES += \
     choice.cpp \
     appmodel.cpp \
     imageviewer.cpp \
-    customgraphicsview.cpp
+    customgraphicsview.cpp \
+    heatmapviewer.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -45,7 +46,8 @@ HEADERS += \
     choice.h \
     appmodel.h \
     imageviewer.h \
-    customgraphicsview.h
+    customgraphicsview.h \
+    heatmapviewer.h
 
 FORMS += \
     aboutdialog.ui \

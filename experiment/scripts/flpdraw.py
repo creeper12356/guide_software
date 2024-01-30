@@ -56,7 +56,7 @@ axs.set_title('{}'.format(map_title))
 axs.set_xticks([n for n in np.linspace(0, total_width, 5)])
 axs.set_xlabel('Horizontal Position (mm)')
 
-axs.set_yticks([n for n in np.linspace(0, total_height, 5)])
+axs.set_yticks([n for n in np.linspace(1, total_height, 5)])
 axs.set_ylabel('Vertical Position (mm)')
 
 plt.axis('scaled')

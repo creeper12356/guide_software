@@ -74,15 +74,11 @@ class PasswordDialog;
 class Choice;
 class ChoiceGuide;
 class ChoiceWidget;
-class ImageViewer;
+class HeatMapViewer;
 class ConsoleDock;
 class TaskProcess;
 class TaskEventLoop;
 
 class AppModel;
-
-enum Exception{
-    UserAbort
-};
 
 #endif // INC_H
