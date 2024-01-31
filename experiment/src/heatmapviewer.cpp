@@ -8,5 +8,6 @@ HeatMapViewer::HeatMapViewer(QWidget *parent)
 
 void HeatMapViewer::mousePressEvent(QMouseEvent *e)
 {
-    qDebug() << e->pos();
+
+
 }

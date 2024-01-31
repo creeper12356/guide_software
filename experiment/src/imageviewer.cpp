@@ -14,19 +14,19 @@ ImageViewer::ImageViewer(QWidget* parent)
   //初始化菜单
   connect(ui->actionZoom_In, &QAction::triggered, this, &ImageViewer::zoomIn);
   connect(ui->actionZoom_Out, &QAction::triggered, this, &ImageViewer::zoomOut);
-  connect(ui->actionFullscreen, &QAction::triggered, this,
+  connect(ui->actionFit, &QAction::triggered, this,
           &ImageViewer::fitWindow);
   connect(ui->actionSaveAs, &QAction::triggered, this,&ImageViewer::saveAs);
 
-  menu = new QMenu(this);
-  menu->addAction(ui->actionSaveAs);
+  mMenu = new QMenu(this);
+  mMenu->addAction(ui->actionSaveAs);
 
   //初始化工具栏
-  QToolBar* toolBar = new QToolBar(this);
-  addToolBar(Qt::TopToolBarArea,toolBar);
-  toolBar->addAction(ui->actionZoom_In);
-  toolBar->addAction(ui->actionZoom_Out);
-  toolBar->addAction(ui->actionFullscreen);
+  mToolBar = new QToolBar(this);
+  addToolBar(Qt::TopToolBarArea,mToolBar);
+  mToolBar->addAction(ui->actionZoom_In);
+  mToolBar->addAction(ui->actionZoom_Out);
+  mToolBar->addAction(ui->actionFit);
 }
 
 ImageViewer::~ImageViewer()
@@ -34,13 +34,38 @@ ImageViewer::~ImageViewer()
     delete ui;
 }
 
+const QString &ImageViewer::currentFile() const
+{
+    return mCurrentFile;
+}
+
+const QGraphicsScene *ImageViewer::scene() const
+{
+    return mScene;
+}
+
+const QPixmap &ImageViewer::image() const
+{
+    return mImage;
+}
+
+QMenu *ImageViewer::menu()
+{
+    return mMenu;
+}
+
+QToolBar *ImageViewer::toolBar()
+{
+    return mToolBar;
+}
+
 void ImageViewer::open(const QString &fileName)
 {
     if(QFile::exists(fileName)){
-        currentFile = fileName;
+        mCurrentFile = fileName;
     }
     else {
-        currentFile = "";
+        mCurrentFile = "";
     }
     showImage();
 }
@@ -50,32 +75,32 @@ void ImageViewer::showImage() {
   ui->graphicsView->resetMatrix();
 
   // Image is a Pixmap
-  image.load(currentFile);
+  mImage.load(mCurrentFile);
 
-  scene = new QGraphicsScene(this);
+  mScene = new QGraphicsScene(this);
 
-  scene->addPixmap(image);
-  scene->setSceneRect(image.rect());
-  ui->graphicsView->setScene(scene);
+  mScene->addPixmap(mImage);
+  mScene->setSceneRect(mImage.rect());
+  ui->graphicsView->setScene(mScene);
 
   scaleImageToFitWindow();
-  QFileInfo file(currentFile);
+  QFileInfo file(mCurrentFile);
   setWindowTitle(file.fileName());
   statusBar()->showMessage(QString("%1 %2x%3px %4 kB")
                                .arg(file.fileName())
-                               .arg(image.width())
-                               .arg(image.height())
-                               .arg(QFile(currentFile).size() / 1000.0));
+                               .arg(mImage.width())
+                               .arg(mImage.height())
+                               .arg(QFile(mCurrentFile).size() / 1000.0));
 }
 
 void ImageViewer::scaleImageToFitWindow() {
-  int y = ui->graphicsView->size().height() - image.height();
-  int x = ui->graphicsView->size().width() - image.width();
+  int y = ui->graphicsView->size().height() - mImage.height();
+  int x = ui->graphicsView->size().width() - mImage.width();
 
   double scaleFactor = 1.0;
 
-  double xsf = ui->graphicsView->size().width() / (double)image.width();
-  double ysf = ui->graphicsView->size().height() / (double)image.height();
+  double xsf = ui->graphicsView->size().width() / (double)mImage.width();
+  double ysf = ui->graphicsView->size().height() / (double)mImage.height();
 
   // There are 4 cases here -
   // 1. (+x,+y) Image fits well in the slot -> Do nothing
@@ -98,28 +123,28 @@ void ImageViewer::scaleImageToFitWindow() {
 
 
 void ImageViewer::zoomIn() {
-  zoomin++;
-  if (zoomin <= 12)
+  mZoomin++;
+  if (mZoomin <= 12)
     ui->graphicsView->scale(1.2, 1.2);
   else
-    zoomin--;
+    mZoomin--;
 }
 
 void ImageViewer::zoomOut() {
-  zoomin--;
-  if (zoomin >= -8)
+  mZoomin--;
+  if (mZoomin >= -8)
     ui->graphicsView->scale(1 / 1.2, 1 / 1.2);
   else
-      zoomin++;
+      mZoomin++;
 }
 
 void ImageViewer::saveAs()
 {
-    QString saveFileName = QFileDialog::getSaveFileName(this,"另存为",currentFile,"*.png");
+    QString saveFileName = QFileDialog::getSaveFileName(this,"另存为",mCurrentFile,"*.png");
     if(saveFileName.isEmpty()){
         return ;
     }
-    image.save(saveFileName);
+    mImage.save(saveFileName);
 }
 
 void ImageViewer::fitWindow() {
@@ -137,8 +162,8 @@ void ImageViewer::resizeEvent(QResizeEvent*) {
 
 void ImageViewer::contextMenuEvent(QContextMenuEvent *e)
 {
-    if(!currentFile.isEmpty()){
-        menu->exec(e->globalPos());
+    if(!mCurrentFile.isEmpty()){
+        mMenu->exec(e->globalPos());
     }
 }
 
