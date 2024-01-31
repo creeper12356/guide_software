@@ -41,6 +41,8 @@ public slots:
     void simulatePerformance();
     //!生成温度图
     void genHeatMap();
+    //!探针函数
+    void probe(QString program , qreal x , qreal y);
     //!终止
     void terminate();
 

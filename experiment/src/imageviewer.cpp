@@ -44,6 +44,11 @@ const QGraphicsScene *ImageViewer::scene() const
     return mScene;
 }
 
+const CustomGraphicsView *ImageViewer::view() const
+{
+    return ui->graphicsView;
+}
+
 const QPixmap &ImageViewer::image() const
 {
     return mImage;
@@ -57,6 +62,11 @@ QMenu *ImageViewer::menu()
 QToolBar *ImageViewer::toolBar()
 {
     return mToolBar;
+}
+
+QStatusBar *ImageViewer::statusBar()
+{
+    return ui->statusbar;
 }
 
 void ImageViewer::open(const QString &fileName)

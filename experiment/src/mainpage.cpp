@@ -56,6 +56,8 @@ MainPage::MainPage() :
     connect(ui->actionMaximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
     connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
     connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
+
+    connect(mHeatMapViewer,&HeatMapViewer::probeTriggered,this,&MainPage::probe);
 }
 
 MainPage::~MainPage()

@@ -9,6 +9,10 @@ probe_x = float(probe_x)
 probe_y = sys.argv[4]  # probe's y coordinate
 probe_y = float(probe_y)
 
+if probe_x < 0 or probe_x > 0.015 or probe_y < 0 or probe_y > 0.015:
+	print('overflow')
+	exit(0)
+
 temps = []
 
 with open(path_steady, 'r') as fp:
@@ -24,8 +28,8 @@ with open(path_steady, 'r') as fp:
 # length = len(temps)
 # row, cow = int(np.sqrt(length)), int(np.sqrt(length))  # sqrt returns float type, so we need to convert it to int
 # temps = np.reshape(temps, (row, cow))
-
-col = round(probe_x / (0.015 / 63))
-row = round((0.015 - probe_y) / (0.015 / 63))
-inx = int(row * 63 + col)
+length = 64
+col = round(probe_x / (0.015 / length))
+row = round((0.015 - probe_y) / (0.015 / length))
+inx = int(row * length + col)
 print(temps[inx])

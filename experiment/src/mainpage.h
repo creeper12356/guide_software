@@ -60,6 +60,8 @@ signals:
     void simulatePerformance();
     void genHeatMap();
     void terminate();
+    //探针信号
+    void probe(QString program ,qreal x, qreal y);
     //向core请求退出软件的信号
     void quit();
     void forceQuit();

@@ -23,6 +23,8 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
+#include <QGraphicsView>
+
 #include <QAction>
 
 #include <QHBoxLayout>

@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include "customgraphicsview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,8 +21,11 @@ protected:
 
   const QString& currentFile() const;
   const QGraphicsScene* scene() const;
+  const CustomGraphicsView *view() const;
   const QPixmap& image() const;
   QMenu* menu();
+  QToolBar* toolBar();
+  QStatusBar* statusBar();
 
 public:
   void open(const QString& fileName);

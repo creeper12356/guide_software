@@ -73,6 +73,9 @@ void Core::initConnections()
         this,&Core::genHeatMap);
     connect(this,&Core::genHeatMapFinished,
             mMainPage,&MainPage::genHeatMapFinishedSlot);
+    //温度场探针
+    connect(mMainPage,&MainPage::probe,this,&Core::probe);
+
     //终止
     connect(mMainPage,&MainPage::terminate,
             this,&Core::terminate);
@@ -257,6 +260,7 @@ void Core::genHeatMap()
 //    }
     QDir::setCurrent("..");
     //准备温度图文件夹
+    blockWait(mPriProc,"mkdir HotSpot_output ; rm HotSpot_output/* -rf");
     blockWait(mPriProc,"mkdir HeatMap ; rm HeatMap/* -rf");
 
     //处理性能数据
@@ -286,10 +290,19 @@ void Core::genHeatMap()
     mEventLoop->setEnabled(true);
 
     //后处理
-    //删除所有中间文件夹
-    blockWait(mPriProc,"rm McPAT_input McPAT_output HotSpot_input HotSpot_output -rf");
+    //删除除了HotSpot_output之外的所有中间文件夹
+    blockWait(mPriProc,"rm McPAT_input McPAT_output HotSpot_input -rf");
     emit genHeatMapFinished();
     emit longTaskFinished();
+}
+
+void Core::probe(QString program, qreal x, qreal y)
+{
+    //TODO : 检查温度图是否生成
+    QString probeCmd = "python scripts/probe.py HotSpot_output/%1/%1.grid.steady 0 %2 %3";
+    probeCmd = probeCmd.arg(program , QString::number(x) , QString::number(y));
+
+    blockWait(mPubProc,probeCmd);
 }
 
 void Core::terminate()
@@ -408,9 +421,11 @@ void Core::writePtrace(const QString &program)
 
 void Core::runHotspot(const QString &program)
 {
+    //创建HotSpot子文件夹
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
     blockWait(mPriProc,mkdirCmd);
+
     QDir::setCurrent("HotSpot-master");
     QString hotspotCmd = "./hotspot "
                          "-c ../utils/example.config "
