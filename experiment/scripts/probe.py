@@ -29,7 +29,10 @@ with open(path_steady, 'r') as fp:
 # row, cow = int(np.sqrt(length)), int(np.sqrt(length))  # sqrt returns float type, so we need to convert it to int
 # temps = np.reshape(temps, (row, cow))
 length = 64
-col = round(probe_x / (0.015 / length))
-row = round((0.015 - probe_y) / (0.015 / length))
-inx = int(row * length + col)
+col = int(probe_x / 0.015 * length)
+row = int((0.015 - probe_y) / 0.015 * length)
+# print("col={}".format(col))
+# print("row={}".format(row))
+inx = row * length + col
+# print("inx={}".format(inx))
 print(temps[inx])

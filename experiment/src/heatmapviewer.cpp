@@ -24,13 +24,6 @@ QPointF HeatMapViewer::globalToData(const QPoint &pos)
     return QPointF(x,y);
 }
 
-void HeatMapViewer::mouseMoveEvent(QMouseEvent *e)
-{
-    qDebug() << "move event";
-    QPointF dataPos = globalToData(e->globalPos());
-    statusBar()->showMessage(QString("(%1,%2)").arg(QString::number(dataPos.x()),QString::number(dataPos.y())));
-}
-
 void HeatMapViewer::mousePressEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton && mActionProbe->isChecked()){

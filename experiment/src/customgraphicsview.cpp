@@ -5,7 +5,6 @@ CustomGraphicsView::CustomGraphicsView(QWidget *parent) : QGraphicsView(parent)
     //设置变换和调整大小锚点为鼠标位置
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);
-    setMouseTracking(true);
 }
 
 void CustomGraphicsView::wheelEvent(QWheelEvent *event) {
@@ -25,11 +24,6 @@ void CustomGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 }
 
 void CustomGraphicsView::mousePressEvent(QMouseEvent *event)
-{
-    event->ignore();
-}
-
-void CustomGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     event->ignore();
 }
