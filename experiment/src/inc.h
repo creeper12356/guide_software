@@ -83,4 +83,6 @@ class TaskEventLoop;
 
 class AppModel;
 
+bool isRunningInDocker();
+
 #endif // INC_H

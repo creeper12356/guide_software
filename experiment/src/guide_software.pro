@@ -30,7 +30,8 @@ SOURCES += \
     appmodel.cpp \
     imageviewer.cpp \
     customgraphicsview.cpp \
-    heatmapviewer.cpp
+    heatmapviewer.cpp \
+    inc.cpp
 
 HEADERS += \
     aboutdialog.h \

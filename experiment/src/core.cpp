@@ -27,11 +27,17 @@ Core::Core(QApplication* a):
 
     initConnections();
 
-    if(mAptInstaller->checkAndInstall() && mPyLibInstaller->checkAndInstall()){
+
+    if(isRunningInDocker()) {
         mMainPage->show();
     }
-    else{
-        emit quit();
+    else {
+        if(mAptInstaller->checkAndInstall() && mPyLibInstaller->checkAndInstall()){
+            mMainPage->show();
+        }
+        else{
+            emit quit();
+        }
     }
 }
 
