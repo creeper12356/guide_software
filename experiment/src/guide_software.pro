@@ -31,7 +31,8 @@ SOURCES += \
     imageviewer.cpp \
     customgraphicsview.cpp \
     heatmapviewer.cpp \
-    inc.cpp
+    inc.cpp \
+    probewidget.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -48,7 +49,8 @@ HEADERS += \
     appmodel.h \
     imageviewer.h \
     customgraphicsview.h \
-    heatmapviewer.h
+    heatmapviewer.h \
+    probewidget.h
 
 FORMS += \
     aboutdialog.ui \
@@ -56,7 +58,8 @@ FORMS += \
     dependencyinstaller.ui \
     mainpage.ui \
     choicewidget.ui \
-    imageviewer.ui
+    imageviewer.ui \
+    probewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -6,6 +6,7 @@
 #include "consoledock.h"
 #include "consoledock.h"
 #include "heatmapviewer.h"
+#include "probewidget.h"
 
 MainPage::MainPage() :
     QMainWindow(nullptr),
@@ -29,13 +30,16 @@ MainPage::MainPage() :
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
     mHeatMapViewer = new HeatMapViewer(this);
-//    mHeatMapDisplay->resize(mChoiceWidget->size());
+
+    mProbeWidget = new ProbeWidget(this);
 
     QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
     splitter->addWidget(mChoiceWidget);
+    splitter->addWidget(mProbeWidget);
     splitter->addWidget(mHeatMapViewer);
     splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
+    splitter->setStretchFactor(1,0);
+    splitter->setStretchFactor(2,1);
     centralLayout->addWidget(splitter);
 
     restoreStateAndGeometry();
@@ -234,6 +238,13 @@ void MainPage::performanceSimulationFailedSlot(QString warningInfo)
 void MainPage::genHeatMapFinishedSlot()
 {
     logConsole("生成温度图结束。");
+}
+
+void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
+{
+    mProbeWidget->setTemperature(temperature);
+    mProbeWidget->setProbeX(probeX);
+    mProbeWidget->setProbeY(probeY);
 }
 
 void MainPage::longTaskStartedSlot()

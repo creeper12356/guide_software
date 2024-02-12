@@ -42,7 +42,7 @@ public slots:
     //!生成温度图
     void genHeatMap();
     //!探针函数
-    void probe(QString program , qreal x , qreal y);
+    void probe(QString program , qreal probeX , qreal probeY);
     //!终止
     void terminate();
 
@@ -132,6 +132,8 @@ signals:
     void simulatePerformanceFailed(QString warningInfo);
     //!生成温度图完成
     void genHeatMapFinished();
+
+    void probeResult(qreal temperature , qreal probeX, qreal probeY);
 
     //!耗时任务开始
     void longTaskStarted();

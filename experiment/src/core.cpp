@@ -81,6 +81,7 @@ void Core::initConnections()
             mMainPage,&MainPage::genHeatMapFinishedSlot);
     //温度场探针
     connect(mMainPage,&MainPage::probe,this,&Core::probe);
+    connect(this,&Core::probeResult,mMainPage,&MainPage::displayProbeResult);
 
     //终止
     connect(mMainPage,&MainPage::terminate,
@@ -302,13 +303,47 @@ void Core::genHeatMap()
     emit longTaskFinished();
 }
 
-void Core::probe(QString program, qreal x, qreal y)
+void Core::probe(QString program, qreal probeX, qreal probeY)
+    //TODO : optimize algorithm
 {
     //TODO : 检查温度图是否生成
-    QString probeCmd = "python scripts/probe.py HotSpot_output/%1/%1.grid.steady 0 %2 %3";
-    probeCmd = probeCmd.arg(program , QString::number(x) , QString::number(y));
+    //TODO : read 0.015 from elsewhere
+    if(probeX < 0 || probeX > 0.015 || probeY < 0 || probeY > 0.015) {
+        qDebug() << "overflow";
+        return ;
+    }
 
-    blockWait(mPubProc,probeCmd);
+    QFile steadyFile(QString("HotSpot_output/%1/%1.grid.steady").arg(program));
+    const int layer = 0;
+    if(!steadyFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return ;
+    }
+    QTextStream ts(&steadyFile);
+    QString line;
+    QVector<qreal> temps;
+    int count = 0;
+    while(!ts.atEnd()) {
+        line = ts.readLine();
+        if(line[0] == 'L' && count <= layer) {
+            ++count;
+            continue;
+        }
+        if(line[0] == 'L' && count > layer) {
+            break;
+        }
+        if(count - 1 == layer) {
+            temps.append(QString(line.split(QRegExp("\\s+"))[1]).toDouble());
+        }
+    }
+    qDebug() << "temps size : " << temps.size();
+    steadyFile.close();
+    const int length = 64;//sqrt(temps.size())
+    int col = int(probeX / 0.015 * length);
+    int row = int((0.015 - probeY) / 0.015 * length);
+    int inx = row * length + col;
+    qDebug() << "inx: " << inx;
+
+    emit probeResult(temps[inx],probeX,probeY);
 }
 
 void Core::terminate()

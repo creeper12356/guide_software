@@ -76,6 +76,7 @@ class PasswordDialog;
 class Choice;
 class ChoiceGuide;
 class ChoiceWidget;
+class ProbeWidget;
 class HeatMapViewer;
 class ConsoleDock;
 class TaskProcess;

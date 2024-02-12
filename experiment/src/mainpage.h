@@ -37,6 +37,7 @@ public slots:
     void performanceSimulationFinishedSlot();
     void performanceSimulationFailedSlot(QString warningInfo);
     void genHeatMapFinishedSlot();
+    void displayProbeResult(qreal temperature,qreal probeX,qreal probeY);
 
     void longTaskStartedSlot();
     void longTaskFinishedSlot();
@@ -92,6 +93,7 @@ private:
 
     HeatMapViewer* mHeatMapViewer = nullptr;
     ChoiceWidget* mChoiceWidget = nullptr;
+    ProbeWidget* mProbeWidget = nullptr;
 
     ChoiceGuide* mGuide;
 private:
