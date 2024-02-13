@@ -19,13 +19,15 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="ChoiceWidget" name="choiceWidget" native="true"/>
-      <widget class="ProbeWidget" name="probeWidget" native="true"/>
-      <widget class="HeatMapViewer" name="heatMapViewer" native="true"/>
+     <widget class="ProbeWidget" name="probeWidget" native="true"/>
+    </item>
+    <item>
+     <widget class="ChoiceWidget" name="choiceWidget" native="true"/>
+    </item>
+    <item>
+     <widget class="HeatMapViewer" name="heatMapViewer" native="true">
+      <zorder>probeWidget</zorder>
+      <zorder>choiceWidget</zorder>
      </widget>
     </item>
    </layout>

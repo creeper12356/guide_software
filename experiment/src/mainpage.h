@@ -85,8 +85,10 @@ private:
 private:
     ConsoleDock* mConsoleDock;
     LogDock* mLogDock;
-
     ChoiceGuide* mGuide;
+
+    QSplitter* mMainSplitter;
+    QSplitter* mLeftSplitter;
 private:
     Ui::MainPage *ui;
 };

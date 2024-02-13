@@ -24,12 +24,19 @@ MainPage::MainPage() :
     mGuide = new ChoiceGuide();
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-//    QSplitter* mainSplitter = new QSplitter(ui->centralwidget);
-//    mainSplitter->addWidget(ui->choiceWidget);
-//    mainSplitter->addWidget(ui->probeWidget);
+    mLeftSplitter = new QSplitter(Qt::Vertical,this);
+    mLeftSplitter->setObjectName("leftSplitter");
+    mLeftSplitter->addWidget(ui->choiceWidget);
+    mLeftSplitter->addWidget(ui->probeWidget);
+    mMainSplitter  = new QSplitter(Qt::Horizontal,this);
+    mMainSplitter->setObjectName("mainSplitter");
 
-//    mainSplitter->addWidget(ui->heatMapViewer);
-//    restoreStateAndGeometry();
+    mMainSplitter->addWidget(mLeftSplitter);
+    mMainSplitter->addWidget(ui->heatMapViewer);
+
+    centralWidget()->layout()->addWidget(mMainSplitter);
+
+    restoreStateAndGeometry();
 
     connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
 
