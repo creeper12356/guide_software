@@ -12,6 +12,7 @@ private:
     QPointF globalToData(const QPoint& pos);
 protected:
     void mousePressEvent(QMouseEvent* e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
 signals:
     void probeTriggered(QString program , qreal x, qreal y);
 private:

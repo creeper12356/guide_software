@@ -29,6 +29,7 @@ public:
     ~ConsoleDock() override;
 
     bool connectProcess(TaskProcess *process, QByteArray *cache);
+    void clear();
 
 private:
     void appendInfo(const QString &str);

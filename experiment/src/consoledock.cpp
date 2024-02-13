@@ -84,6 +84,11 @@ bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
     return true;
 }
 
+void ConsoleDock::clear()
+{
+    mPlainTextEdit->clear();
+}
+
 void ConsoleDock::appendInfo(const QString &str)
 {
     mPlainTextEdit->appendHtml(QLatin1String("<pre>") + str.toHtmlEscaped() +
@@ -104,7 +109,7 @@ void ConsoleDock::appendError(const QString &str)
 
 void ConsoleDock::appendScript(const QString &str)
 {
-    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightblue'>") + QDir::currentPath().toHtmlEscaped() +
+    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightblue'>") + QDir(mProcess->workingDirectory()).absolutePath().toHtmlEscaped() +
                                QLatin1String("</pre>") +
                                QLatin1String("<pre style='color:lightgreen'>&gt; ") + str.toHtmlEscaped() +
                                QLatin1String("</pre>"));

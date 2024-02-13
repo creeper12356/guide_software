@@ -17,7 +17,6 @@ Core::Core(QApplication* a):
     mPriProc = new TaskProcess(this);
     mPriProc->setProgram("bash");
 
-
     //初始化界面
     mMainPage = new MainPage;
     mAptInstaller = new AptInstaller;
@@ -26,7 +25,6 @@ Core::Core(QApplication* a):
     mAppModel = new AppModel(mMainPage);
 
     initConnections();
-
 
     if(isRunningInDocker()) {
         mMainPage->show();
@@ -197,8 +195,8 @@ void Core::simulatePerformance()
         QDir::current().mkdir(program);
     }
 
-    //进入仿真模块文件夹 并运行性能仿真
-    QDir::setCurrent("../gem5");
+    //运行性能仿真
+    QDir::setCurrent("..");
     QString simulateCmdFormat =
             "M5_PATH=../full_system_images/ ./build/X86/gem5.opt configs/example/fs.py "
             "--script=../TR-09-32-parsec-2.1-alpha-files/%1_%2c_%3.rcS "
@@ -216,19 +214,21 @@ void Core::simulatePerformance()
                     QString::number(mAppModel->userChoice()->threadNum),
                     mAppModel->userChoice()->test.toLower()
                     );
-//      qDebug() << simulateCmd;
+
+        mPubProc->setWorkingDirectory("gem5");
         //运行仿真，耗时较长
         noBlockWait(mPubProc,
                     simulateCmd,
                     mEventLoop);
+        mPubProc->setWorkingDirectory(".");
+
         //将输出文件拷贝到对应目标路径
-        blockWait(mPriProc,"cp m5out/* ../gem5_output/" + program);
+        blockWait(mPriProc,"cp gem5/m5out/* gem5_output/" + program);
         if(mPubProc->isEnabled()){
             logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }
 
-    QDir::setCurrent("..");
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
     mEventLoop->setEnabled(true);
@@ -466,8 +466,6 @@ void Core::runHotspot(const QString &program)
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
     blockWait(mPriProc,mkdirCmd);
-
-    QDir::setCurrent("HotSpot-master");
     QString hotspotCmd = "./hotspot "
                          "-c ../utils/example.config "
                          "-f ../utils/ev6.flp "
@@ -478,8 +476,9 @@ void Core::runHotspot(const QString &program)
                          "-model_type grid "
                          "-grid_steady_file ../HotSpot_output/%1/%1.grid.steady ";
     hotspotCmd = hotspotCmd.arg(program);
+    mPubProc->setWorkingDirectory("HotSpot-master");
     noBlockWait(mPubProc,hotspotCmd,mEventLoop);
-    QDir::setCurrent("..");
+    mPubProc->setWorkingDirectory(".");
 }
 
 void Core::drawHeatMap(const QString &program)

@@ -28,6 +28,11 @@ void CustomGraphicsView::mousePressEvent(QMouseEvent *event)
     event->ignore();
 }
 
+void CustomGraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    event->ignore();
+}
+
 void CustomGraphicsView::handleZoom(QWheelEvent *event) {
     int delta = event->angleDelta().y();
     // Perform your custom zoom logic here

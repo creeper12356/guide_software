@@ -31,3 +31,11 @@ void HeatMapViewer::mousePressEvent(QMouseEvent *e)
         emit probeTriggered(QFileInfo(currentFile()).baseName(),dataPos.x(),dataPos.y());
     }
 }
+
+void HeatMapViewer::mouseMoveEvent(QMouseEvent *e)
+{
+    if(mActionProbe->isChecked()){
+        QPointF dataPos = globalToData(e->globalPos());
+        emit probeTriggered(QFileInfo(currentFile()).baseName(),dataPos.x(),dataPos.y());
+    }
+}

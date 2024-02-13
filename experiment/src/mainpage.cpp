@@ -247,6 +247,7 @@ void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
     mLogDock->clear();
+    mConsoleDock->clear();
     ui->actionConfigure->setEnabled(false);
     ui->actionCleanScript->setEnabled(false);
     ui->actionGenScript->setEnabled(false);
