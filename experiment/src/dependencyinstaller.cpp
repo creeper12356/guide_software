@@ -1,6 +1,7 @@
 #include "dependencyinstaller.h"
 #include "passworddialog.h"
 #include "ui_dependencyinstaller.h"
+#include "compatibility.h"
 
 DependencyInstaller::DependencyInstaller()
    : QDialog(nullptr)
@@ -169,15 +170,16 @@ QString AptInstaller::updateCommand()
 
 QString AptInstaller::getNotInstalledCommand()
 {
-    return "xargs apt list --installed < config/requirements.txt "
+    return QString(
+           "xargs apt list --installed < %1 "
            "| tail -n +2 "
            "| cut -f 1 -d / "
            "| sort "
            "> config/installed.txt "
            "&& "
-           "comm config/installed.txt config/requirements.txt -13 "
+           "comm config/installed.txt %1 -13 "
            "&& "
-           "rm config/installed.txt ";
+           "rm config/installed.txt ").arg(Compatibility::aptRequirementFile());
 }
 
 QString AptInstaller::installCommand()
@@ -211,16 +213,17 @@ QString PyLibInstaller::updateCommand()
 
 QString PyLibInstaller::getNotInstalledCommand()
 {
-    return "pip list | tail -n +3 | cut -f 1 -d ' ' | sort > config/py_installed.txt "
+    return QString(
+           "%1 list | tail -n +3 | cut -f 1 -d ' ' | sort > config/py_installed.txt "
            "&& "
-           "comm config/py_installed.txt config/py_requirements.txt -13 "
+           "comm config/py_installed.txt %2 -13 "
            "&& "
-           "rm config/py_installed.txt ";
+           "rm config/py_installed.txt ").arg(Compatibility::pip() , Compatibility::pipRequirementFile());
 }
 
 QString PyLibInstaller::installCommand()
 {
-    return "%1pip install %2 "
+    return "%1" + Compatibility::pip() + " install %2 "
            "2> /dev/null";
 }
 
