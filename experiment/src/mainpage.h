@@ -14,6 +14,8 @@ public:
     ~MainPage();
 
     void initDockWidgets() ;
+    void initSplitter();
+    void initConnections();
     void restoreStateAndGeometry();
     void saveStateAndGeometry();
 

@@ -493,6 +493,6 @@ void Core::drawHeatMap(const QString &program)
                          "%1 "
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
-    blockWait(mPubProc,heatMapCmd);
+    noBlockWait(mPubProc,heatMapCmd,mEventLoop);
 }
 

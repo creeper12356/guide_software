@@ -13,49 +13,11 @@ MainPage::MainPage() :
     ui(new Ui::MainPage)
 {
     ui->setupUi(this);
-
-    initDockWidgets();
-
-    connect(ui->choiceWidget,&ChoiceWidget::currentTextChanged,
-            this,[this](const QString& program){
-       ui->heatMapViewer->open(QString("HeatMap/%1.png").arg(program));
-    });
-
     mGuide = new ChoiceGuide();
-    connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
-
-    mLeftSplitter = new QSplitter(Qt::Vertical,this);
-    mLeftSplitter->setObjectName("leftSplitter");
-    mLeftSplitter->addWidget(ui->choiceWidget);
-    mLeftSplitter->addWidget(ui->probeWidget);
-    mMainSplitter  = new QSplitter(Qt::Horizontal,this);
-    mMainSplitter->setObjectName("mainSplitter");
-
-    mMainSplitter->addWidget(mLeftSplitter);
-    mMainSplitter->addWidget(ui->heatMapViewer);
-
-    centralWidget()->layout()->addWidget(mMainSplitter);
-
+    initDockWidgets();
+    initSplitter();
     restoreStateAndGeometry();
-
-    connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
-
-    connect(ui->actionConfigure,&QAction::triggered,this,&MainPage::configureTriggered);
-    connect(ui->actionClearConfig,&QAction::triggered,this,&MainPage::clearConfig);
-    connect(ui->actionCleanScript,&QAction::triggered,this,&MainPage::cleanScript);
-    connect(ui->actionGenScript,&QAction::triggered,this,&MainPage::genScript);
-
-    connect(ui->actionSimulatePerformance,&QAction::triggered,
-            this,&MainPage::simulatePerformanceTriggered);
-    connect(ui->actionGenHeatMap,&QAction::triggered,this,&MainPage::genHeatMapTriggered);
-
-    connect(ui->actionTerminate,&QAction::triggered,this,&MainPage::terminate);
-
-    connect(ui->actionMaximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
-    connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
-    connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
-
-    connect(ui->heatMapViewer,&HeatMapViewer::probeTriggered,this,&MainPage::probe);
+    initConnections();
 }
 
 MainPage::~MainPage()
@@ -115,6 +77,51 @@ void MainPage::initDockWidgets()
     });
     ui->statusbar->addWidget(consoleToggleButton);
     ui->statusbar->addWidget(logToggleButton);
+}
+
+void MainPage::initSplitter()
+{
+    mLeftSplitter = new QSplitter(Qt::Vertical,this);
+    mLeftSplitter->setObjectName("leftSplitter");
+    mLeftSplitter->addWidget(ui->choiceWidget);
+    mLeftSplitter->addWidget(ui->probeWidget);
+    mMainSplitter  = new QSplitter(Qt::Horizontal,this);
+    mMainSplitter->setObjectName("mainSplitter");
+
+    mMainSplitter->addWidget(mLeftSplitter);
+    mMainSplitter->addWidget(ui->heatMapViewer);
+
+    centralWidget()->layout()->addWidget(mMainSplitter);
+}
+
+void MainPage::initConnections()
+{
+    //menuBar trigger
+    connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
+
+    connect(ui->actionConfigure,&QAction::triggered,this,&MainPage::configureTriggered);
+    connect(ui->actionClearConfig,&QAction::triggered,this,&MainPage::clearConfig);
+    connect(ui->actionCleanScript,&QAction::triggered,this,&MainPage::cleanScript);
+    connect(ui->actionGenScript,&QAction::triggered,this,&MainPage::genScript);
+
+    connect(ui->actionSimulatePerformance,&QAction::triggered,
+            this,&MainPage::simulatePerformanceTriggered);
+    connect(ui->actionGenHeatMap,&QAction::triggered,this,&MainPage::genHeatMapTriggered);
+
+    connect(ui->actionTerminate,&QAction::triggered,this,&MainPage::terminate);
+
+    connect(ui->actionMaximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
+
+    connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
+    connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
+
+    //other trigger
+    connect(ui->heatMapViewer,&HeatMapViewer::probeTriggered,this,&MainPage::probe);
+
+    connect(ui->choiceWidget,&ChoiceWidget::currentTextChanged,
+            this,[this](const QString& program){
+       ui->heatMapViewer->open(QString("HeatMap/%1.png").arg(program));
+    });
 }
 
 void MainPage::restoreStateAndGeometry()
