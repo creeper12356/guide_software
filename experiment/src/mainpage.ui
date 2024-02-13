@@ -23,7 +23,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>28</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -86,6 +86,35 @@
    <addaction name="menu_5"/>
    <addaction name="menu_6"/>
    <addaction name="menu"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>30</width>
+     <height>30</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionConfigure"/>
+   <addaction name="actionCleanScript"/>
+   <addaction name="actionGenScript"/>
+   <addaction name="actionSimulatePerformance"/>
+   <addaction name="actionGenHeatMap"/>
+   <addaction name="actionTerminate"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
@@ -165,6 +194,9 @@
    </property>
   </action>
   <action name="actionTerminate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res.qrc">
      <normaloff>:/img/terminate_icon.png</normaloff>:/img/terminate_icon.png</iconset>

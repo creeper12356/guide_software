@@ -3,6 +3,7 @@
 //包含该项目所有Qt标准库，宏定义，类声明，枚举声明，命名空间
 #include <QObject>
 #include <QApplication>
+#include <QCoreApplication>
 #include <QProcess>
 
 #include <QSize>
@@ -10,7 +11,9 @@
 #include <QDialog>
 #include <QInputDialog>
 #include <QMainWindow>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QMenu>
 #include <QPushButton>
 #include <QToolButton>
 #include <QButtonGroup>
@@ -79,6 +82,7 @@ class ChoiceWidget;
 class ProbeWidget;
 class HeatMapViewer;
 class ConsoleDock;
+class LogDock;
 class TaskProcess;
 class TaskEventLoop;
 

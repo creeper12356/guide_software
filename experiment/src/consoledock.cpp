@@ -21,13 +21,6 @@
 
 #include "consoledock.h"
 #include "taskmanager.h"
-#include <QCoreApplication>
-#include <QLineEdit>
-#include <QMenu>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QShortcut>
-#include <QVBoxLayout>
 
 
 class ConsoleOutputWidget : public QPlainTextEdit
@@ -57,11 +50,7 @@ ConsoleDock::ConsoleDock(QWidget *parent)
     p.setColor(QPalette::Text, Qt::lightGray);
     mPlainTextEdit->setPalette(p);
 
-//    mClearButton = new QPushButton("清空");
-//    connect(mClearButton, &QPushButton::clicked, mPlainTextEdit, &QPlainTextEdit::clear);
-
     auto bottomBar = new QHBoxLayout;
-//    bottomBar->addWidget(mClearButton);
 
     layout->addWidget(mPlainTextEdit);
     layout->addLayout(bottomBar);
@@ -72,8 +61,6 @@ ConsoleDock::ConsoleDock(QWidget *parent)
 
 ConsoleDock::~ConsoleDock()
 {
-//    mBash->kill();
-//    mBash->waitForFinished(-1);
 }
 
 bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)

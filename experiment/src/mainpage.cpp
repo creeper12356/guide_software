@@ -4,7 +4,7 @@
 #include "choiceguide.h"
 #include "choicewidget.h"
 #include "consoledock.h"
-#include "consoledock.h"
+#include "logdock.h"
 #include "heatmapviewer.h"
 #include "probewidget.h"
 
@@ -16,7 +16,6 @@ MainPage::MainPage() :
 
     QHBoxLayout* centralLayout = new QHBoxLayout(ui->centralwidget);
 
-    initToolBar();
     initDockWidgets();
 
 
@@ -82,37 +81,10 @@ ChoiceWidget *MainPage::choiceWidget()
     return mChoiceWidget;
 }
 
-QTextBrowser *MainPage::logBrowser()
-{
-    return dynamic_cast<QTextBrowser*> (mLogDock->widget());
-}
-
-void MainPage::initToolBar()
-{
-    mToolBar = new QToolBar(this);
-    mToolBar->setObjectName("toolBar");
-    mToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    this->addToolBar(Qt::TopToolBarArea,mToolBar);
-    mToolBar->setIconSize(QSize(30,30));
-
-    mToolBar->addAction(ui->actionConfigure);
-    mToolBar->addAction(ui->actionCleanScript);
-    mToolBar->addAction(ui->actionGenScript);
-    mToolBar->addAction(ui->actionSimulatePerformance);
-    mToolBar->addAction(ui->actionGenHeatMap);
-    mToolBar->addAction(ui->actionTerminate);
-
-    auto font = mToolBar->font();
-    mToolBar->setFont(font);
-    ui->actionTerminate->setDisabled(true);
-}
-
 void MainPage::initDockWidgets()
 {
     mConsoleDock = new ConsoleDock(this);
-    QTextBrowser *logBrowser = new QTextBrowser(this);
-    (mLogDock = new QDockWidget("日志",this))->setWidget(logBrowser);
-    mLogDock->setObjectName("logDock");
+    mLogDock = new LogDock(this);
 
     addDockWidget(Qt::BottomDockWidgetArea, mConsoleDock);
     addDockWidget(Qt::BottomDockWidgetArea, mLogDock);
@@ -122,8 +94,6 @@ void MainPage::initDockWidgets()
     mLogDock->setVisible(false);
 
     auto toggleConsoleAction = mConsoleDock->toggleViewAction();
-//    toggleConsoleAction->setIcon(terminalIcon);
-//    toggleConsoleAction->setIconVisibleInMenu(false);
     auto consoleToggleButton = new QToolButton;
     consoleToggleButton->setDefaultAction(toggleConsoleAction);
     consoleToggleButton->setAutoRaise(true);
@@ -250,19 +220,23 @@ void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
-    logBrowser()->clear();
-    for(auto action: mToolBar->actions()){
-        action->setDisabled(true);
-    }
+    mLogDock->clear();
+    ui->actionConfigure->setEnabled(false);
+    ui->actionCleanScript->setEnabled(false);
+    ui->actionGenScript->setEnabled(false);
+    ui->actionSimulatePerformance->setEnabled(false);
+    ui->actionGenHeatMap->setEnabled(false);
     ui->actionTerminate->setEnabled(true);
 }
 
 void MainPage::longTaskFinishedSlot()
 {
-    for(auto action: mToolBar->actions()){
-        action->setEnabled(true);
-    }
-    ui->actionTerminate->setDisabled(true);
+    ui->actionConfigure->setEnabled(true);
+    ui->actionCleanScript->setEnabled(true);
+    ui->actionGenScript->setEnabled(true);
+    ui->actionSimulatePerformance->setEnabled(true);
+    ui->actionGenHeatMap->setEnabled(true);
+    ui->actionTerminate->setEnabled(false);
 }
 
 void MainPage::askQuitSlot()
@@ -287,17 +261,17 @@ void MainPage::logConsole(const QString &info)
 {
     if(info.isEmpty()){
         //若信息为空则清空日志
-        logBrowser()->clear();
+        mLogDock->clear();
         return ;
     }
-    logBrowser()->append(info);
+    mLogDock->append(info);
 }
 
 void MainPage::logConsoleProgram(const QString& program, const QString& info)
 {
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);
-    logBrowser()->append(prefix + info);
+    mLogDock->append(prefix + info);
 }
 
 void MainPage::closeEvent(QCloseEvent *event)

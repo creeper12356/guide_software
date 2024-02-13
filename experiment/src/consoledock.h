@@ -21,10 +21,6 @@
 #pragma once
 #include "inc.h"
 
-class QLineEdit;
-class QPlainTextEdit;
-class QPushButton;
-
 class ConsoleDock : public QDockWidget
 {
     Q_OBJECT
@@ -42,7 +38,6 @@ private:
     void appendScriptResult(const QString &str);
 
     QPlainTextEdit *mPlainTextEdit = nullptr;
-//    QPushButton *mClearButton;
     TaskProcess* mProcess = nullptr;
     QByteArray* mCache = nullptr;
 };

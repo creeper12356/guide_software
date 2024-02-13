@@ -13,7 +13,6 @@ public:
     MainPage();
     ~MainPage();
 
-    void initToolBar() ;
     void initDockWidgets() ;
     void restoreStateAndGeometry();
     void saveStateAndGeometry();
@@ -21,8 +20,6 @@ public:
 public:
     ConsoleDock* consoleDock();
     ChoiceWidget* choiceWidget();
-    QTextBrowser* logBrowser();
-
 public slots:
 
     /*!
@@ -86,14 +83,12 @@ private:
     void critical(const QString& info);
 
 private:
-    QToolBar* mToolBar = nullptr;
+    ConsoleDock* mConsoleDock;
+    LogDock* mLogDock;
 
-    ConsoleDock* mConsoleDock = nullptr;
-    QDockWidget* mLogDock = nullptr;
-
-    HeatMapViewer* mHeatMapViewer = nullptr;
-    ChoiceWidget* mChoiceWidget = nullptr;
-    ProbeWidget* mProbeWidget = nullptr;
+    HeatMapViewer* mHeatMapViewer;
+    ChoiceWidget* mChoiceWidget;
+    ProbeWidget* mProbeWidget;
 
     ChoiceGuide* mGuide;
 private:

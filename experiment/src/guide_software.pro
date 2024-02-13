@@ -32,7 +32,8 @@ SOURCES += \
     customgraphicsview.cpp \
     heatmapviewer.cpp \
     inc.cpp \
-    probewidget.cpp
+    probewidget.cpp \
+    logdock.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -50,7 +51,8 @@ HEADERS += \
     imageviewer.h \
     customgraphicsview.h \
     heatmapviewer.h \
-    probewidget.h
+    probewidget.h \
+    logdock.h
 
 FORMS += \
     aboutdialog.ui \
