@@ -1,7 +1,6 @@
 #ifndef CORE_H
 #define CORE_H
 #include "inc.h"
-
 /*!
  * \brief 客户端内核
  */

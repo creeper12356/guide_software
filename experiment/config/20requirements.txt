@@ -1,0 +1,17 @@
+build-essential
+gcc-multilib
+git
+g++-multilib
+libc6-dev-i386
+libgoogle-perftools-dev
+libprotobuf-dev
+libprotoc-dev
+m4
+protobuf-compiler
+python3
+python3-matplotlib
+python3-pip
+python-dev-is-python3
+scons
+zlib1g
+zlib1g-dev

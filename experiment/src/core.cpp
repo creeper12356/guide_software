@@ -6,10 +6,14 @@
 #include "choice.h"
 #include "appmodel.h"
 
+#include "compatibility.h"
+
 Core::Core(QApplication* a):
     QObject(nullptr),
     mApp(a)
 {
+    Compatibility::initialize();
+
     //初始化进程和事件循环
     mEventLoop = new TaskEventLoop(this);
     mPubProc = new TaskProcess(this);
@@ -26,7 +30,7 @@ Core::Core(QApplication* a):
 
     initConnections();
 
-    if(isRunningInDocker()) {
+    if(Compatibility::isRunningInDocker()) {
         mMainPage->show();
     }
     else {
@@ -403,7 +407,7 @@ bool Core::splitGem5Output(const QString &program)
     blockWait(mPriProc,mkdirCmd);
 
     //分割stats文件
-    blockWait(mPubProc,QString("python scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
+    blockWait(mPubProc,QString(Compatibility::python() + " scripts/split.py gem5_output/%1/stats.txt McPAT_input/").arg(program));
     if(cache == "True\n"){
         //分割成功
         //in folder McPAT_input
@@ -425,7 +429,7 @@ bool Core::splitGem5Output(const QString &program)
 
 void Core::genXml(const QString &program)
 {
-    QString genXmlCmd = "python scripts/generateXML.py McPAT_input/%1/3.txt utils/template.xml McPAT_input/%1/3.xml";
+    QString genXmlCmd = " scripts/generateXML.py McPAT_input/%1/3.txt utils/template.xml McPAT_input/%1/3.xml";
     blockWait(mPubProc,genXmlCmd.arg(program));
 }
 
@@ -452,7 +456,7 @@ void Core::writePtrace(const QString &program)
     QString mkdirCmd = "mkdir HotSpot_input";
     blockWait(mPriProc,mkdirCmd);
     //调用python脚本
-    QString writePtraceCmd = "python scripts/writeptrace.py "
+    QString writePtraceCmd = Compatibility::python() + " scripts/writeptrace.py "
                              "utils/ev6.flp "
                              "McPAT_output/%1/3.txt "
                              "HotSpot_input/%1.ptrace";
@@ -485,7 +489,7 @@ void Core::drawHeatMap(const QString &program)
 {
     //TODO: 检查输出文件夹./HeatMap
 
-    QString heatMapCmd = "python scripts/flpdraw.py "
+    QString heatMapCmd = Compatibility::python() + " scripts/flpdraw.py "
                          "utils/ev6.flp "
                          "HotSpot_output/%1/%1.grid.steady "
                          "0 "

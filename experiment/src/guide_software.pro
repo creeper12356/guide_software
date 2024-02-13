@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     aboutdialog.cpp \
     choiceguide.cpp \
+    compatibility.cpp \
     dependencyinstaller.cpp \
     mainpage.cpp \
     choicewidget.cpp \
@@ -31,13 +32,13 @@ SOURCES += \
     imageviewer.cpp \
     customgraphicsview.cpp \
     heatmapviewer.cpp \
-    inc.cpp \
     probewidget.cpp \
     logdock.cpp
 
 HEADERS += \
     aboutdialog.h \
     choiceguide.h \
+    compatibility.h \
     dependencyinstaller.h \
     mainpage.h \
     choicewidget.h \
