@@ -71,9 +71,7 @@ bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
     this->mProcess = process;
     this->mCache = cache;
     connect(mProcess,&TaskProcess::started,this,[this](){
-//        if(mProcess->isEnabled()){
-            appendScript(mProcess->arguments()[1]);
-//        }
+        appendScript(mProcess->arguments()[1]);
     });
     connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
         *mCache = mProcess->readAllStandardOutput();

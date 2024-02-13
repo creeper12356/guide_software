@@ -14,34 +14,22 @@ MainPage::MainPage() :
 {
     ui->setupUi(this);
 
-    QHBoxLayout* centralLayout = new QHBoxLayout(ui->centralwidget);
-
     initDockWidgets();
 
-
-    mChoiceWidget = new ChoiceWidget(ui->centralwidget);
-    connect(mChoiceWidget,&ChoiceWidget::currentTextChanged,
+    connect(ui->choiceWidget,&ChoiceWidget::currentTextChanged,
             this,[this](const QString& program){
-       mHeatMapViewer->open(QString("HeatMap/%1.png").arg(program));
+       ui->heatMapViewer->open(QString("HeatMap/%1.png").arg(program));
     });
 
     mGuide = new ChoiceGuide();
     connect(ui->actionConfigure,&QAction::triggered,mGuide,&ChoiceGuide::show);
 
-    mHeatMapViewer = new HeatMapViewer(this);
+//    QSplitter* mainSplitter = new QSplitter(ui->centralwidget);
+//    mainSplitter->addWidget(ui->choiceWidget);
+//    mainSplitter->addWidget(ui->probeWidget);
 
-    mProbeWidget = new ProbeWidget(this);
-
-    QSplitter* splitter = new QSplitter(Qt::Orientation::Horizontal,ui->centralwidget);
-    splitter->addWidget(mChoiceWidget);
-    splitter->addWidget(mProbeWidget);
-    splitter->addWidget(mHeatMapViewer);
-    splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,0);
-    splitter->setStretchFactor(2,1);
-    centralLayout->addWidget(splitter);
-
-    restoreStateAndGeometry();
+//    mainSplitter->addWidget(ui->heatMapViewer);
+//    restoreStateAndGeometry();
 
     connect(ui->actionQuit,&QAction::triggered,this,&MainPage::quit);
 
@@ -60,7 +48,7 @@ MainPage::MainPage() :
     connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
     connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
 
-    connect(mHeatMapViewer,&HeatMapViewer::probeTriggered,this,&MainPage::probe);
+    connect(ui->heatMapViewer,&HeatMapViewer::probeTriggered,this,&MainPage::probe);
 }
 
 MainPage::~MainPage()
@@ -78,7 +66,7 @@ ConsoleDock *MainPage::consoleDock()
 
 ChoiceWidget *MainPage::choiceWidget()
 {
-    return mChoiceWidget;
+    return ui->choiceWidget;
 }
 
 void MainPage::initDockWidgets()
@@ -154,7 +142,7 @@ void MainPage::configureTriggered()
     connect(mGuide,&ChoiceGuide::configureFinished,&eventLoop,&QEventLoop::quit);
     mGuide->show();
     eventLoop.exec();
-    mChoiceWidget->refreshUserChoice(mGuide->userChoice());
+    ui->choiceWidget->refreshUserChoice(mGuide->userChoice());
     emit configureFinished(mGuide->userChoice());
 }
 
@@ -212,9 +200,9 @@ void MainPage::genHeatMapFinishedSlot()
 
 void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
 {
-    mProbeWidget->setTemperature(temperature);
-    mProbeWidget->setProbeX(probeX);
-    mProbeWidget->setProbeY(probeY);
+    ui->probeWidget->setTemperature(temperature);
+    ui->probeWidget->setProbeX(probeX);
+    ui->probeWidget->setProbeY(probeY);
 }
 
 void MainPage::longTaskStartedSlot()
@@ -294,5 +282,5 @@ void MainPage::aboutqtTriggered()
 
 void MainPage::updateUserChoice(const Choice *userChoice)
 {
-    mChoiceWidget->refreshUserChoice(userChoice);
+    ui->choiceWidget->refreshUserChoice(userChoice);
 }

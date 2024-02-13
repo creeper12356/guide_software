@@ -86,10 +86,6 @@ private:
     ConsoleDock* mConsoleDock;
     LogDock* mLogDock;
 
-    HeatMapViewer* mHeatMapViewer;
-    ChoiceWidget* mChoiceWidget;
-    ProbeWidget* mProbeWidget;
-
     ChoiceGuide* mGuide;
 private:
     Ui::MainPage *ui;

@@ -16,7 +16,20 @@
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="ChoiceWidget" name="choiceWidget" native="true"/>
+      <widget class="ProbeWidget" name="probeWidget" native="true"/>
+      <widget class="HeatMapViewer" name="heatMapViewer" native="true"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -107,7 +120,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionConfigure"/>
    <addaction name="actionCleanScript"/>
@@ -238,6 +251,26 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ChoiceWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">choicewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProbeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">probewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HeatMapViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">heatmapviewer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../res.qrc"/>
  </resources>
