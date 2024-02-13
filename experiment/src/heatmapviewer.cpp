@@ -7,8 +7,6 @@ HeatMapViewer::HeatMapViewer(QWidget *parent)
     mActionProbe = new QAction("探针",this);
     mActionProbe->setCheckable(true);
     toolBar()->addAction(mActionProbe);
-
-    setMouseTracking(true);
 }
 
 QPointF HeatMapViewer::globalToData(const QPoint &pos)
@@ -27,14 +25,6 @@ QPointF HeatMapViewer::globalToData(const QPoint &pos)
 void HeatMapViewer::mousePressEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton && mActionProbe->isChecked()){
-        QPointF dataPos = globalToData(e->globalPos());
-        emit probeTriggered(QFileInfo(currentFile()).baseName(),dataPos.x(),dataPos.y());
-    }
-}
-
-void HeatMapViewer::mouseMoveEvent(QMouseEvent *e)
-{
-    if(mActionProbe->isChecked()){
         QPointF dataPos = globalToData(e->globalPos());
         emit probeTriggered(QFileInfo(currentFile()).baseName(),dataPos.x(),dataPos.y());
     }

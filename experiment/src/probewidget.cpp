@@ -25,5 +25,5 @@ void ProbeWidget::setProbeY(qreal y)
 
 void ProbeWidget::setTemperature(qreal temperature)
 {
-    ui->temp_output->setText(QString::number(temperature));
+    ui->temp_output->setText(QString::number(temperature,'f',2));
 }
