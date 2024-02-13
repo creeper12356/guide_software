@@ -129,6 +129,18 @@ void MainPage::restoreStateAndGeometry()
         this->restoreGeometry(geometryRestorer.readAll());
         geometryRestorer.close();
     }
+
+    QFile splitterRestorer;
+    splitterRestorer.setFileName("config/mainSplitter.txt");
+    if(splitterRestorer.open(QIODevice::ReadOnly)) {
+        mMainSplitter->restoreState(splitterRestorer.readAll());
+        splitterRestorer.close();
+    }
+    splitterRestorer.setFileName("config/leftSplitter.txt");
+    if(splitterRestorer.open(QIODevice::ReadOnly)) {
+        mLeftSplitter->restoreState(splitterRestorer.readAll());
+        splitterRestorer.close();
+    }
 }
 
 void MainPage::saveStateAndGeometry()
@@ -137,10 +149,22 @@ void MainPage::saveStateAndGeometry()
     stateSaver.open(QIODevice::WriteOnly);
     stateSaver.write(this->saveState());
     stateSaver.close();
+
     QFile geometrySaver("config/geometry.txt");
     geometrySaver.open(QIODevice::WriteOnly);
     geometrySaver.write(this->saveGeometry());
     geometrySaver.close();
+
+    QFile splitterSaver;
+    splitterSaver.setFileName("config/mainSplitter.txt");
+    splitterSaver.open(QIODevice::WriteOnly);
+    splitterSaver.write(mMainSplitter->saveState());
+    splitterSaver.close();
+
+    splitterSaver.setFileName("config/leftSplitter.txt");
+    splitterSaver.open(QIODevice::WriteOnly);
+    splitterSaver.write(mLeftSplitter->saveState());
+    splitterSaver.close();
 }
 
 void MainPage::configureTriggered()
