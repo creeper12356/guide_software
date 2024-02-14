@@ -4,12 +4,7 @@
 	"Alpha":false,
 	"X86":
 	{
-		"SPEC 2017":
-		[
-			"hello",
-			"world",
-			"kkk"
-		],
+		"SPEC 2017":false,
 		"PARSEC":
 		[
 			"blackscholes",

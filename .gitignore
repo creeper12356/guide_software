@@ -1,12 +1,12 @@
 experiment/gem5/
-experiment/build-*
+experiment/build*
 experiment/TR-*
 experiment/full*
 experiment/*input/
 experiment/*output/
 experiment/mcpat/
 experiment/HeatMap/
-experiment/HotSpot-master
+experiment/HotSpot-master/
 experiment/default.desktop
 experiment/guide_software
 experiment/lib/
@@ -19,6 +19,8 @@ experiment/doc/
 experiment/config/config.json
 experiment/config/state.txt
 experiment/config/geometry.txt
+experiment/config/leftSplitter.txt
+experiment/config/mainSplitter.txt
 phase2/
 
 
