@@ -32,8 +32,6 @@ public:
     void clear();
 
 private:
-    void appendInfo(const QString &str);
-    void appendWarning(const QString &str);
     void appendError(const QString &str);
     void appendScript(const QString &str);
     void appendScriptResult(const QString &str);

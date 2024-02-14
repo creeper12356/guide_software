@@ -22,27 +22,12 @@
 #include "consoledock.h"
 #include "taskmanager.h"
 
-
-class ConsoleOutputWidget : public QPlainTextEdit
-{
-public:
-    using QPlainTextEdit::QPlainTextEdit;
-
-protected:
-};
-
-
 ConsoleDock::ConsoleDock(QWidget *parent)
     : QDockWidget(parent)
-    , mPlainTextEdit(new ConsoleOutputWidget)
 {
     setObjectName(QLatin1String("ConsoleDock"));
 
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
+    mPlainTextEdit = new QPlainTextEdit(this);
     mPlainTextEdit->setReadOnly(true);
 
     QPalette p = mPlainTextEdit->palette();
@@ -50,12 +35,7 @@ ConsoleDock::ConsoleDock(QWidget *parent)
     p.setColor(QPalette::Text, Qt::lightGray);
     mPlainTextEdit->setPalette(p);
 
-    auto bottomBar = new QHBoxLayout;
-
-    layout->addWidget(mPlainTextEdit);
-    layout->addLayout(bottomBar);
-
-    setWidget(widget);
+    setWidget(mPlainTextEdit);
     setWindowTitle("终端");
 }
 
@@ -89,34 +69,36 @@ void ConsoleDock::clear()
     mPlainTextEdit->clear();
 }
 
-void ConsoleDock::appendInfo(const QString &str)
-{
-    mPlainTextEdit->appendHtml(QLatin1String("<pre>") + str.toHtmlEscaped() +
-                               QLatin1String("</pre>"));
-}
-
-void ConsoleDock::appendWarning(const QString &str)
-{
-    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:orange'>") + str.toHtmlEscaped() +
-                               QLatin1String("</pre>"));
-}
 
 void ConsoleDock::appendError(const QString &str)
 {
-    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:red'>") + str.toHtmlEscaped() +
-                               QLatin1String("</pre>"));
+    QString html =
+    "<pre style='color:red'>"
+      "%1"
+    "</pre>";
+    html = html.arg(str.toHtmlEscaped());
+    mPlainTextEdit->appendHtml(html);
+
 }
 
 void ConsoleDock::appendScript(const QString &str)
 {
-    mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightblue'>") + QDir(mProcess->workingDirectory()).absolutePath().toHtmlEscaped() +
-                               QLatin1String("</pre>") +
-                               QLatin1String("<pre style='color:lightgreen'>&gt; ") + str.toHtmlEscaped() +
-                               QLatin1String("</pre>"));
+    QString html =
+    "<pre>"
+      "<span style='color:lightblue'>%1</span>"
+      "<span style='color:white'>$ </span>"
+      "<span style='color:lightgreen'>%2</span>"
+    "</pre>";
+    html = html.arg(QDir(mProcess->workingDirectory()).absolutePath().toHtmlEscaped(),str.toHtmlEscaped());
+    mPlainTextEdit->appendHtml(html);
 }
 
 void ConsoleDock::appendScriptResult(const QString &str)
 {
-     mPlainTextEdit->appendHtml(QLatin1String("<pre style='color:lightgrey'>") + str.toHtmlEscaped() +
-                               QLatin1String("</pre>"));
+    QString html =
+    "<pre style='color:lightgrey'>"
+      "%1"
+    "</pre>";
+    html = html.arg(str.toHtmlEscaped());
+    mPlainTextEdit->appendHtml(html);
 }
