@@ -6,5 +6,6 @@
         <file>img/clean_icon.png</file>
         <file>img/temp_icon.png</file>
         <file>img/terminate_icon.png</file>
+        <file>img/clear_conf_icon.png</file>
     </qresource>
 </RCC>
