@@ -10,9 +10,15 @@ public:
     explicit TaskProcess(QObject* parent = 0);
     void setEnabled(bool flag);
     bool isEnabled() const;
+    const QByteArray& cache() const;
     void start(OpenMode mode = ReadWrite);
+signals:
+    void stdinUpdated(QString dir, QString info);
+    void stdoutUpdated(QString info);
+    void stderrUpdated(QString info);
 private:
     bool mEnabled = true;
+    QByteArray mCache;
 };
 
 class TaskEventLoop: public QEventLoop

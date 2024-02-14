@@ -1,11 +1,9 @@
 #include "core.h"
 #include "mainpage.h"
 #include "dependencyinstaller.h"
-#include "consoledock.h"
 #include "taskmanager.h"
 #include "choice.h"
 #include "appmodel.h"
-
 #include "compatibility.h"
 
 Core::Core(QApplication* a):
@@ -17,9 +15,7 @@ Core::Core(QApplication* a):
     //初始化进程和事件循环
     mEventLoop = new TaskEventLoop(this);
     mPubProc = new TaskProcess(this);
-    mPubProc->setProgram("bash");
     mPriProc = new TaskProcess(this);
-    mPriProc->setProgram("bash");
 
     //初始化界面
     mMainPage = new MainPage;
@@ -89,11 +85,9 @@ void Core::initConnections()
     connect(mMainPage,&MainPage::terminate,
             this,&Core::terminate);
     //连接终端
-    mMainPage->consoleDock()->connectProcess(mPubProc,&cache);
-
-    connect(mPriProc,&QProcess::readyRead,this,[this](){
-        cache = mPriProc->readAll();
-    });
+    connect(mPubProc,&TaskProcess::stdinUpdated,mMainPage,&MainPage::consoleAppendStdin);
+    connect(mPubProc,&TaskProcess::stdoutUpdated,mMainPage,&MainPage::consoleAppendStdout);
+    connect(mPubProc,&TaskProcess::stderrUpdated,mMainPage,&MainPage::consoleAppendStderr);
 
     //耗时任务的开始和完成
     connect(this,&Core::longTaskStarted,mMainPage,&MainPage::longTaskStartedSlot);
@@ -413,7 +407,7 @@ bool Core::splitGem5Output(const QString &program)
                                                  "McPAT_input/";
     splitCmd = splitCmd.arg(program);
     blockWait(mPubProc, splitCmd);
-    if(cache == "True\n"){
+    if(mPubProc->cache() == "True\n"){
         //分割成功
         //in folder McPAT_input
         qDebug() << "split success";

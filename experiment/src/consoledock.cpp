@@ -43,26 +43,26 @@ ConsoleDock::~ConsoleDock()
 {
 }
 
-bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
-{
-    if(mProcess || !process){
-        return false;
-    }
-    this->mProcess = process;
-    this->mCache = cache;
-    connect(mProcess,&TaskProcess::started,this,[this](){
-        appendScript(mProcess->arguments()[1]);
-    });
-    connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
-        *mCache = mProcess->readAllStandardOutput();
-        this->appendScriptResult(QString::fromUtf8(*mCache));
-    });
-    connect(mProcess,&QProcess::readyReadStandardError,this,[this](){
-        *mCache = mProcess->readAllStandardError();
-        this->appendError(QString::fromUtf8(*mCache));
-    });
-    return true;
-}
+//bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
+//{
+//    if(mProcess || !process){
+//        return false;
+//    }
+//    this->mProcess = process;
+//    this->mCache = cache;
+//    connect(mProcess,&TaskProcess::started,this,[this](){
+////        appendStdin(mProcess->arguments()[1]);
+//    });
+//    connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
+//        *mCache = mProcess->readAllStandardOutput();
+//        this->appendStdout(QString::fromUtf8(*mCache));
+//    });
+//    connect(mProcess,&QProcess::readyReadStandardError,this,[this](){
+//        *mCache = mProcess->readAllStandardError();
+//        this->appendStdErr(QString::fromUtf8(*mCache));
+//    });
+//    return true;
+//}
 
 void ConsoleDock::clear()
 {
@@ -70,18 +70,18 @@ void ConsoleDock::clear()
 }
 
 
-void ConsoleDock::appendError(const QString &str)
+void ConsoleDock::appendStderr(QString info)
 {
     QString html =
     "<pre style='color:red'>"
       "%1"
     "</pre>";
-    html = html.arg(str.toHtmlEscaped());
+    html = html.arg(info.toHtmlEscaped());
     mPlainTextEdit->appendHtml(html);
 
 }
 
-void ConsoleDock::appendScript(const QString &str)
+void ConsoleDock::appendStdin(QString dir , QString info)
 {
     QString html =
     "<pre>"
@@ -89,16 +89,16 @@ void ConsoleDock::appendScript(const QString &str)
       "<span style='color:white'>$ </span>"
       "<span style='color:lightgreen'>%2</span>"
     "</pre>";
-    html = html.arg(QDir(mProcess->workingDirectory()).absolutePath().toHtmlEscaped(),str.toHtmlEscaped());
+    html = html.arg(dir.toHtmlEscaped(),info.toHtmlEscaped());
     mPlainTextEdit->appendHtml(html);
 }
 
-void ConsoleDock::appendScriptResult(const QString &str)
+void ConsoleDock::appendStdout(QString info)
 {
     QString html =
     "<pre style='color:lightgrey'>"
       "%1"
     "</pre>";
-    html = html.arg(str.toHtmlEscaped());
+    html = html.arg(info.toHtmlEscaped());
     mPlainTextEdit->appendHtml(html);
 }

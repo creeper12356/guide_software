@@ -38,6 +38,10 @@ public slots:
     void genHeatMapFinishedSlot();
     void displayProbeResult(qreal temperature,qreal probeX,qreal probeY);
 
+    void consoleAppendStdin(QString dir , QString info);
+    void consoleAppendStdout(QString info);
+    void consoleAppendStderr(QString info);
+
     void longTaskStartedSlot();
     void longTaskFinishedSlot();
 

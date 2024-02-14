@@ -156,7 +156,6 @@ private:
     TaskProcess* mPubProc = nullptr;
     TaskProcess* mPriProc = nullptr;
     //缓冲区,记录上一次readAll操作读到的进程输出
-    QByteArray cache;
 
     MainPage* mMainPage = nullptr;
     AptInstaller* mAptInstaller = nullptr;

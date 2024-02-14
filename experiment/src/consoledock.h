@@ -28,14 +28,15 @@ public:
     explicit ConsoleDock(QWidget *parent = nullptr);
     ~ConsoleDock() override;
 
-    bool connectProcess(TaskProcess *process, QByteArray *cache);
+//    bool connectProcess(TaskProcess *process, QByteArray *cache);
     void clear();
 
-private:
-    void appendError(const QString &str);
-    void appendScript(const QString &str);
-    void appendScriptResult(const QString &str);
+public slots:
+    void appendStdin(QString dir , QString info);
+    void appendStdout(QString info);
+    void appendStderr(QString info);
 
+private:
     QPlainTextEdit *mPlainTextEdit = nullptr;
     TaskProcess* mProcess = nullptr;
     QByteArray* mCache = nullptr;

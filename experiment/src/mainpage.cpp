@@ -243,6 +243,21 @@ void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
     ui->probeWidget->setProbeY(probeY);
 }
 
+void MainPage::consoleAppendStdin(QString dir, QString info)
+{
+    mConsoleDock->appendStdin(dir,info);
+}
+
+void MainPage::consoleAppendStdout(QString info)
+{
+    mConsoleDock->appendStdout(info);
+}
+
+void MainPage::consoleAppendStderr(QString info)
+{
+    mConsoleDock->appendStderr(info);
+}
+
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
