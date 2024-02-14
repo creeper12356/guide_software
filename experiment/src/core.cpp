@@ -13,7 +13,6 @@ Core::Core(QApplication* a):
     Compatibility::initialize();
 
     //初始化进程和事件循环
-    mEventLoop = new TaskEventLoop(this);
     mPubProc = new TaskProcess(this);
     mPriProc = new TaskProcess(this);
 
@@ -51,9 +50,6 @@ Core::~Core()
 void Core::initConnections()
 {
     connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
-    //进程结束后退出事件循环
-    connect(mPubProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
-    connect(mPriProc,SIGNAL(finished(int)),mEventLoop,SLOT(quit()));
     //清空配置
     connect(mMainPage,&MainPage::clearConfig,this,&Core::clearConfig);
     //清空脚本
@@ -146,7 +142,7 @@ void Core::cleanScript()
     //进入脚本文件夹
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     //清空之前生成的脚本
-    blockWait(mPubProc,"rm ./*.rcS 2> /dev/null");
+    mPubProc->blockWaitForFinished("rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
     emit cleanScriptFinished();
 }
@@ -162,11 +158,9 @@ void Core::genScript()
     QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
-    blockWait(mPubProc,"rm ./*.rcS 2>/dev/null");
+    mPubProc->blockWaitForFinished("rm ./*.rcS 2>/dev/null");
     for(auto program : mAppModel->userChoice()->programs){
-        noBlockWait(mPubProc,
-                    writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)),
-                    mEventLoop);
+        mPubProc->noBlockWaitForFinished(writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)));
     }
     QDir::setCurrent("..");
     emit genScriptFinished();
@@ -187,7 +181,7 @@ void Core::simulatePerformance()
     emit longTaskStarted();
     //清空目录
     QDir::setCurrent("gem5_output");
-    blockWait(mPriProc,"rm ./* -rf");
+    mPriProc->blockWaitForFinished("rm ./* -rf");
     //新建文件夹
     for(auto program: mAppModel->userChoice()->programs){
         QDir::current().mkdir(program);
@@ -215,13 +209,12 @@ void Core::simulatePerformance()
 
         mPubProc->setWorkingDirectory("gem5");
         //运行仿真，耗时较长
-        noBlockWait(mPubProc,
-                    simulateCmd,
-                    mEventLoop);
+        mPubProc->noBlockWaitForFinished(simulateCmd);
+
         mPubProc->setWorkingDirectory(".");
 
         //将输出文件拷贝到对应目标路径
-        blockWait(mPriProc,"cp gem5/m5out/* gem5_output/" + program);
+        mPriProc->blockWaitForFinished("cp gem5/m5out/* gem5_output/" + program);
         if(mPubProc->isEnabled()){
             logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
         }
@@ -229,7 +222,6 @@ void Core::simulatePerformance()
 
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
-    mEventLoop->setEnabled(true);
 
     emit simulatePerformanceFinished();
     emit longTaskFinished();
@@ -242,7 +234,7 @@ void Core::genHeatMap()
     logConsole("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
-        noBlockWait(mPubProc,"rm McPAT_input/* -rf",mEventLoop);
+        mPubProc->noBlockWaitForFinished("rm McPAT_input/* -rf");
     }
     else {
         QDir::current().mkdir("McPAT_input");
@@ -265,8 +257,8 @@ void Core::genHeatMap()
 //    }
     QDir::setCurrent("..");
     //准备温度图文件夹
-    blockWait(mPriProc,"mkdir HotSpot_output ; rm HotSpot_output/* -rf");
-    blockWait(mPriProc,"mkdir HeatMap ; rm HeatMap/* -rf");
+    mPriProc->blockWaitForFinished("mkdir HotSpot_output ; rm HotSpot_output/* -rf");
+    mPriProc->blockWaitForFinished("mkdir HeatMap ; rm HeatMap/* -rf");
 
     //处理性能数据
     for(auto& program: resultPrograms){
@@ -292,11 +284,10 @@ void Core::genHeatMap()
 
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
-    mEventLoop->setEnabled(true);
 
     //后处理
     //删除除了HotSpot_output之外的所有中间文件夹
-    blockWait(mPriProc,"rm McPAT_input McPAT_output HotSpot_input -rf");
+    mPriProc->blockWaitForFinished("rm McPAT_input McPAT_output HotSpot_input -rf");
     emit genHeatMapFinished();
     emit longTaskFinished();
 }
@@ -349,7 +340,6 @@ void Core::terminate()
     logConsole("终止。");
     mPubProc->setEnabled(false);
     mPriProc->setEnabled(false);
-    mEventLoop->setEnabled(false);
 
 //ref: https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
     //回收bash的子进程
@@ -398,7 +388,7 @@ bool Core::splitGem5Output(const QString &program)
     //准备输出文件夹
     QString mkdirCmd = "mkdir -p McPAT_input/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(mPriProc,mkdirCmd);
+    mPriProc->blockWaitForFinished(mkdirCmd);
 
     //分割stats文件
     //python scripts/split.py gem5_output/{program}/stats.txt McPAT_input/
@@ -406,17 +396,17 @@ bool Core::splitGem5Output(const QString &program)
                                                  "gem5_output/%1/stats.txt "
                                                  "McPAT_input/";
     splitCmd = splitCmd.arg(program);
-    blockWait(mPubProc, splitCmd);
+    mPubProc->blockWaitForFinished(splitCmd);
     if(mPubProc->cache() == "True\n"){
         //分割成功
         //in folder McPAT_input
         qDebug() << "split success";
         //在McPAT_input中创建文件夹，
         //将分割好的数据移动到该文件夹
-        blockWait(mPriProc,QString("cd McPAT_input ; "
-                                   "mkdir %1 ; "
-                                   "mv ./*.txt %1/ ; "
-                                   "cd ..").arg(program));
+        mPriProc->blockWaitForFinished(QString("cd McPAT_input ; "
+                                               "mkdir %1 ; "
+                                               "mv ./*.txt %1/ ; "
+                                               "cd ..").arg(program));
         return true;
     }
     else{
@@ -434,7 +424,7 @@ void Core::genXml(const QString &program)
                                                   "utils/template.xml "
                                                   "McPAT_input/%1/3.xml";
     genXmlCmd = genXmlCmd.arg(program);
-    blockWait(mPubProc,genXmlCmd);
+    mPubProc->blockWaitForFinished(genXmlCmd);
 }
 
 void Core::runMcpat(const QString &program)
@@ -445,20 +435,20 @@ void Core::runMcpat(const QString &program)
 
     QString mkdirCmd = "mkdir -p McPAT_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(mPriProc,mkdirCmd);
+    mPriProc->blockWaitForFinished(mkdirCmd);
     QString mcpatCmd = "mcpat/mcpat "
                        "-infile %2 "
                        "-print_level 5 "
                        "> McPAT_output/%1/3.txt";
     mcpatCmd = mcpatCmd.arg(program,xmlFile);
-    noBlockWait(mPubProc,mcpatCmd,mEventLoop);
+    mPubProc->noBlockWaitForFinished(mcpatCmd);
 }
 
 void Core::writePtrace(const QString &program)
 {
     //准备输出文件夹
     QString mkdirCmd = "mkdir HotSpot_input";
-    blockWait(mPriProc,mkdirCmd);
+    mPriProc->blockWaitForFinished(mkdirCmd);
     //调用python脚本
     //python scripts/writeptrace.py utils/ev6.flp McPAT_output/{program}/3.txt HotSpot_input/{program}.ptrace
     QString writePtraceCmd = Compatibility::python() + " scripts/writeptrace.py "
@@ -466,7 +456,7 @@ void Core::writePtrace(const QString &program)
                              "McPAT_output/%1/3.txt "
                              "HotSpot_input/%1.ptrace";
     writePtraceCmd = writePtraceCmd.arg(program);
-    blockWait(mPubProc,writePtraceCmd);
+    mPubProc->blockWaitForFinished(writePtraceCmd);
 }
 
 void Core::runHotspot(const QString &program)
@@ -474,7 +464,7 @@ void Core::runHotspot(const QString &program)
     //创建HotSpot子文件夹
     QString mkdirCmd = "mkdir -p HotSpot_output/%1";
     mkdirCmd = mkdirCmd.arg(program);
-    blockWait(mPriProc,mkdirCmd);
+    mPriProc->blockWaitForFinished(mkdirCmd);
     QString hotspotCmd = "./hotspot "
                          "-c ../utils/example.config "
                          "-f ../utils/ev6.flp "
@@ -486,7 +476,7 @@ void Core::runHotspot(const QString &program)
                          "-grid_steady_file ../HotSpot_output/%1/%1.grid.steady ";
     hotspotCmd = hotspotCmd.arg(program);
     mPubProc->setWorkingDirectory("HotSpot-master");
-    noBlockWait(mPubProc,hotspotCmd,mEventLoop);
+    mPubProc->noBlockWaitForFinished(hotspotCmd);
     mPubProc->setWorkingDirectory(".");
 }
 
@@ -502,6 +492,6 @@ void Core::drawHeatMap(const QString &program)
                          "%1 "
                          "HeatMap/%1";
     heatMapCmd = heatMapCmd.arg(program);
-    noBlockWait(mPubProc,heatMapCmd,mEventLoop);
+    mPubProc->noBlockWaitForFinished(heatMapCmd);
 }
 

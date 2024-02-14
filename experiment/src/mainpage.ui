@@ -25,10 +25,7 @@
      <widget class="ChoiceWidget" name="choiceWidget" native="true"/>
     </item>
     <item>
-     <widget class="HeatMapViewer" name="heatMapViewer" native="true">
-      <zorder>probeWidget</zorder>
-      <zorder>choiceWidget</zorder>
-     </widget>
+     <widget class="HeatMapViewer" name="heatMapViewer" native="true"/>
     </item>
    </layout>
   </widget>
@@ -82,24 +79,10 @@
     </property>
     <addaction name="actionTerminate"/>
    </widget>
-   <widget class="QMenu" name="menu_6">
-    <property name="title">
-     <string>窗口</string>
-    </property>
-    <widget class="QMenu" name="menu_7">
-     <property name="title">
-      <string>显示</string>
-     </property>
-     <addaction name="actionShowHeatMap"/>
-    </widget>
-    <addaction name="actionMaximize"/>
-    <addaction name="menu_7"/>
-   </widget>
    <addaction name="menu_4"/>
    <addaction name="menu_3"/>
    <addaction name="menu_2"/>
    <addaction name="menu_5"/>
-   <addaction name="menu_6"/>
    <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -221,25 +204,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
-   </property>
-  </action>
-  <action name="actionMaximize">
-   <property name="text">
-    <string>最大化</string>
-   </property>
-   <property name="shortcut">
-    <string>F11</string>
-   </property>
-  </action>
-  <action name="actionShowHeatMap">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>温度图</string>
    </property>
   </action>
   <action name="actionAboutqt">

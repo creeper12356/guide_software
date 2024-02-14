@@ -110,8 +110,6 @@ void MainPage::initConnections()
 
     connect(ui->actionTerminate,&QAction::triggered,this,&MainPage::terminate);
 
-    connect(ui->actionMaximize,&QAction::triggered,this,&MainPage::maximizeTriggered);
-
     connect(ui->actionAbout,&QAction::triggered,this,&MainPage::aboutTriggererd);
     connect(ui->actionAboutqt,&QAction::triggered,this,&MainPage::aboutqtTriggered);
 
@@ -264,6 +262,7 @@ void MainPage::longTaskStartedSlot()
     mLogDock->clear();
     mConsoleDock->clear();
     ui->actionConfigure->setEnabled(false);
+    ui->actionClearConfig->setEnabled(false);
     ui->actionCleanScript->setEnabled(false);
     ui->actionGenScript->setEnabled(false);
     ui->actionSimulatePerformance->setEnabled(false);
@@ -274,6 +273,7 @@ void MainPage::longTaskStartedSlot()
 void MainPage::longTaskFinishedSlot()
 {
     ui->actionConfigure->setEnabled(true);
+    ui->actionClearConfig->setEnabled(true);
     ui->actionCleanScript->setEnabled(true);
     ui->actionGenScript->setEnabled(true);
     ui->actionSimulatePerformance->setEnabled(true);

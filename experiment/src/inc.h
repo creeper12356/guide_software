@@ -50,32 +50,16 @@
 
 #include <QDebug>
 #define SECOND 1000
-/*
- * 无阻塞等待
- * QProcess* process,
- * QString command,
- * QEventLoop* eventLoop
- */
-#define noBlockWait(process,command,eventLoop) \
-    process->setArguments(QStringList() << "-c" << command);\
-    process->start();\
-    eventLoop->exec();
-/*
- * 阻塞等待
- * QProcess* process,
- * QString command
- */
-#define blockWait(process,command) \
-    process->setArguments(QStringList() << "-c" << command);\
-    process->start();\
-    process->waitForFinished(-1);
 
 class Core;
 class MainPage;
+class AppModel;
+
 class DependencyInstaller;
 class AptInstaller;
 class PyLibInstaller;
 class PasswordDialog;
+
 class Choice;
 class ChoiceGuide;
 class ChoiceWidget;
@@ -84,9 +68,5 @@ class HeatMapViewer;
 class ConsoleDock;
 class LogDock;
 class TaskProcess;
-class TaskEventLoop;
-
-class AppModel;
-
 class Compatibility;
 #endif // INC_H

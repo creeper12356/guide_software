@@ -148,7 +148,6 @@ signals:
 private:
 
     QApplication* mApp = nullptr;
-    TaskEventLoop* mEventLoop = nullptr;
     AppModel* mAppModel = nullptr;
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
