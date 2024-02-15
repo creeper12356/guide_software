@@ -289,12 +289,12 @@ void MainPage::askQuitSlot()
     }
 }
 
-void MainPage::warning(const QString &info)
+void MainPage::warning(QString info)
 {
     QMessageBox::warning(this,"警告",info);
 }
 
-void MainPage::critical(const QString &info)
+void MainPage::critical(QString info)
 {
     QMessageBox::critical(this,"错误",info);
 }

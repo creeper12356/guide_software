@@ -93,6 +93,10 @@ void Core::initConnections()
     connect(mMainPage,&MainPage::quit,this,&Core::checkQuit);
     connect(this,&Core::askQuit,mMainPage,&MainPage::askQuitSlot);
     connect(mMainPage,&MainPage::forceQuit,this,&Core::forceQuit);
+
+    //警告和错误
+    connect(this,&Core::warning,mMainPage,&MainPage::warning);
+    connect(this,&Core::critical,mMainPage,&MainPage::critical);
 }
 
 bool Core::checkConfigured()
@@ -102,14 +106,20 @@ bool Core::checkConfigured()
 
 bool Core::checkGenScript()
 {
-    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/");
+    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        //找不到脚本目录
+        return false;
+    }
     QString scriptFormat("%1_%2c_%3.rcS");
     QString script;
     bool res = true;
     for(auto& program: mAppModel->userChoice()->programs){
-        script = scriptFormat.arg(program,QString::number(mAppModel->userChoice()->threadNum),
+        script = scriptFormat.arg(program,
+                                  QString::number(mAppModel->userChoice()->threadNum),
                                   mAppModel->userChoice()->test.toLower());
         if(!QDir::current().exists(script)){
+            //某程序对应脚本不存在
             res = false;
             break;
         }
@@ -140,7 +150,11 @@ void Core::logConsoleProgram(const QString &program, const QString &info)
 void Core::cleanScript()
 {
     //进入脚本文件夹
-    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
+    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        //找不到脚本目录
+        return ;
+    }
     //清空之前生成的脚本
     mPubProc->blockWaitForFinished("rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
@@ -155,7 +169,10 @@ void Core::genScript()
         return ;
     }
     //进入脚本文件夹
-    QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files");
+    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files")) {
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        return ;
+    }
     QString writeScriptCmd = "./writescripts.pl %1 %2";
     //清空之前生成的脚本
     mPubProc->blockWaitForFinished("rm ./*.rcS 2>/dev/null");
@@ -179,16 +196,16 @@ void Core::simulatePerformance()
     }
 
     emit longTaskStarted();
-    //清空目录
-    QDir::setCurrent("gem5_output");
-    mPriProc->blockWaitForFinished("rm ./* -rf");
+
+    //准备gem5_output目录
+    mPriProc->noBlockWaitForFinished("mkdir gem5_output ; rm gem5_output/* -rf");
+
     //新建文件夹
     for(auto program: mAppModel->userChoice()->programs){
-        QDir::current().mkdir(program);
+        QDir("gem5_output").mkdir(program);
     }
 
     //运行性能仿真
-    QDir::setCurrent("..");
     QString simulateCmdFormat =
             "M5_PATH=../full_system_images/ ./build/X86/gem5.opt configs/example/fs.py "
             "--script=../TR-09-32-parsec-2.1-alpha-files/%1_%2c_%3.rcS "
@@ -239,9 +256,11 @@ void Core::genHeatMap()
     else {
         QDir::current().mkdir("McPAT_input");
     }
-    QDir::setCurrent("gem5_output");
     //仿真结果的所有文件夹列表
-    QStringList resultPrograms = QDir::current().entryList(QDir::NoDotAndDotDot | QDir::Dirs);
+    if(!QDir("gem5_output").exists()) {
+        logConsole("[FAIL]找不到目录gem5_output");
+    }
+    QStringList resultPrograms = QDir("gem5_output").entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     if(resultPrograms.empty()){
         logConsole("[FAIL]找不到可用的程序，请检查目录gem5_output。");
     }
@@ -255,7 +274,7 @@ void Core::genHeatMap()
 //            resultPrograms.removeOne(program);
 //        }
 //    }
-    QDir::setCurrent("..");
+
     //准备温度图文件夹
     mPriProc->blockWaitForFinished("mkdir HotSpot_output ; rm HotSpot_output/* -rf");
     mPriProc->blockWaitForFinished("mkdir HeatMap ; rm HeatMap/* -rf");

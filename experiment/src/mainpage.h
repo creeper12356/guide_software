@@ -47,6 +47,17 @@ public slots:
 
     void askQuitSlot();
 
+public slots:
+    /*!
+     * \brief 显示警告的对话框
+     * \param info 警告内容
+     */
+    void warning(QString info);
+    /*!
+     * \brief 显示错误的对话框
+     * \param info 错误内容
+     */
+    void critical(QString info);
 private slots:
     void configureTriggered();
     void simulatePerformanceTriggered();
@@ -76,17 +87,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 
-private:
-    /*!
-     * \brief 显示警告的对话框
-     * \param info 警告内容
-     */
-    void warning(const QString& info);
-    /*!
-     * \brief 显示错误的对话框
-     * \param info 错误内容
-     */
-    void critical(const QString& info);
 
 private:
     ConsoleDock* mConsoleDock;

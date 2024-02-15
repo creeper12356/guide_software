@@ -139,6 +139,9 @@ signals:
     //!耗时任务完成
     void longTaskFinished();
 
+    void warning(QString info);
+    void critical(QString info);
+
     //!询问用户是否退出
     void askQuit();
 
