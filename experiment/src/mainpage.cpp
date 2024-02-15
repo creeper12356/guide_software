@@ -264,7 +264,7 @@ void MainPage::critical(QString info)
     QMessageBox::critical(this,"错误",info);
 }
 
-void MainPage::logConsole(const QString &info)
+void MainPage::log(const QString &info)
 {
     if(info.isEmpty()){
         //若信息为空则清空日志
@@ -274,7 +274,7 @@ void MainPage::logConsole(const QString &info)
     mLogDock->append(info);
 }
 
-void MainPage::logConsoleProgram(const QString& program, const QString& info)
+void MainPage::logProgram(const QString& program, const QString& info)
 {
     QString prefix = "程序\"%1\": ";
     prefix = prefix.arg(program);

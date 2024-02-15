@@ -77,8 +77,8 @@ signals:
     void forceQuit();
 
 public:
-    void logConsole(const QString& info);
-    void logConsoleProgram(const QString &program, const QString &info);
+    void log(const QString& info);
+    void logProgram(const QString &program, const QString &info);
 protected:
     void closeEvent(QCloseEvent *event);
 

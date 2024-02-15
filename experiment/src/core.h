@@ -61,6 +61,7 @@ public slots:
     void forceQuit();
 
 public:
+
     /*!
      * \brief 分割gem5输出的性能数据
      * \param program 基准程序名
@@ -116,7 +117,7 @@ public:
     void logConsoleProgram(const QString& program, const QString& info);
 
 signals:
-
+    //!探针结果
     void probeResult(qreal temperature , qreal probeX, qreal probeY);
 
     //!耗时任务开始

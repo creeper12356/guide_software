@@ -122,19 +122,20 @@ bool Core::checkGenScript()
 void Core::clearConfig()
 {
     mAppModel->clearUserChoiceAndNotify();
+    logConsole("清空配置完成。");
 }
 
 void Core::logConsole(const QString &info)
 {
     if(mPubProc->isEnabled() && mPriProc->isEnabled()){
-        mMainPage->logConsole(info);
+        mMainPage->log(info);
     }
 }
 
 void Core::logConsoleProgram(const QString &program, const QString &info)
 {
     if(mPubProc->isEnabled() && mPriProc->isEnabled()){
-        mMainPage->logConsoleProgram(program , info);
+        mMainPage->logProgram(program , info);
     }
 }
 
@@ -295,7 +296,7 @@ void Core::genHeatMap()
         logConsoleProgram(program,"生成温度图...");
         drawHeatMap(program);
         if(QFile(QString("HeatMap/%1.png").arg(program)).exists()) {
-            logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+            logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png)。 ");
         }
     }
 
