@@ -61,7 +61,6 @@ public slots:
     void forceQuit();
 
 public:
-
     /*!
      * \brief 分割gem5输出的性能数据
      * \param program 基准程序名
@@ -117,20 +116,6 @@ public:
     void logConsoleProgram(const QString& program, const QString& info);
 
 signals:
-    //任务完成的信号
-
-    //!清理脚本完成
-    void cleanScriptFinished();
-    //!脚本成功完成
-    void genScriptFinished();
-    //!脚本生成失败
-    void genScriptFailed(QString warningInfo);
-    //!性能仿真完成
-    void simulatePerformanceFinished();
-    //!性能仿真失败
-    void simulatePerformanceFailed(QString warningInfo);
-    //!生成温度图完成
-    void genHeatMapFinished();
 
     void probeResult(qreal temperature , qreal probeX, qreal probeY);
 

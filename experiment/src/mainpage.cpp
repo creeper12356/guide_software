@@ -184,13 +184,11 @@ void MainPage::configureTriggered()
 
 void MainPage::simulatePerformanceTriggered()
 {
-    ui->actionSimulatePerformance->setEnabled(false);
     emit simulatePerformance();
 }
 
 void MainPage::genHeatMapTriggered()
 {
-    ui->actionGenHeatMap->setEnabled(false);
     emit genHeatMap();
 }
 
@@ -201,37 +199,6 @@ void MainPage::aboutTriggererd()
                      "热仿真向导软件<br>"
                      "Source code at <a style=\"color: #8AB8FE\" "
                      "href='https://github.com/creeper12356/guide_software'>GitHub</a>");
-}
-
-void MainPage::cleanScriptFinishedSlot()
-{
-    logConsole("清理脚本完成。");
-}
-
-void MainPage::genScriptFinishedSlot()
-{
-    logConsole("脚本已成功生成。");
-}
-
-void MainPage::genScriptFailedSlot(QString warningInfo)
-{
-    warning(warningInfo);
-}
-
-void MainPage::performanceSimulationFinishedSlot()
-{
-    logConsole("性能仿真结束。");
-}
-
-void MainPage::performanceSimulationFailedSlot(QString warningInfo)
-{
-    warning(warningInfo);
-    ui->actionSimulatePerformance->setEnabled(true);
-}
-
-void MainPage::genHeatMapFinishedSlot()
-{
-    logConsole("生成温度图结束。");
 }
 
 void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
@@ -259,8 +226,6 @@ void MainPage::consoleAppendStderr(QString info)
 void MainPage::longTaskStartedSlot()
 {
     //forbid all actions but terminate when running long tasks
-    mLogDock->clear();
-    mConsoleDock->clear();
     ui->actionConfigure->setEnabled(false);
     ui->actionClearConfig->setEnabled(false);
     ui->actionCleanScript->setEnabled(false);

@@ -30,12 +30,6 @@ public slots:
      */
     void updateUserChoice(const Choice* userChoice);
 
-    void cleanScriptFinishedSlot();
-    void genScriptFinishedSlot();
-    void genScriptFailedSlot(QString warningInfo);
-    void performanceSimulationFinishedSlot();
-    void performanceSimulationFailedSlot(QString warningInfo);
-    void genHeatMapFinishedSlot();
     void displayProbeResult(qreal temperature,qreal probeX,qreal probeY);
 
     void consoleAppendStdin(QString dir , QString info);
@@ -58,6 +52,7 @@ public slots:
      * \param info 错误内容
      */
     void critical(QString info);
+
 private slots:
     void configureTriggered();
     void simulatePerformanceTriggered();

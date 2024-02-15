@@ -55,24 +55,15 @@ void Core::initConnections()
     //清空脚本
     connect(mMainPage,&MainPage::cleanScript,
             this,&Core::cleanScript);
-    connect(this,&Core::cleanScriptFinished,mMainPage,&MainPage::cleanScriptFinishedSlot);
     //生成脚本
     connect(mMainPage,&MainPage::genScript,
             this,&Core::genScript);
-    connect(this,&Core::genScriptFinished,mMainPage,&MainPage::genScriptFinishedSlot);
-    connect(this,&Core::genScriptFailed,mMainPage,&MainPage::genScriptFailedSlot);
     //性能仿真
     connect(mMainPage,&MainPage::simulatePerformance,
             this,&Core::simulatePerformance);
-    connect(this,&Core::simulatePerformanceFinished,
-            mMainPage,&MainPage::performanceSimulationFinishedSlot);
-    connect(this,&Core::simulatePerformanceFailed,
-            mMainPage,&MainPage::performanceSimulationFailedSlot);
     //生成温度图
     connect(mMainPage,&MainPage::genHeatMap,
         this,&Core::genHeatMap);
-    connect(this,&Core::genHeatMapFinished,
-            mMainPage,&MainPage::genHeatMapFinishedSlot);
     //温度场探针
     connect(mMainPage,&MainPage::probe,this,&Core::probe);
     connect(this,&Core::probeResult,mMainPage,&MainPage::displayProbeResult);
@@ -107,7 +98,7 @@ bool Core::checkConfigured()
 bool Core::checkGenScript()
 {
     if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
         //找不到脚本目录
         return false;
     }
@@ -151,26 +142,26 @@ void Core::cleanScript()
 {
     //进入脚本文件夹
     if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
         //找不到脚本目录
         return ;
     }
     //清空之前生成的脚本
     mPubProc->blockWaitForFinished("rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
-    emit cleanScriptFinished();
+    logConsole("清空脚本完成。");
 }
 
 void Core::genScript()
 {
     //检查前置条件
     if(!checkConfigured()){
-        emit genScriptFailed("请先配置，选择基准程序和测试集。");
+        emit warning("请先配置，选择基准程序和测试集。");
         return ;
     }
     //进入脚本文件夹
     if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file。");
+        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
         return ;
     }
     QString writeScriptCmd = "./writescripts.pl %1 %2";
@@ -180,18 +171,23 @@ void Core::genScript()
         mPubProc->noBlockWaitForFinished(writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)));
     }
     QDir::setCurrent("..");
-    emit genScriptFinished();
+    logConsole("脚本已成功生成。");
 }
 
 void Core::simulatePerformance()
 {
+    logConsole("开始性能仿真...");
     //检查前置条件
     if(!checkConfigured()){
-        emit simulatePerformanceFailed("请先配置，选择基准程序和测试集。");
+        emit warning("请先配置，选择基准程序和测试集。");
         return ;
     }
     if(!checkGenScript()){
-        emit simulatePerformanceFailed("因部分脚本缺失无法进行仿真，请先生成脚本。");
+        emit warning("因部分脚本缺失无法进行仿真，请先生成脚本。");
+        return ;
+    }
+    if(!QDir("gem5").exists()) {
+        emit critical("找不到目录gem5/。");
         return ;
     }
 
@@ -240,15 +236,13 @@ void Core::simulatePerformance()
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
 
-    emit simulatePerformanceFinished();
+    logConsole("性能仿真完成。");
     emit longTaskFinished();
 }
 
 void Core::genHeatMap()
 {
-    emit longTaskStarted();
     logConsole("开始生成温度图...");
-    logConsole("检查性能仿真输出...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
         mPubProc->noBlockWaitForFinished("rm McPAT_input/* -rf");
@@ -257,23 +251,25 @@ void Core::genHeatMap()
         QDir::current().mkdir("McPAT_input");
     }
     //仿真结果的所有文件夹列表
-    if(!QDir("gem5_output").exists()) {
-        logConsole("[FAIL]找不到目录gem5_output");
-    }
     QStringList resultPrograms = QDir("gem5_output").entryList(QDir::NoDotAndDotDot | QDir::Dirs);
     if(resultPrograms.empty()){
-        logConsole("[FAIL]找不到可用的程序，请检查目录gem5_output。");
+        emit warning("找不到可用的程序，请检查目录gem5_output/。");
+        return ;
     }
+    //检查关键模块
+    if(!QDir("mcpat").exists()) {
+        emit critical("找不到目录mcpat/。");
+        return ;
+    }
+    if(!QDir("HotSpot-master").exists()) {
+        emit critical("找不到目录HotSpot-master/。");
+        return ;
+    }
+
     //检查仿真是否成功
-    //may buggy here
-//    for(auto& program: resultPrograms){
-//        if(QDir(program).entryList(QDir::Files).count() != 5){
-////            backend buggy here.
-////            文件数不为５，仿真失败
-//            logProgram(program,"[FAIL]性能仿真结果不完整。终止。");
-//            resultPrograms.removeOne(program);
-//        }
-//    }
+    //TODO : 检查性能仿真文件夹是否有5个文件
+
+    emit longTaskStarted();
 
     //准备温度图文件夹
     mPriProc->blockWaitForFinished("mkdir HotSpot_output ; rm HotSpot_output/* -rf");
@@ -298,16 +294,17 @@ void Core::genHeatMap()
         logConsole("完成!");
         logConsoleProgram(program,"生成温度图...");
         drawHeatMap(program);
-        logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+        if(QFile(QString("HeatMap/%1.png").arg(program)).exists()) {
+            logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png). ");
+        }
     }
 
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
 
-    //后处理
     //删除除了HotSpot_output之外的所有中间文件夹
     mPriProc->blockWaitForFinished("rm McPAT_input McPAT_output HotSpot_input -rf");
-    emit genHeatMapFinished();
+    logConsole("生成温度图完成。");
     emit longTaskFinished();
 }
 

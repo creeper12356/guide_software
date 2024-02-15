@@ -6,7 +6,7 @@ import numpy as np
 
 path_flp = sys.argv[1]
 path_steady = sys.argv[2]
-layer = long(sys.argv[3])
+layer = int(sys.argv[3])
 map_title = sys.argv[4]
 path_map = sys.argv[5]
 
