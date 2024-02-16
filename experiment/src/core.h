@@ -102,9 +102,9 @@ public:
     /*!
      * \brief 写入日志
      * \param info 写入的信息
-     * \sa logConsoleProgram
+     * \sa logProgram
      */
-    void logConsole(const QString& info);
+    void log(const QString& info);
 
     /*!
      * \brief 格式化写入日志
@@ -112,9 +112,9 @@ public:
      * 等价于写入：程序"{program}":{info}
      * \param program 基准程序名
      * \param info 写入信息
-     * \sa logConsole
+     * \sa log
      */
-    void logConsoleProgram(const QString& program, const QString& info);
+    void logProgram(const QString& program, const QString& info);
 
 signals:
     //!探针结果

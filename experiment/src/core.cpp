@@ -122,17 +122,17 @@ bool Core::checkGenScript()
 void Core::clearConfig()
 {
     mAppModel->clearUserChoiceAndNotify();
-    logConsole("清空配置完成。");
+    log("清空配置完成。");
 }
 
-void Core::logConsole(const QString &info)
+void Core::log(const QString &info)
 {
     if(mPubProc->isEnabled() && mPriProc->isEnabled()){
         mMainPage->log(info);
     }
 }
 
-void Core::logConsoleProgram(const QString &program, const QString &info)
+void Core::logProgram(const QString &program, const QString &info)
 {
     if(mPubProc->isEnabled() && mPriProc->isEnabled()){
         mMainPage->logProgram(program , info);
@@ -150,7 +150,7 @@ void Core::cleanScript()
     //清空之前生成的脚本
     mPubProc->blockWaitForFinished("rm ./*.rcS 2> /dev/null");
     QDir::setCurrent("..");
-    logConsole("清空脚本完成。");
+    log("清空脚本完成。");
 }
 
 void Core::genScript()
@@ -172,12 +172,12 @@ void Core::genScript()
         mPubProc->noBlockWaitForFinished(writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)));
     }
     QDir::setCurrent("..");
-    logConsole("脚本已成功生成。");
+    log("脚本已成功生成。");
 }
 
 void Core::simulatePerformance()
 {
-    logConsole("开始性能仿真...");
+    log("开始性能仿真...");
     //检查前置条件
     if(!checkConfigured()){
         emit warning("请先配置，选择基准程序和测试集。");
@@ -213,7 +213,7 @@ void Core::simulatePerformance()
     for(auto program: mAppModel->userChoice()->programs){
         //文件名中测试集均为小写
         if(mPubProc->isEnabled()){
-            logConsoleProgram(program,"开始性能仿真...");
+            logProgram(program,"开始性能仿真...");
         }
         simulateCmd = simulateCmdFormat.arg(
                     program,
@@ -230,20 +230,20 @@ void Core::simulatePerformance()
         //将输出文件拷贝到对应目标路径
         mPriProc->blockWaitForFinished("cp gem5/m5out/* gem5_output/" + program);
         if(mPubProc->isEnabled()){
-            logConsoleProgram(program,"[SUCCESS]性能仿真完成.");
+            logProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }
 
     mPubProc->setEnabled(true);
     mPriProc->setEnabled(true);
 
-    logConsole("性能仿真完成。");
+    log("性能仿真完成。");
     emit longTaskFinished();
 }
 
 void Core::genHeatMap()
 {
-    logConsole("开始生成温度图...");
+    log("开始生成温度图...");
     //准备输入文件夹
     if(QDir::current().exists("McPAT_input")){
         mPubProc->noBlockWaitForFinished("rm McPAT_input/* -rf");
@@ -278,25 +278,25 @@ void Core::genHeatMap()
 
     //处理性能数据
     for(auto& program: resultPrograms){
-        logConsoleProgram(program,"分割性能数据...");
+        logProgram(program,"分割性能数据...");
         if(!splitGem5Output(program)){
-            logConsoleProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
+            logProgram(program,"[FAIL]分割性能仿真结果失败。终止。");
             continue;
         }
-        logConsoleProgram(program,"生成xml文件...");
+        logProgram(program,"生成xml文件...");
         genXml(program);
-        logConsoleProgram(program,"运行McPAT模块...");
+        logProgram(program,"运行McPAT模块...");
         runMcpat(program);
-        logConsole("完成!");
-        logConsoleProgram(program,"生成ptrace文件...");
+        log("完成!");
+        logProgram(program,"生成ptrace文件...");
         writePtrace(program);
-        logConsoleProgram(program,"运行Hotspot模块...");
+        logProgram(program,"运行Hotspot模块...");
         runHotspot(program);
-        logConsole("完成!");
-        logConsoleProgram(program,"生成温度图...");
+        log("完成!");
+        logProgram(program,"生成温度图...");
         drawHeatMap(program);
         if(QFile(QString("HeatMap/%1.png").arg(program)).exists()) {
-            logConsoleProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png)。 ");
+            logProgram(program,"[SUCCESS]温度图已成功生成(HeatMap/" + program + ".png)。 ");
         }
     }
 
@@ -305,7 +305,7 @@ void Core::genHeatMap()
 
     //删除除了HotSpot_output之外的所有中间文件夹
     mPriProc->blockWaitForFinished("rm McPAT_input McPAT_output HotSpot_input -rf");
-    logConsole("生成温度图完成。");
+    log("生成温度图完成。");
     emit longTaskFinished();
 }
 
@@ -354,7 +354,7 @@ void Core::probe(QString program, qreal probeX, qreal probeY)
 
 void Core::terminate()
 {
-    logConsole("终止。");
+    log("终止。");
     mPubProc->setEnabled(false);
     mPriProc->setEnabled(false);
 
