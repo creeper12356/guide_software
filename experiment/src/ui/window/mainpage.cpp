@@ -1,12 +1,13 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
-#include "aboutdialog.h"
-#include "choiceguide.h"
-#include "choicewidget.h"
-#include "consoledock.h"
-#include "logdock.h"
-#include "heatmapviewer.h"
-#include "probewidget.h"
+
+#include "ui/window/aboutdialog.h"
+#include "ui/window/choiceguide.h"
+#include "ui/widget/choicewidget.h"
+#include "ui/widget/consoledock.h"
+#include "ui/widget/logdock.h"
+#include "ui/widget/heatmapviewer.h"
+#include "ui/widget/probewidget.h"
 
 MainPage::MainPage() :
     QMainWindow(nullptr),

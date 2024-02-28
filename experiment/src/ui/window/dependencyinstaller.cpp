@@ -1,7 +1,8 @@
 #include "dependencyinstaller.h"
-#include "passworddialog.h"
 #include "ui_dependencyinstaller.h"
-#include "compatibility.h"
+
+#include "logic/utils/compatibility.h"
+#include "ui/window/passworddialog.h"
 
 DependencyInstaller::DependencyInstaller()
    : QDialog(nullptr)

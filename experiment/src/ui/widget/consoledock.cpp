@@ -20,7 +20,8 @@
  */
 
 #include "consoledock.h"
-#include "taskmanager.h"
+
+#include "logic/utils/taskmanager.h"
 
 ConsoleDock::ConsoleDock(QWidget *parent)
     : QDockWidget(parent)

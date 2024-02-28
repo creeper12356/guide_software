@@ -1,7 +1,8 @@
 #include "choicewidget.h"
 #include "ui_choicewidget.h"
 
-#include "choice.h"
+#include "data/utils/choice.h"
+
 ChoiceWidget::ChoiceWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChoiceWidget)

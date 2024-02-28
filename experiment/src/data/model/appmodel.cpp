@@ -1,6 +1,7 @@
 #include "appmodel.h"
-#include "choice.h"
-#include "mainpage.h"
+
+#include "data/utils/choice.h"
+#include "ui/window/mainpage.h"
 
 AppModel::AppModel(MainPage *mainPage)
     : QObject()
