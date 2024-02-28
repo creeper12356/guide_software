@@ -121,7 +121,7 @@ void PerformanceCore::simulatePerformance()
     for(auto program: mAppModel->userChoice()->programs){
         //文件名中测试集均为小写
         if(mPubProc->isEnabled()){
-            logProgram(program,"开始性能仿真...");
+            emit logProgram(program,"开始性能仿真...");
         }
         simulateCmd = simulateCmdFormat.arg(
                     program,
@@ -138,7 +138,7 @@ void PerformanceCore::simulatePerformance()
         //将输出文件拷贝到对应目标路径
         mPriProc->blockWaitForFinished("cp gem5/m5out/* gem5_output/" + program);
         if(mPubProc->isEnabled()){
-            logProgram(program,"[SUCCESS]性能仿真完成.");
+            emit logProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }
 

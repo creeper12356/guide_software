@@ -18,12 +18,6 @@ public:
     void initConnections();
 
 public slots:
-    //!性能仿真
-    void simulatePerformance();
-    //!生成温度图
-    void genHeatMap();
-    //!探针函数
-    void probe(QString program , qreal probeX , qreal probeY);
     //!终止
     void terminate();
 
@@ -43,44 +37,6 @@ public slots:
     void forceQuit();
 
 public:
-
-    /*!
-     * \brief 分割gem5输出的性能数据
-     * \param program 基准程序名
-     * \return 是否分割成功
-     */
-    bool splitGem5Output(const QString& program);
-
-    /*!
-     * \brief 将分割后的性能数据转换为xml文件
-     * \param program 基准程序名
-     */
-    void genXml(const QString& program);
-
-    /*!
-     * \brief 运行McPAT模块
-     * \param program 基准程序名
-     */
-    void runMcpat(const QString &program);
-
-    /*!
-     * \brief 将功耗数据转换为ptrace文件
-     * \param program 基准程序名
-     */
-    void writePtrace(const QString& program);
-
-    /*!
-     * \brief 运行HotSpot模块，生成grid.steady文件
-     * \param program 基准程序名
-     */
-    void runHotspot(const QString& program);
-
-    /*!
-     * \brief 调用脚本绘制温度图
-     * \param program 基准程序名
-     */
-    void drawHeatMap(const QString& program);
-
     /*!
      * \brief 写入日志
      * \param info 写入的信息
@@ -99,9 +55,6 @@ public:
     void logProgram(const QString& program, const QString& info);
 
 signals:
-    //!探针结果
-    void probeResult(qreal temperature , qreal probeX, qreal probeY);
-
     //!耗时任务开始
     void longTaskStarted();
     //!耗时任务完成
