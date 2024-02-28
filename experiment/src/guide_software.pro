@@ -16,53 +16,60 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    aboutdialog.cpp \
-    choiceguide.cpp \
-    compatibility.cpp \
-    dependencyinstaller.cpp \
-    mainpage.cpp \
-    choicewidget.cpp \
-    core.cpp \
+    data/model/appmodel.cpp \
+    data/utils/choice.cpp \
+    logic/core/core.cpp \
+    logic/core/heatmapcore.cpp \
+    logic/core/performancecore.cpp \
+    logic/utils/compatibility.cpp \
+    logic/utils/subcore.cpp \
+    logic/utils/taskmanager.cpp \
     main.cpp \
-    consoledock.cpp \
-    taskmanager.cpp \
-    passworddialog.cpp \
-    choice.cpp \
-    appmodel.cpp \
-    imageviewer.cpp \
-    customgraphicsview.cpp \
-    heatmapviewer.cpp \
-    probewidget.cpp \
-    logdock.cpp
-
-HEADERS += \
-    aboutdialog.h \
-    choiceguide.h \
-    compatibility.h \
-    dependencyinstaller.h \
-    mainpage.h \
-    choicewidget.h \
-    core.h \
-    inc.h \
-    consoledock.h \
-    taskmanager.h \
-    passworddialog.h \
-    choice.h \
-    appmodel.h \
-    imageviewer.h \
-    customgraphicsview.h \
-    heatmapviewer.h \
-    probewidget.h \
-    logdock.h
+    ui/utils/customgraphicsview.cpp \
+    ui/utils/imageviewer.cpp \
+    ui/widget/choicewidget.cpp \
+    ui/widget/consoledock.cpp \
+    ui/widget/heatmapviewer.cpp \
+    ui/widget/logdock.cpp \
+    ui/widget/probewidget.cpp \
+    ui/window/aboutdialog.cpp \
+    ui/window/choiceguide.cpp \
+    ui/window/dependencyinstaller.cpp \
+    ui/window/mainpage.cpp \
+    ui/window/passworddialog.cpp
 
 FORMS += \
-    aboutdialog.ui \
-    choiceguide.ui \
-    dependencyinstaller.ui \
-    mainpage.ui \
-    choicewidget.ui \
-    imageviewer.ui \
-    probewidget.ui
+    ui/utils/imageviewer.ui \
+    ui/widget/choicewidget.ui \
+    ui/widget/probewidget.ui \
+    ui/window/aboutdialog.ui \
+    ui/window/choiceguide.ui \
+    ui/window/dependencyinstaller.ui \
+    ui/window/mainpage.ui
+
+HEADERS += \
+    data/model/appmodel.h \
+    data/utils/choice.h \
+    inc.h \
+    logic/core/core.h \
+    logic/core/heatmapcore.h \
+    logic/core/performancecore.h \
+    logic/utils/compatibility.h \
+    logic/utils/subcore.h \
+    logic/utils/taskmanager.h \
+    ui/utils/customgraphicsview.h \
+    ui/utils/imageviewer.h \
+    ui/widget/choicewidget.h \
+    ui/widget/consoledock.h \
+    ui/widget/heatmapviewer.h \
+    ui/widget/logdock.h \
+    ui/widget/probewidget.h \
+    ui/window/aboutdialog.h \
+    ui/window/choiceguide.h \
+    ui/window/dependencyinstaller.h \
+    ui/window/mainpage.h \
+    ui/window/passworddialog.h
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

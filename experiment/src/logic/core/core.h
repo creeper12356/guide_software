@@ -17,25 +17,7 @@ public:
      */
     void initConnections();
 
-    /*!
-     * \brief 检查用户是否配置成功
-     * \return 用户是否配置成功
-     */
-    bool checkConfigured();
-
-    /*!
-     * \brief 检查脚本是否成功生成
-     * \return 如果用户未配置，返回true；如果用户已配置，返回所有的脚本是否成功生成。
-     */
-    bool checkGenScript();
-
 public slots:
-    //!清空配置
-    void clearConfig();
-    //!清空脚本
-    void cleanScript();
-    //!生成脚本
-    void genScript();
     //!性能仿真
     void simulatePerformance();
     //!生成温度图
@@ -138,16 +120,19 @@ private:
 
     QApplication* mApp = nullptr;
     AppModel* mAppModel = nullptr;
+
     //调用外部程序的进程
     //pub_proc为公有进程，将输出打印到终端，更新cache
     //pri_proc为私有进程，不打印输出，只更新cache
     TaskProcess* mPubProc = nullptr;
     TaskProcess* mPriProc = nullptr;
-    //缓冲区,记录上一次readAll操作读到的进程输出
 
     MainPage* mMainPage = nullptr;
     AptInstaller* mAptInstaller = nullptr;
     PyLibInstaller* mPyLibInstaller = nullptr;
+
+    PerformanceCore* mPerformanceCore;
+    HeatMapCore* mHeatMapCore;
 };
 
 #endif // CORE_H

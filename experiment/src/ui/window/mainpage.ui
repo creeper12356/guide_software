@@ -127,7 +127,7 @@
   </action>
   <action name="actionSimulatePerformance">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/per_sim_icon.png</normaloff>:/img/per_sim_icon.png</iconset>
    </property>
    <property name="text">
@@ -141,7 +141,7 @@
   </action>
   <action name="actionGenHeatMap">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/temp_icon.png</normaloff>:/img/temp_icon.png</iconset>
    </property>
    <property name="text">
@@ -153,7 +153,7 @@
   </action>
   <action name="actionGenScript">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/gen_icon.png</normaloff>:/img/gen_icon.png</iconset>
    </property>
    <property name="text">
@@ -173,7 +173,7 @@
   </action>
   <action name="actionConfigure">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/conf_icon.png</normaloff>:/img/conf_icon.png</iconset>
    </property>
    <property name="text">
@@ -182,7 +182,7 @@
   </action>
   <action name="actionCleanScript">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/clean_icon.png</normaloff>:/img/clean_icon.png</iconset>
    </property>
    <property name="text">
@@ -197,7 +197,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/terminate_icon.png</normaloff>:/img/terminate_icon.png</iconset>
    </property>
    <property name="text">
@@ -214,7 +214,7 @@
   </action>
   <action name="actionClearConfig">
    <property name="icon">
-    <iconset resource="../res.qrc">
+    <iconset resource="../../../res.qrc">
      <normaloff>:/img/clear_conf_icon.png</normaloff>:/img/clear_conf_icon.png</iconset>
    </property>
    <property name="text">
@@ -226,24 +226,24 @@
   <customwidget>
    <class>ChoiceWidget</class>
    <extends>QWidget</extends>
-   <header location="global">choicewidget.h</header>
+   <header location="global">ui/widget/choicewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>ProbeWidget</class>
    <extends>QWidget</extends>
-   <header location="global">probewidget.h</header>
+   <header location="global">ui/widget/probewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>HeatMapViewer</class>
    <extends>QWidget</extends>
-   <header location="global">heatmapviewer.h</header>
+   <header location="global">ui/widget/heatmapviewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res.qrc"/>
+  <include location="../../../res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,5 +1,6 @@
 #include "inc.h"
-#include "core.h"
+
+#include "logic/core/core.h"
 int main(int argc, char *argv[])
 {
     //remove this line before build executable file.

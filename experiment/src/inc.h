@@ -69,4 +69,7 @@ class ConsoleDock;
 class LogDock;
 class TaskProcess;
 class Compatibility;
+
+class PerformanceCore;
+class HeatMapCore;
 #endif // INC_H

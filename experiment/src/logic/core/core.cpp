@@ -1,10 +1,13 @@
 #include "core.h"
-#include "mainpage.h"
-#include "dependencyinstaller.h"
-#include "taskmanager.h"
-#include "choice.h"
-#include "appmodel.h"
-#include "compatibility.h"
+
+#include "logic/core/performancecore.h"
+#include "logic/core/heatmapcore.h"
+#include "logic/utils/taskmanager.h"
+#include "logic/utils/compatibility.h"
+#include "data/utils/choice.h"
+#include "data/model/appmodel.h"
+#include "ui/window/mainpage.h"
+#include "ui/window/dependencyinstaller.h"
 
 Core::Core(QApplication* a):
     QObject(nullptr),
@@ -22,6 +25,9 @@ Core::Core(QApplication* a):
     mPyLibInstaller = new PyLibInstaller;
 
     mAppModel = new AppModel(mMainPage);
+
+    mPerformanceCore = new PerformanceCore(this , mAppModel , mPubProc, mPriProc);
+    mHeatMapCore = new HeatMapCore(this);
 
     initConnections();
 
@@ -51,13 +57,13 @@ void Core::initConnections()
 {
     connect(this,&Core::quit,mApp,&QApplication::quit,Qt::QueuedConnection);
     //清空配置
-    connect(mMainPage,&MainPage::clearConfig,this,&Core::clearConfig);
+    connect(mMainPage,&MainPage::clearConfig,mPerformanceCore,&PerformanceCore::clearConfig);
     //清空脚本
     connect(mMainPage,&MainPage::cleanScript,
-            this,&Core::cleanScript);
+            mPerformanceCore,&PerformanceCore::cleanScript);
     //生成脚本
     connect(mMainPage,&MainPage::genScript,
-            this,&Core::genScript);
+            mPerformanceCore,&PerformanceCore::genScript);
     //性能仿真
     connect(mMainPage,&MainPage::simulatePerformance,
             this,&Core::simulatePerformance);
@@ -90,40 +96,6 @@ void Core::initConnections()
     connect(this,&Core::critical,mMainPage,&MainPage::critical);
 }
 
-bool Core::checkConfigured()
-{
-    return mAppModel->userChoice()->isConfigured();
-}
-
-bool Core::checkGenScript()
-{
-    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
-        //找不到脚本目录
-        return false;
-    }
-    QString scriptFormat("%1_%2c_%3.rcS");
-    QString script;
-    bool res = true;
-    for(auto& program: mAppModel->userChoice()->programs){
-        script = scriptFormat.arg(program,
-                                  QString::number(mAppModel->userChoice()->threadNum),
-                                  mAppModel->userChoice()->test.toLower());
-        if(!QDir::current().exists(script)){
-            //某程序对应脚本不存在
-            res = false;
-            break;
-        }
-    }
-    QDir::setCurrent("..");
-    return res;
-}
-
-void Core::clearConfig()
-{
-    mAppModel->clearUserChoiceAndNotify();
-    log("清空配置完成。");
-}
 
 void Core::log(const QString &info)
 {
@@ -139,51 +111,15 @@ void Core::logProgram(const QString &program, const QString &info)
     }
 }
 
-void Core::cleanScript()
-{
-    //进入脚本文件夹
-    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files/")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
-        //找不到脚本目录
-        return ;
-    }
-    //清空之前生成的脚本
-    mPubProc->blockWaitForFinished("rm ./*.rcS 2> /dev/null");
-    QDir::setCurrent("..");
-    log("清空脚本完成。");
-}
-
-void Core::genScript()
-{
-    //检查前置条件
-    if(!checkConfigured()){
-        emit warning("请先配置，选择基准程序和测试集。");
-        return ;
-    }
-    //进入脚本文件夹
-    if(!QDir::setCurrent("TR-09-32-parsec-2.1-alpha-files")) {
-        emit critical("找不到目录TR-09-32-parsec-2.1-alpha-file/。");
-        return ;
-    }
-    QString writeScriptCmd = "./writescripts.pl %1 %2";
-    //清空之前生成的脚本
-    mPubProc->blockWaitForFinished("rm ./*.rcS 2>/dev/null");
-    for(auto program : mAppModel->userChoice()->programs){
-        mPubProc->noBlockWaitForFinished(writeScriptCmd.arg(program,QString::number(mAppModel->userChoice()->threadNum)));
-    }
-    QDir::setCurrent("..");
-    log("脚本已成功生成。");
-}
-
 void Core::simulatePerformance()
 {
     log("开始性能仿真...");
     //检查前置条件
-    if(!checkConfigured()){
+    if(!mPerformanceCore->checkConfigured()){
         emit warning("请先配置，选择基准程序和测试集。");
         return ;
     }
-    if(!checkGenScript()){
+    if(!mPerformanceCore->checkGenScript()){
         emit warning("因部分脚本缺失无法进行仿真，请先生成脚本。");
         return ;
     }

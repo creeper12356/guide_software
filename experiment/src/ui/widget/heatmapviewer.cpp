@@ -1,4 +1,5 @@
 #include "heatmapviewer.h"
+
 #include <QStatusBar>
 
 HeatMapViewer::HeatMapViewer(QWidget *parent)

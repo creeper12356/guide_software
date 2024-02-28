@@ -29,7 +29,7 @@
    <string>配置</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../res.qrc">
+   <iconset resource="../../../res.qrc">
     <normaloff>:/img/conf_icon.png</normaloff>:/img/conf_icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -294,7 +294,7 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="../res.qrc"/>
+  <include location="../../../res.qrc"/>
  </resources>
  <connections/>
 </ui>

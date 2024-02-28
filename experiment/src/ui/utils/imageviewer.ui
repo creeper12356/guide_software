@@ -79,7 +79,7 @@ color: rgb(238, 238, 236);</string>
   <customwidget>
    <class>CustomGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">customgraphicsview.h</header>
+   <header location="global">ui/utils/customgraphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

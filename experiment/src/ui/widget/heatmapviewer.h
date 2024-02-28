@@ -1,7 +1,7 @@
 #ifndef HEATMAPVIEWER_H
 #define HEATMAPVIEWER_H
 #include "inc.h"
-#include "imageviewer.h"
+#include "ui/utils/imageviewer.h"
 
 class HeatMapViewer : public ImageViewer
 {
