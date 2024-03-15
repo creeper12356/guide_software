@@ -8,7 +8,7 @@ QString Compatibility::mPipRequirementFile;
 
 void Compatibility::initialize()
 {
-    //目前只支持Ubuntu16.04和Ubuntu20.04
+    // 目前只支持Ubuntu16.04和Ubuntu20.04
     if(QSysInfo::productType() != "ubuntu") {
         qFatal("non-Ubuntu system detected.");
     }
@@ -30,7 +30,7 @@ void Compatibility::initialize()
         qFatal("Unsupported Ubuntu version.");
     }
 
-    //init inDocker
+    // init inDocker
     mInDocker = false;
     QFile cgroupFile("/proc/1/cgroup");
     if (cgroupFile.open(QIODevice::ReadOnly | QIODevice::Text)) {

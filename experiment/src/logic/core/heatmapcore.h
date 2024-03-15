@@ -3,13 +3,27 @@
 #include "inc.h"
 #include "logic/utils/subcore.h"
 
-//!生成温度图功能模块
+/*!
+ * \brief 温度图功能模块
+ * \details 温度图功能模块，包含所有生成温度图相关的功能函数。
+ * \sa Core
+ */
 class HeatMapCore : public SubCore
 {
     Q_OBJECT
 public:
+
+    /*!
+     * \brief HeatMapCore构造函数
+     * \param core 核心类指针
+     * \param appModel 数据模型指针
+     * \param pubProc 公有进程指针
+     * \param priProc 私有进程指针
+     */
     HeatMapCore(Core* core ,AppModel* appModel , TaskProcess* pubProc, TaskProcess* priProc);
+
 public :
+
     /*!
      * \brief 分割gem5输出的性能数据
      * \param program 基准程序名
@@ -48,6 +62,7 @@ public :
     void drawHeatMap(const QString& program);
 
 public slots:
+
     //!生成温度图
     void genHeatMap();
     //!探针函数

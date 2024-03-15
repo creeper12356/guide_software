@@ -7,6 +7,7 @@ namespace Ui {
 class ProbeWidget;
 }
 
+//!探针窗口
 class ProbeWidget : public QWidget
 {
     Q_OBJECT

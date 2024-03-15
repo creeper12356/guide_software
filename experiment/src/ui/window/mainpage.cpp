@@ -1,13 +1,14 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 
-#include "ui/window/aboutdialog.h"
 #include "ui/window/choiceguide.h"
 #include "ui/widget/choicewidget.h"
 #include "ui/widget/consoledock.h"
 #include "ui/widget/logdock.h"
 #include "ui/widget/heatmapviewer.h"
 #include "ui/widget/probewidget.h"
+
+
 
 MainPage::MainPage() :
     QMainWindow(nullptr),
@@ -29,15 +30,7 @@ MainPage::~MainPage()
     delete ui;
 }
 
-ConsoleDock *MainPage::consoleDock()
-{
-    return mConsoleDock;
-}
 
-ChoiceWidget *MainPage::choiceWidget()
-{
-    return ui->choiceWidget;
-}
 
 void MainPage::initDockWidgets()
 {
@@ -177,6 +170,11 @@ void MainPage::configureTriggered()
 {
     QEventLoop eventLoop;
     connect(mGuide,&ChoiceGuide::configureFinished,&eventLoop,&QEventLoop::quit);
+
+    QPoint guidePos = this->geometry().center();
+    guidePos -= QPoint(mGuide->geometry().width() / 2, mGuide->geometry().height() / 2);
+    mGuide->move(guidePos);
+
     mGuide->show();
     eventLoop.exec();
     ui->choiceWidget->refreshUserChoice(mGuide->userChoice());
@@ -196,10 +194,10 @@ void MainPage::genHeatMapTriggered()
 void MainPage::aboutTriggererd()
 {
     QMessageBox::about(this, "关于",
-                     "<center><h2>Guide Software</h2></center><br>"
-                     "热仿真向导软件<br>"
-                     "Source code at <a style=\"color: #8AB8FE\" "
-                     "href='https://github.com/creeper12356/guide_software'>GitHub</a>");
+                     "<center><h2>Guide Software</h2></center>"
+                     "<p>热仿真向导软件</p>"
+                     "Source code at <a style=\"color: blue\" "
+                     "href='https://github.com/creeper12356/guide_software'>GitHub</a><br>");
 }
 
 void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
@@ -226,7 +224,6 @@ void MainPage::consoleAppendStderr(QString info)
 
 void MainPage::longTaskStartedSlot()
 {
-    //forbid all actions but terminate when running long tasks
     ui->actionConfigure->setEnabled(false);
     ui->actionClearConfig->setEnabled(false);
     ui->actionCleanScript->setEnabled(false);
@@ -249,7 +246,9 @@ void MainPage::longTaskFinishedSlot()
 
 void MainPage::askQuitSlot()
 {
-    auto button = QMessageBox::warning(this,"警告","存在未结束的进程，是否强制退出？",QMessageBox::No | QMessageBox::Yes);
+    auto button = QMessageBox::warning(this,
+                                       "警告","存在未结束的进程，是否强制退出？",
+                                       QMessageBox::No | QMessageBox::Yes);
     if(button == QMessageBox::Yes){
         emit forceQuit();
     }
@@ -286,13 +285,6 @@ void MainPage::closeEvent(QCloseEvent *event)
 {
     ui->actionQuit->trigger();
     event->ignore();
-}
-
-
-void MainPage::maximizeTriggered()
-{
-    if(isMaximized()) showNormal();
-    else			  showMaximized();
 }
 
 void MainPage::aboutqtTriggered()

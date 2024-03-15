@@ -3,6 +3,7 @@
 #include "inc.h"
 #include "ui/utils/imageviewer.h"
 
+//!温度图窗口
 class HeatMapViewer : public ImageViewer
 {
     Q_OBJECT

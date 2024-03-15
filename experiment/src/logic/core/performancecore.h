@@ -4,7 +4,13 @@
 #include "inc.h"
 #include "logic/utils/subcore.h"
 
-//!性能仿真功能模块
+
+
+/*!
+ * \brief 性能仿真功能模块
+ * \details 性能仿真功能模块，包含所有性能仿真相关的功能函数。
+ * \sa Core
+ */
 class PerformanceCore : public SubCore
 {
     Q_OBJECT
@@ -35,6 +41,8 @@ public slots:
 signals:
     void simulatePerformanceStarted();
     void simulatePerformanceFinished();
+
+
 
     void logProgram(QString info, QString program);
 

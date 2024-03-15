@@ -1,5 +1,5 @@
 #pragma once
-
+// source code refs:  https://github.com/Mithil467/Coreavor
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include "customgraphicsview.h"
