@@ -8,8 +8,18 @@ class HeatMapCore : public SubCore
 {
     Q_OBJECT
 public:
+
+    /*!
+     * \brief HeatMapCore构造函数
+     * \param core 核心类指针
+     * \param appModel 数据模型指针
+     * \param pubProc 公有进程指针
+     * \param priProc 私有进程指针
+     */
     HeatMapCore(Core* core ,AppModel* appModel , TaskProcess* pubProc, TaskProcess* priProc);
+
 public :
+
     /*!
      * \brief 分割gem5输出的性能数据
      * \param program 基准程序名

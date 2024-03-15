@@ -15,7 +15,7 @@ Core::Core(QApplication* a):
 {
     Compatibility::initialize();
 
-    //初始化进程和事件循环
+    //初始化进程
     mPubProc = new TaskProcess(this);
     mPriProc = new TaskProcess(this);
 
@@ -111,34 +111,41 @@ void Core::logProgram(const QString &program, const QString &info)
     }
 }
 
+bool Core::killChildProcesses(Q_PID pid)
+{
+    if(!pid) return false;
+
+    QProcess getChildProcess;
+    QStringList getChildCommand;
+    const int waitTimeOut = 5 * SECOND;
+
+    getChildCommand << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
+    getChildProcess.start("ps", getChildCommand);
+    if(!getChildProcess.waitForFinished(waitTimeOut)) return false;
+    QString childIds = getChildProcess.readAllStandardOutput();
+    qDebug() << "childs: " << childIds;
+    childIds.replace('\n', ' ');
+
+    if(!childIds.trimmed().isEmpty()){
+        return QProcess::execute("kill " + childIds) == 0;
+    }
+    else{
+        qDebug() << "no child to kill.";
+        return false;
+    }
+}
+
 void Core::terminate()
 {
     log("终止。");
     mPubProc->setEnabled(false);
     mPriProc->setEnabled(false);
 
-//ref: https://stackoverflow.com/questions/28830103/qprocesskill-does-not-kill-children-in-linux
-    //回收bash的子进程
-    QProcess get_childs;
-    QStringList get_childs_cmd;
-    auto pid = mPubProc->pid();
-    if(pid){
-        //pid != 0 表示当前有进程正在运行
-        get_childs_cmd << "--ppid" << QString::number(pid) << "-o" << "pid" << "--no-heading";
-        get_childs.start("ps", get_childs_cmd);
-        get_childs.waitForFinished(5000);
-        QString childIds = get_childs.readAllStandardOutput();
-        qDebug() << "childs: " << childIds;
-        childIds.replace('\n', ' ');
-        if(!childIds.trimmed().isEmpty()){
-            QProcess::execute("kill " + childIds);
-        }
-        else{
-            qDebug() << "no child to kill";
-        }
-        mPubProc->kill();
-        mPubProc->waitForFinished(-1);
-    }
+    killChildProcesses(mPubProc->pid());
+    killChildProcesses(mPriProc->pid());
+
+    mPubProc->kill();
+    mPubProc->waitForFinished(-1);
     mPriProc->kill();
     mPriProc->waitForFinished(-1);
 }
