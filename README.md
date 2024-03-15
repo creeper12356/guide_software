@@ -39,14 +39,14 @@ sudo apt upgrade
 sudo apt install wget tar
 
 #下载压缩包并解压
-wget https://github.com/creeper12356/guide_software/releases/download/v2.0.0-alpha/release.tar.gz
+wget https://github.com/creeper12356/guide_software/releases/download/v2.1.0-alpha/release_2.1.0.tar.gz
 wget https://github.com/creeper12356/guide_software/releases/download/v2.0.0-alpha/modules.tar.gz
-tar -zxvf release.tar.gz
+tar -zxvf release_2.1.0.tar.gz
 tar -zxvf modules.tar.gz
-cp modules/* release/ -r
+cp modules/* release_2.1.0/ -r
 
 #运行项目
-cd release/
+cd release_2.1.0/
 ./guide_software
 ```
 **2. 从源代码编译（Ubuntu16.04环境）**
