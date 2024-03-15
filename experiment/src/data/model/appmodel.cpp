@@ -11,16 +11,16 @@ AppModel::AppModel(MainPage *mainPage)
     connect(this,&AppModel::userChoiceChanged,mMainPage,&MainPage::updateUserChoice);
     connect(mMainPage,&MainPage::configureFinished,this,&AppModel::setUserChoice);
 
-    readFromFile("config/config.json");
+    readFromConfigFile("config/config.json");
 }
 
 AppModel::~AppModel()
 {
-    writeToFile("config/config.json");
+    writeToConfigFile("config/config.json");
     delete mUserChoice;
 }
 
-bool AppModel::readFromFile(const QString &fileName)
+bool AppModel::readFromConfigFile(const QString &fileName)
 {
     QFile reader(fileName);
     reader.open(QIODevice::ReadOnly);
@@ -35,7 +35,7 @@ bool AppModel::readFromFile(const QString &fileName)
     return true;
 }
 
-void AppModel::writeToFile(const QString &fileName)
+void AppModel::writeToConfigFile(const QString &fileName)
 {
     QJsonObject configJsonObject;
     configJsonObject.insert("userChoice",mUserChoice->toJsonObject());

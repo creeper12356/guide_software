@@ -3,7 +3,11 @@
 #include "inc.h"
 #include "logic/utils/subcore.h"
 
-//!生成温度图功能模块
+/*!
+ * \brief 温度图功能模块
+ * \details 温度图功能模块，包含所有生成温度图相关的功能函数。
+ * \sa Core
+ */
 class HeatMapCore : public SubCore
 {
     Q_OBJECT
@@ -58,6 +62,7 @@ public :
     void drawHeatMap(const QString& program);
 
 public slots:
+
     //!生成温度图
     void genHeatMap();
     //!探针函数

@@ -2,6 +2,7 @@
 #define LOGDOCK_H
 #include "inc.h"
 
+//!日志窗口
 class LogDock : public QDockWidget
 {
 public:

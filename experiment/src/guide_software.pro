@@ -32,7 +32,6 @@ SOURCES += \
     ui/widget/heatmapviewer.cpp \
     ui/widget/logdock.cpp \
     ui/widget/probewidget.cpp \
-    ui/window/aboutdialog.cpp \
     ui/window/choiceguide.cpp \
     ui/window/dependencyinstaller.cpp \
     ui/window/mainpage.cpp \
@@ -42,7 +41,6 @@ FORMS += \
     ui/utils/imageviewer.ui \
     ui/widget/choicewidget.ui \
     ui/widget/probewidget.ui \
-    ui/window/aboutdialog.ui \
     ui/window/choiceguide.ui \
     ui/window/dependencyinstaller.ui \
     ui/window/mainpage.ui
@@ -64,7 +62,6 @@ HEADERS += \
     ui/widget/heatmapviewer.h \
     ui/widget/logdock.h \
     ui/widget/probewidget.h \
-    ui/window/aboutdialog.h \
     ui/window/choiceguide.h \
     ui/window/dependencyinstaller.h \
     ui/window/mainpage.h \

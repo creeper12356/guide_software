@@ -1,7 +1,6 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 
-#include "ui/window/aboutdialog.h"
 #include "ui/window/choiceguide.h"
 #include "ui/widget/choicewidget.h"
 #include "ui/widget/consoledock.h"

@@ -44,26 +44,6 @@ ConsoleDock::~ConsoleDock()
 {
 }
 
-//bool ConsoleDock::connectProcess(TaskProcess *process, QByteArray* cache)
-//{
-//    if(mProcess || !process){
-//        return false;
-//    }
-//    this->mProcess = process;
-//    this->mCache = cache;
-//    connect(mProcess,&TaskProcess::started,this,[this](){
-////        appendStdin(mProcess->arguments()[1]);
-//    });
-//    connect(mProcess,&QProcess::readyReadStandardOutput,this,[this](){
-//        *mCache = mProcess->readAllStandardOutput();
-//        this->appendStdout(QString::fromUtf8(*mCache));
-//    });
-//    connect(mProcess,&QProcess::readyReadStandardError,this,[this](){
-//        *mCache = mProcess->readAllStandardError();
-//        this->appendStdErr(QString::fromUtf8(*mCache));
-//    });
-//    return true;
-//}
 
 void ConsoleDock::clear()
 {
@@ -79,7 +59,6 @@ void ConsoleDock::appendStderr(QString info)
     "</pre>";
     html = html.arg(info.toHtmlEscaped());
     mPlainTextEdit->appendHtml(html);
-
 }
 
 void ConsoleDock::appendStdin(QString dir , QString info)

@@ -7,6 +7,7 @@ namespace Ui {
 class ChoiceGuide;
 }
 
+//!选择引导窗口
 class ChoiceGuide : public QMainWindow
 {
     Q_OBJECT

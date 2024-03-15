@@ -1,12 +1,11 @@
 #ifndef USERCHOICEWIDGET_H
 #define USERCHOICEWIDGET_H
 #include "inc.h"
-class Choice;
 
 namespace Ui {
 class ChoiceWidget;
 }
-
+//! 配置窗口
 class ChoiceWidget : public QWidget
 {
     Q_OBJECT
