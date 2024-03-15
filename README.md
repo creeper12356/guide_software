@@ -43,10 +43,10 @@ wget https://github.com/creeper12356/guide_software/releases/download/v2.1.0-alp
 wget https://github.com/creeper12356/guide_software/releases/download/v2.0.0-alpha/modules.tar.gz
 tar -zxvf release_2.1.0.tar.gz
 tar -zxvf modules.tar.gz
-cp modules/* release_2.1.0/ -r
+cp modules/* release/ -r
 
 #运行项目
-cd release_2.1.0/
+cd release/
 ./guide_software
 ```
 **2. 从源代码编译（Ubuntu16.04环境）**
