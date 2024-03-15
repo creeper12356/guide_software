@@ -2,7 +2,15 @@
 #define CORE_H
 #include "inc.h"
 
-
+/*!
+ * \brief 核心类
+ * \details Core类为软件的控制器，它的主要功能是集成软件各个模块，
+ *          使用信号与槽机制将图形化界面、数据模型、子功能核心模块连接在一起。
+ *          P.S: 具体的功能函数不要写在Core中，请写在SubCore的派生类中，然后在Core中添加对应派生类的成员。
+ *          e.g: 具体的功能：runMcPat; SubCore的派生类： HeatMapCore; 派生类成员： mHeatMapCore。
+ *
+ * \sa SubCore
+ */
 class Core: public QObject
 {
     Q_OBJECT
@@ -44,10 +52,24 @@ public slots:
 
     /*!
      * \brief 强制退出
-     *
+     * \details 杀死所有正在进行的进程，发出quit信号退出软件。
+     * \sa quit
      * 结束所有进程并退出。
      */
     void forceQuit();
+signals:
+
+    /*!
+     * \brief 询问用户退出信号
+     * \details 该信号连接到MainPage，将触发对话框，询问用户是否终止软件。
+     */
+    void askQuit();
+
+    /*!
+     * \brief 退出信号
+     * \details 该信号连接到mApp， 将无条件终止软件运行。
+     */
+    void quit();
 
 private:
     /*!
@@ -62,7 +84,7 @@ private:
 public:
     /*!
      * \brief 写入日志
-     * \details 将内容info写入日志窗口
+     * \details 将内容info写入日志窗口，如果信息为空将清空日志。
      * \param info 写入的信息
      * \sa logProgram
      */
@@ -70,7 +92,7 @@ public:
 
     /*!
      * \brief 格式化写入日志
-     * \details 将内容 程序"{program}":{info} 写入日志窗口
+     * \details 将内容 程序"{program}":{info} 写入日志窗口。
      * \param program 基准程序名
      * \param info 写入信息
      * \sa log
@@ -95,29 +117,22 @@ signals:
     void critical(QString info);
 
 
-
-
-
 signals:
     /*!
      * \brief 耗时任务开始信号
-     * \details 该信号与MainPage连接，主页将禁用除了
+     * \details 该信号与MainPage连接，当耗时任务开始时发出此信号，GUI页面做出调整。
+     * \sa MainPage::longTaskStartedSlot
      */
     void longTaskStarted();
-    //!耗时任务完成
+
+    /*!
+     * \brief 耗时任务结束信号
+     * \details 该信号与MainPage连接，当耗时任务结束时发出此信号，GUI页面撤销调整。
+     * \sa MainPage::longTaskFinishedSlot
+     */
     void longTaskFinished();
 
-    /*!
-     * \brief 询问用户退出信号
-     * \details 该信号连接到MainPage，将触发对话框，询问用户是否终止软件。
-     */
-    void askQuit();
 
-    /*!
-     * \brief 退出信号
-     * \details 该信号连接到mApp， 将无条件终止软件运行。
-     */
-    void quit();
 
 private:
     // 基本

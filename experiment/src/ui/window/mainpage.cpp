@@ -9,6 +9,8 @@
 #include "ui/widget/heatmapviewer.h"
 #include "ui/widget/probewidget.h"
 
+
+
 MainPage::MainPage() :
     QMainWindow(nullptr),
     ui(new Ui::MainPage)
@@ -29,15 +31,7 @@ MainPage::~MainPage()
     delete ui;
 }
 
-ConsoleDock *MainPage::consoleDock()
-{
-    return mConsoleDock;
-}
 
-ChoiceWidget *MainPage::choiceWidget()
-{
-    return ui->choiceWidget;
-}
 
 void MainPage::initDockWidgets()
 {
@@ -177,6 +171,11 @@ void MainPage::configureTriggered()
 {
     QEventLoop eventLoop;
     connect(mGuide,&ChoiceGuide::configureFinished,&eventLoop,&QEventLoop::quit);
+
+    QPoint guidePos = this->geometry().center();
+    guidePos -= QPoint(mGuide->geometry().width() / 2, mGuide->geometry().height() / 2);
+    mGuide->move(guidePos);
+
     mGuide->show();
     eventLoop.exec();
     ui->choiceWidget->refreshUserChoice(mGuide->userChoice());
@@ -196,10 +195,10 @@ void MainPage::genHeatMapTriggered()
 void MainPage::aboutTriggererd()
 {
     QMessageBox::about(this, "关于",
-                     "<center><h2>Guide Software</h2></center><br>"
-                     "热仿真向导软件<br>"
-                     "Source code at <a style=\"color: #8AB8FE\" "
-                     "href='https://github.com/creeper12356/guide_software'>GitHub</a>");
+                     "<center><h2>Guide Software</h2></center>"
+                     "<p>热仿真向导软件</p>"
+                     "Source code at <a style=\"color: blue\" "
+                     "href='https://github.com/creeper12356/guide_software'>GitHub</a><br>");
 }
 
 void MainPage::displayProbeResult(qreal temperature, qreal probeX, qreal probeY)
@@ -286,13 +285,6 @@ void MainPage::closeEvent(QCloseEvent *event)
 {
     ui->actionQuit->trigger();
     event->ignore();
-}
-
-
-void MainPage::maximizeTriggered()
-{
-    if(isMaximized()) showNormal();
-    else			  showMaximized();
 }
 
 void MainPage::aboutqtTriggered()

@@ -15,20 +15,24 @@ Core::Core(QApplication* a):
 {
     Compatibility::initialize();
 
+    // P.S. 初始化顺序有一定的依赖关系
     //初始化进程
     mPubProc = new TaskProcess(this);
     mPriProc = new TaskProcess(this);
 
-    //初始化界面
+    // 初始化界面
     mMainPage = new MainPage;
     mAptInstaller = new AptInstaller;
     mPyLibInstaller = new PyLibInstaller;
 
+    // 初始化数据模型
     mAppModel = new AppModel(mMainPage);
 
+    // 初始化子功能模块
     mPerformanceCore = new PerformanceCore(this , mAppModel , mPubProc, mPriProc);
     mHeatMapCore = new HeatMapCore(this , mAppModel, mPubProc, mPriProc);
 
+    // 初始化信号槽连接
     initConnections();
 
     if(Compatibility::isRunningInDocker()) {
