@@ -104,6 +104,10 @@ void PerformanceCore::simulatePerformance()
 
     //准备gem5_output目录
     mPriProc->noBlockWaitForFinished("mkdir gem5_output ; rm gem5_output/* -rf");
+    //准备performance_data目录
+    const QString currentDateTimeStr = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+    const QString endOutputDir = QString("performance_data/%1").arg(currentDateTimeStr);
+    mPriProc->noBlockWaitForFinished(QString("mkdir -p %1").arg(endOutputDir));
 
     //新建文件夹
     for(auto program: mAppModel->userChoice()->programs){
@@ -135,9 +139,12 @@ void PerformanceCore::simulatePerformance()
 
         mPubProc->setWorkingDirectory(".");
 
-        //将输出文件拷贝到对应目标路径
-        mPriProc->blockWaitForFinished("cp gem5/m5out/* gem5_output/" + program);
+
         if(mPubProc->isEnabled()){
+            //将输出文件拷贝到对应目标路径
+            mPriProc->blockWaitForFinished("cp gem5/m5out/* gem5_output/" + program);
+            mPriProc->blockWaitForFinished(QString("cp gem5_output/%1/stats.txt %2/%1_stats.txt")
+                                           .arg(program, endOutputDir));
             emit logProgram(program,"[SUCCESS]性能仿真完成.");
         }
     }

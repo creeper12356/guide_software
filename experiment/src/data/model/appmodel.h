@@ -5,7 +5,7 @@
 /*!
  * \brief 数据模型类
  * \details 数据模型类(AppModel)主要用于软件数据的读取、写入、维护，与MainPage通过信号松耦合连接。
- *          所有关于软件文件读写的操作函数，都应该位于AppModel类中。
+ *          所有与软件数据持久化相关的读写函数，都应该位于AppModel类中。
  */
 class AppModel : public QObject
 {

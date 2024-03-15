@@ -48,6 +48,8 @@
 #include <QEventLoop>
 #include <QTimer>
 
+#include <QDateTime>
+
 #include <QDebug>
 #define SECOND 1000
 
