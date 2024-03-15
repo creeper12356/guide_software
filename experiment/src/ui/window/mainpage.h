@@ -6,6 +6,7 @@ namespace Ui {
 class MainPage;
 }
 
+
 /*!
  * \brief 主页面类
  * \details 软件的主页面类，托管软件所有的GUI事件。

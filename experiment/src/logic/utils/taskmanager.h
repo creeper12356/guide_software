@@ -39,18 +39,4 @@ private:
 };
 
 
-class TaskManager : public QObject
-{
-    Q_OBJECT
-public:
-    explicit TaskManager(QObject *parent = 0);
-
-signals:
-
-public slots:
-
-private:
-    QProcess* mProcess = nullptr;
-};
-
 #endif // TASKMANAGER_H

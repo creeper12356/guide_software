@@ -4,6 +4,9 @@
 
 /*!
  * \brief 子核心模块接口类
+ * \details 子核心模块接口类，提供基本的接口与Core通信。
+ *          为软件新增子功能模块，可以继承SubCore类，在派生类中完成子功能的函数。
+ * \sa Core
  */
 class SubCore : public QObject
 {
@@ -22,6 +25,7 @@ public:
                      TaskProcess* pubProc = nullptr,
                      TaskProcess* priProc = nullptr);
 signals:
+    // 与Core相同的信号接口
     void log(QString info);
     void warning(QString info);
     void critical(QString info);

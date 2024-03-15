@@ -225,7 +225,6 @@ void MainPage::consoleAppendStderr(QString info)
 
 void MainPage::longTaskStartedSlot()
 {
-    //forbid all actions but terminate when running long tasks
     ui->actionConfigure->setEnabled(false);
     ui->actionClearConfig->setEnabled(false);
     ui->actionCleanScript->setEnabled(false);
@@ -248,7 +247,9 @@ void MainPage::longTaskFinishedSlot()
 
 void MainPage::askQuitSlot()
 {
-    auto button = QMessageBox::warning(this,"警告","存在未结束的进程，是否强制退出？",QMessageBox::No | QMessageBox::Yes);
+    auto button = QMessageBox::warning(this,
+                                       "警告","存在未结束的进程，是否强制退出？",
+                                       QMessageBox::No | QMessageBox::Yes);
     if(button == QMessageBox::Yes){
         emit forceQuit();
     }
